@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #764ba2, #764ba2);
+            margin: 0;
+            padding: 50px;
+            color: white;
+        }
+
+        /* Container Box */
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            display: inline-block;
+            width: 350px;
+        }
+
+        h2 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(249, 242, 242, 0.93);
+            color: white;
+        }
+
+        input::placeholder {
+            color: rgba(253, 246, 246, 0.94);
+        }
+
+        /* Button Styles */
+        button {
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(90deg, #ff4b2b, #ff416c);
+        }
+
+        /* Password Error Message */
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none; /* Hidden by default */
+        }
+
+        /* Login Section */
+        .login-section {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            display: inline-block;
+            margin-top: 10px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🚀 Create Your Account</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label for="username">Username</label>
+            {{ form.username }}
+
+            <label for="email">Email</label>
+            {{ form.email }}
+
+            <label for="password1">Password</label>
+            {{ form.password1 }}
+            <p id="password-error" class="error-message">⚠️ Password must be at least 8 characters and not too common.</p>
+
+            <label for="password2">Confirm Password</label>
+            {{ form.password2 }}
+            <p id="confirm-error" class="error-message">⚠️ Passwords do not match.</p>
+
+            <button type="submit">Sign Up</button>
+        </form>
+
+        <!-- Login Section -->
+        <div class="login-section">
+            <p>Already have an account?</p>
+            <a href="{% url 'login' %}" class="login-btn">Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const password1 = document.querySelector("#id_password1");
+            const password2 = document.querySelector("#id_password2");
+            const passwordError = document.getElementById("password-error");
+            const confirmError = document.getElementById("confirm-error");
+
+            // Password validation
+            password1.addEventListener("input", function () {
+                if (password1.value.length < 8) {
+                    passwordError.style.display = "block";
+                } else {
+                    passwordError.style.display = "none";
+                }
+            });
+
+            // Password confirmation validation
+            password2.addEventListener("input", function () {
+                if (password2.value !== password1.value) {
+                    confirmError.style.display = "block";
+                } else {
+                    confirmError.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
