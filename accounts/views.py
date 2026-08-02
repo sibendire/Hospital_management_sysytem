@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from django.shortcuts import render
 
 from .forms import SignupForm
 
@@ -77,6 +78,14 @@ def logout_view(request):
     return redirect('login')
 
 
+# def add_patient_view(request):
+
+#     add_patient(request)
+
+#     return redirect('Add_Patient')
+
+
+
 
 # ADD THIS FUNCTION
 def dashboard(request):
@@ -85,3 +94,7 @@ def dashboard(request):
         request,
         'accounts/dashboard.html'
     )
+
+
+def home(request):
+    return render(request, "home.html")

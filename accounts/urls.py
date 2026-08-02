@@ -4,6 +4,7 @@ from .views import (
     signup_view,
     login_view,
     logout_view,
+    # add_patient_view,
     dashboard
 )
 
@@ -15,6 +16,11 @@ urlpatterns = [
         signup_view,
         name='signup'
     ),
+    # path(
+    #     'Add_Patient/', 
+    #      add_patient_view,
+    #      name='Add_Patient'
+    # ),
 
     path(
         'login/',
