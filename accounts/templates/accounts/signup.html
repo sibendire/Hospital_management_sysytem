@@ -1,162 +1,223 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #764ba2, #764ba2);
-            margin: 0;
-            padding: 50px;
-            color: white;
-        }
 
-        /* Container Box */
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            display: inline-block;
-            width: 350px;
-        }
+<title>Create Account</title>
 
-        h2 {
-            color: white;
-            margin-bottom: 15px;
-        }
 
-        /* Form Styles */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+<style>
 
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-            background: rgba(249, 242, 242, 0.93);
-            color: white;
-        }
+body{
 
-        input::placeholder {
-            color: rgba(253, 246, 246, 0.94);
-        }
+    background:linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+    );
 
-        /* Button Styles */
-        button {
-            background: linear-gradient(90deg, #ff416c, #ff4b2b);
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
+    font-family:Arial;
 
-        button:hover {
-            transform: scale(1.05);
-            background: linear-gradient(90deg, #ff4b2b, #ff416c);
-        }
+    height:100vh;
 
-        /* Password Error Message */
-        .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none; /* Hidden by default */
-        }
+    display:flex;
 
-        /* Login Section */
-        .login-section {
-            margin-top: 20px;
-            font-size: 14px;
-        }
+    justify-content:center;
 
-        .login-btn {
-            display: inline-block;
-            margin-top: 10px;
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: 0.3s;
-        }
+    align-items:center;
 
-        .login-btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(90deg, #00f2fe, #4facfe);
-        }
-    </style>
+}
+
+
+
+.container{
+
+    background:white;
+
+    width:380px;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
+
+}
+
+
+
+h2{
+
+    text-align:center;
+
+}
+
+
+
+input{
+
+    width:100%;
+
+    padding:12px;
+
+    margin-bottom:15px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+    color:black;
+
+}
+
+
+
+button{
+
+    width:100%;
+
+    padding:12px;
+
+    background:#667eea;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    font-size:18px;
+
+}
+
+
+
+.error{
+
+    color:red;
+
+    font-size:14px;
+
+}
+
+
+
+a{
+
+    text-decoration:none;
+
+}
+
+
+</style>
+
 </head>
+
+
+
 <body>
-    <div class="container">
-        <h2>🚀 Create Your Account</h2>
-        <form method="post">
-            {% csrf_token %}
-            <label for="username">Username</label>
-            {{ form.username }}
 
-            <label for="email">Email</label>
-            {{ form.email }}
 
-            <label for="password1">Password</label>
-            {{ form.password1 }}
-            <p id="password-error" class="error-message">⚠️ Password must be at least 8 characters and not too common.</p>
+<div class="container">
 
-            <label for="password2">Confirm Password</label>
-            {{ form.password2 }}
-            <p id="confirm-error" class="error-message">⚠️ Passwords do not match.</p>
 
-            <button type="submit">Sign Up</button>
-        </form>
+<h2>
+Create Account
+</h2>
 
-        <!-- Login Section -->
-        <div class="login-section">
-            <p>Already have an account?</p>
-            <a href="{% url 'login' %}" class="login-btn">Login</a>
-        </div>
-    </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const password1 = document.querySelector("#id_password1");
-            const password2 = document.querySelector("#id_password2");
-            const passwordError = document.getElementById("password-error");
-            const confirmError = document.getElementById("confirm-error");
 
-            // Password validation
-            password1.addEventListener("input", function () {
-                if (password1.value.length < 8) {
-                    passwordError.style.display = "block";
-                } else {
-                    passwordError.style.display = "none";
-                }
-            });
+{% if messages %}
 
-            // Password confirmation validation
-            password2.addEventListener("input", function () {
-                if (password2.value !== password1.value) {
-                    confirmError.style.display = "block";
-                } else {
-                    confirmError.style.display = "none";
-                }
-            });
-        });
-    </script>
+{% for message in messages %}
+
+<p class="error">
+{{message}}
+</p>
+
+{% endfor %}
+
+{% endif %}
+
+
+
+<form method="POST">
+
+
+{% csrf_token %}
+
+
+
+<label>
+Username
+</label>
+
+{{form.username}}
+
+{{form.username.errors}}
+
+
+
+<label>
+Email
+</label>
+
+{{form.email}}
+
+{{form.email.errors}}
+
+
+
+<label>
+Password
+</label>
+
+{{form.password1}}
+
+{{form.password1.errors}}
+
+
+
+<label>
+Confirm Password
+</label>
+
+{{form.password2}}
+
+{{form.password2.errors}}
+
+
+
+<button type="submit">
+
+Sign Up
+
+</button>
+
+
+</form>
+
+
+
+<br>
+
+
+<center>
+
+Already have account?
+
+<a href="{% url 'login' %}">
+Login
+</a>
+
+
+</center>
+
+
+
+</div>
+
+
 </body>
+
 </html>

@@ -1,48 +1,89 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
 
 from .forms import SignupForm
 
 
+
+def home(request):
+
+    return render(
+        request,
+        "home.html"
+    )
+
+
+
 def signup_view(request):
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
         form = SignupForm(request.POST)
+
 
         if form.is_valid():
 
             user = form.save()
 
-            login(request, user)
+
+            login(
+                request,
+                user
+            )
+
 
             messages.success(
                 request,
-                "Signup successful!"
+                "Account created successfully."
             )
 
-            return redirect('dashboard')
+
+            return redirect(
+                "dashboard"
+            )
+
+
+        else:
+
+            print(form.errors)
+
+            messages.error(
+                request,
+                "Please correct the errors below."
+            )
+
 
     else:
+
         form = SignupForm()
+
 
 
     return render(
         request,
-        'accounts/signup.html',
-        {'form': form}
+        "accounts/signup.html",
+        {
+            "form": form
+        }
     )
 
 
 
 def login_view(request):
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        username = request.POST['username']
-        password = request.POST['password']
+
+        username = request.POST.get(
+            "username"
+        )
+
+
+        password = request.POST.get(
+            "password"
+        )
+
 
         user = authenticate(
             request,
@@ -50,51 +91,65 @@ def login_view(request):
             password=password
         )
 
+
         if user is not None:
 
-            login(request, user)
 
-            return redirect('dashboard')
+            login(
+                request,
+                user
+            )
+
+
+            messages.success(
+                request,
+                "Welcome back."
+            )
+
+
+            return redirect(
+                "dashboard"
+            )
+
 
         else:
 
+
             messages.error(
                 request,
-                "Invalid username or password"
+                "Invalid username or password."
             )
 
 
     return render(
         request,
-        'accounts/login.html'
+        "accounts/login.html"
     )
 
 
 
 def logout_view(request):
 
-    logout(request)
-
-    return redirect('login')
-
-
-# def add_patient_view(request):
-
-#     add_patient(request)
-
-#     return redirect('Add_Patient')
+    logout(
+        request
+    )
 
 
+    messages.success(
+        request,
+        "You have logged out successfully."
+    )
 
 
-# ADD THIS FUNCTION
+    return redirect(
+        "home"
+    )
+
+
+
 def dashboard(request):
 
     return render(
         request,
-        'accounts/dashboard.html'
+        "dashboard.html"
     )
-
-
-def home(request):
-    return render(request, "home.html")

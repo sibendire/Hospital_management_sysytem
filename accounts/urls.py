@@ -1,43 +1,50 @@
 from django.urls import path
 
 from .views import (
+    home,
     signup_view,
     login_view,
     logout_view,
-    # add_patient_view,
-    dashboard
+    dashboard,
 )
+
 
 
 urlpatterns = [
 
+
     path(
-        'signup/',
+        "",
+        home,
+        name="home"
+    ),
+
+
+    path(
+        "signup/",
         signup_view,
-        name='signup'
+        name="signup"
     ),
-    # path(
-    #     'Add_Patient/', 
-    #      add_patient_view,
-    #      name='Add_Patient'
-    # ),
+
 
     path(
-        'login/',
+        "login/",
         login_view,
-        name='login'
+        name="login"
     ),
 
+
     path(
-        'logout/',
+        "logout/",
         logout_view,
-        name='logout'
+        name="logout"
     ),
 
+
     path(
-        'dashboard/',
+        "dashboard/",
         dashboard,
-        name='dashboard'
+        name="dashboard"
     ),
 
 ]
