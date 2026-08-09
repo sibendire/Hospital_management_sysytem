@@ -1,0 +1,860 @@
+```html
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Invoice {{ invoice.invoice_number }} | MediCare HMS</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #263238;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #123c69;
+            color: white;
+            padding: 25px 18px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+        }
+
+        .logo h2 {
+            margin-top: 8px;
+            font-size: 20px;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: #c9d8e8;
+            margin-top: 5px;
+        }
+
+        .menu-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #9fb8d0;
+            margin: 20px 12px 8px;
+        }
+
+        .sidebar a {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 13px 14px;
+            margin-bottom: 5px;
+            color: #eaf2f8;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #1e5a91;
+        }
+
+        .icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        .main {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            color: #123c69;
+            font-size: 24px;
+        }
+
+        .topbar p {
+            color: #7a8793;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 7px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #1769aa;
+            color: white;
+        }
+
+        .btn-success {
+            background: #16834b;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e8eef4;
+            color: #263238;
+        }
+
+        .invoice-container {
+            background: white;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #edf0f3;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+
+        .hospital h2 {
+            color: #123c69;
+            font-size: 23px;
+        }
+
+        .hospital p {
+            color: #71808d;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .invoice-info {
+            text-align: right;
+        }
+
+        .invoice-info h2 {
+            color: #1769aa;
+            margin-bottom: 8px;
+        }
+
+        .invoice-info p {
+            font-size: 13px;
+            color: #65727d;
+            margin: 4px 0;
+        }
+
+        .patient-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .info-box h3 {
+            color: #123c69;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            margin: 6px 0;
+            color: #52606d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #f4f7fa;
+            color: #63717d;
+            padding: 13px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #edf0f3;
+            font-size: 13px;
+        }
+
+        .amount {
+            text-align: right;
+        }
+
+        .invoice-summary {
+            width: 380px;
+            margin-left: auto;
+            margin-top: 25px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #123c69;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-size: 19px;
+            font-weight: bold;
+            color: #123c69;
+        }
+
+        .summary-row.balance {
+            background: #fff3df;
+            padding: 14px;
+            border-radius: 7px;
+            margin-top: 10px;
+            color: #c87900;
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .paid {
+            background: #e7f7ef;
+            color: #16834b;
+        }
+
+        .pending {
+            background: #fff3df;
+            color: #c87900;
+        }
+
+        .partial {
+            background: #e8f1fb;
+            color: #1769aa;
+        }
+
+        .footer {
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid #edf0f3;
+            text-align: center;
+            color: #8996a3;
+            font-size: 12px;
+        }
+
+        @media print {
+
+            .sidebar,
+            .topbar,
+            .actions {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 0;
+            }
+
+            body {
+                background: white;
+            }
+
+            .invoice-container {
+                box-shadow: none;
+            }
+        }
+
+        @media(max-width: 800px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .invoice-header,
+            .patient-section {
+                grid-template-columns: 1fr;
+                display: block;
+            }
+
+            .invoice-info {
+                text-align: left;
+                margin-top: 20px;
+            }
+
+            .invoice-summary {
+                width: 100%;
+            }
+
+            .actions {
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<!-- ================= SIDEBAR ================= -->
+
+<div class="sidebar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            🏥
+        </div>
+
+        <h2>MediCare HMS</h2>
+
+        <p>
+            Hospital Management System
+        </p>
+
+    </div>
+
+
+    <div class="menu-title">
+        Main
+    </div>
+
+    <a href="{% url 'dashboard' %}">
+        <span class="icon">🏠</span>
+        Dashboard
+    </a>
+
+
+    <a href="{% url 'patient_list' %}">
+        <span class="icon">👥</span>
+        Patients
+    </a>
+
+
+    <div class="menu-title">
+        Departments
+    </div>
+
+
+    <a href="{% url 'laboratory_dashboard' %}">
+        <span class="icon">🧪</span>
+        Laboratory
+    </a>
+
+
+    <a href="{% url 'pharmacy_dashboard' %}">
+        <span class="icon">💊</span>
+        Pharmacy
+    </a>
+
+
+    <a href="{% url 'billing_dashboard' %}" class="active">
+        <span class="icon">💰</span>
+        Billing
+    </a>
+
+
+    <div class="menu-title">
+        Administration
+    </div>
+
+
+    <a href="#">
+        <span class="icon">📊</span>
+        Reports
+    </a>
+
+
+    <a href="#">
+        <span class="icon">⚙️</span>
+        Settings
+    </a>
+
+
+    <a href="{% url 'logout' %}">
+        <span class="icon">🚪</span>
+        Logout
+    </a>
+
+</div>
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="main">
+
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div>
+
+            <h1>
+                Invoice Details
+            </h1>
+
+            <p>
+                Review patient billing and payment information
+            </p>
+
+        </div>
+
+
+        <div class="actions">
+
+            <a href="{% url 'invoice_list' %}"
+               class="btn btn-secondary">
+                ← Back to Invoices
+            </a>
+
+
+            <button onclick="window.print()"
+                    class="btn btn-primary">
+                🖨 Print Invoice
+            </button>
+
+
+            <a href="{% url 'record_payment' invoice.id %}"
+               class="btn btn-success">
+                💳 Record Payment
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= INVOICE ================= -->
+
+    <div class="invoice-container">
+
+
+        <div class="invoice-header">
+
+
+            <div class="hospital">
+
+                <h2>
+                    MediCare Hospital
+                </h2>
+
+                <p>
+                    Quality Healthcare Services
+                </p>
+
+                <p>
+                    Kampala, Uganda
+                </p>
+
+                <p>
+                    Tel: +256 700 000000
+                </p>
+
+            </div>
+
+
+            <div class="invoice-info">
+
+                <h2>
+                    INVOICE
+                </h2>
+
+                <p>
+                    <strong>
+                        Invoice No:
+                    </strong>
+
+                    {{ invoice.invoice_number }}
+                </p>
+
+                <p>
+                    <strong>
+                        Date:
+                    </strong>
+
+                    {{ invoice.created_at|date:"d M Y" }}
+                </p>
+
+                <p>
+                    <strong>
+                        Status:
+                    </strong>
+
+                    {% if invoice.status == "Paid" %}
+
+                        <span class="badge paid">
+                            Paid
+                        </span>
+
+                    {% elif invoice.status == "Partial" %}
+
+                        <span class="badge partial">
+                            Partially Paid
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge pending">
+                            Pending
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PATIENT INFORMATION -->
+
+        <div class="patient-section">
+
+
+            <div class="info-box">
+
+                <h3>
+                    BILL TO
+                </h3>
+
+                <p>
+                    <strong>
+                        Patient:
+                    </strong>
+
+                    {{ invoice.patient.first_name }}
+                    {{ invoice.patient.last_name }}
+                </p>
+
+                <p>
+                    <strong>
+                        Patient Number:
+                    </strong>
+
+                    {{ invoice.patient.patient_number }}
+                </p>
+
+                <p>
+                    <strong>
+                        Phone:
+                    </strong>
+
+                    {{ invoice.patient.phone }}
+                </p>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <h3>
+                    BILLING INFORMATION
+                </h3>
+
+                <p>
+                    <strong>
+                        Invoice Date:
+                    </strong>
+
+                    {{ invoice.created_at|date:"d M Y H:i" }}
+                </p>
+
+                <p>
+                    <strong>
+                        Prepared By:
+                    </strong>
+
+                    {{ invoice.created_by|default:"Billing Department" }}
+                </p>
+
+                <p>
+                    <strong>
+                        Payment Status:
+                    </strong>
+
+                    {{ invoice.status }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= ITEMS ================= -->
+
+        <h3 style="color:#123c69; margin-bottom:10px;">
+            Services & Charges
+        </h3>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Description
+                    </th>
+
+                    <th>
+                        Department
+                    </th>
+
+                    <th>
+                        Quantity
+                    </th>
+
+                    <th>
+                        Unit Price
+                    </th>
+
+                    <th class="amount">
+                        Total
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for item in invoice.items.all %}
+
+                <tr>
+
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+                    <td>
+                        {{ item.description }}
+                    </td>
+
+                    <td>
+                        {{ item.department|default:"General" }}
+                    </td>
+
+                    <td>
+                        {{ item.quantity }}
+                    </td>
+
+                    <td>
+                        UGX {{ item.unit_price|floatformat:0 }}
+                    </td>
+
+                    <td class="amount">
+
+                        UGX {{ item.total_price|floatformat:0 }}
+
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+
+                    <td colspan="6"
+                        style="text-align:center; padding:30px;">
+
+                        No invoice items have been added.
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        <!-- ================= SUMMARY ================= -->
+
+        <div class="invoice-summary">
+
+
+            <div class="summary-row">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <strong>
+                    UGX {{ invoice.subtotal|floatformat:0 }}
+                </strong>
+
+            </div>
+
+
+            {% if invoice.discount %}
+
+            <div class="summary-row">
+
+                <span>
+                    Discount
+                </span>
+
+                <strong>
+                    UGX {{ invoice.discount|floatformat:0 }}
+                </strong>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if invoice.tax %}
+
+            <div class="summary-row">
+
+                <span>
+                    Tax
+                </span>
+
+                <strong>
+                    UGX {{ invoice.tax|floatformat:0 }}
+                </strong>
+
+            </div>
+
+            {% endif %}
+
+
+            <div class="summary-row total">
+
+                <span>
+                    TOTAL
+                </span>
+
+                <strong>
+                    UGX {{ invoice.total_amount|floatformat:0 }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Amount Paid
+                </span>
+
+                <strong>
+                    UGX {{ invoice.amount_paid|floatformat:0 }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row balance">
+
+                <span>
+                    BALANCE DUE
+                </span>
+
+                <strong>
+                    UGX {{ invoice.balance|floatformat:0 }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <div class="footer">
+
+            <p>
+                Thank you for choosing MediCare Hospital.
+            </p>
+
+            <p style="margin-top:5px;">
+                This invoice is computer generated and does not require a signature.
+            </p>
+
+            <p style="margin-top:8px;">
+                © 2026 MediCare Hospital Management System
+            </p>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+</body>
+</html>
+```

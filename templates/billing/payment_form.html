@@ -1,0 +1,1033 @@
+```html
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Record Payment | MediCare HMS</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #263238;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #123c69;
+            color: white;
+            padding: 25px 18px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .logo h2 {
+            font-size: 20px;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: #c9d8e8;
+            margin-top: 5px;
+        }
+
+        .menu-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #9fb8d0;
+            margin: 20px 12px 8px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            margin-bottom: 5px;
+            color: #eaf2f8;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #1e5a91;
+            color: white;
+        }
+
+        .icon {
+            width: 24px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            background: white;
+            min-height: 70px;
+            border-radius: 12px;
+            padding: 15px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #123c69;
+        }
+
+        .page-title p {
+            color: #7a8793;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: #eef4f9;
+            color: #1769aa;
+            padding: 10px 16px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #dfeaf3;
+        }
+
+        /* ================= LAYOUT ================= */
+
+        .page-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            padding: 25px;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #edf0f3;
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            color: #123c69;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: #8996a3;
+            margin-top: 5px;
+        }
+
+        /* ================= PATIENT INFORMATION ================= */
+
+        .patient-box {
+            background: #f6f9fc;
+            border: 1px solid #e3eaf1;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 25px;
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .patient-header h3 {
+            font-size: 15px;
+            color: #263238;
+        }
+
+        .invoice-number {
+            color: #1769aa;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .patient-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .detail {
+            font-size: 13px;
+        }
+
+        .detail label {
+            display: block;
+            color: #8996a3;
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .detail strong {
+            color: #263238;
+        }
+
+        /* ================= FORM ================= */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #455a64;
+            margin-bottom: 7px;
+        }
+
+        .required {
+            color: #d32f2f;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d8e0e7;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+            color: #263238;
+            transition: .2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #1769aa;
+            box-shadow: 0 0 0 3px rgba(23,105,170,.08);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: #8996a3;
+            margin-top: 5px;
+        }
+
+        /* ================= PAYMENT METHOD ================= */
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .method-option {
+            position: relative;
+        }
+
+        .method-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .method-label {
+            display: block;
+            padding: 15px;
+            border: 1px solid #d8e0e7;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: .2s;
+        }
+
+        .method-label .method-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 7px;
+        }
+
+        .method-label span {
+            font-size: 12px;
+            font-weight: 600;
+            color: #455a64;
+        }
+
+        .method-option input:checked + .method-label {
+            border-color: #1769aa;
+            background: #eef6fd;
+            color: #1769aa;
+        }
+
+        /* ================= BUTTONS ================= */
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #edf0f3;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 7px;
+            padding: 12px 22px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-cancel {
+            background: #eef1f4;
+            color: #54616b;
+        }
+
+        .btn-cancel:hover {
+            background: #e1e5e8;
+        }
+
+        .btn-primary {
+            background: #16834b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #126b3d;
+        }
+
+        /* ================= SUMMARY ================= */
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            padding: 25px;
+        }
+
+        .summary-card h2 {
+            color: #123c69;
+            font-size: 17px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 13px 0;
+            border-bottom: 1px solid #edf0f3;
+            font-size: 13px;
+        }
+
+        .summary-row span {
+            color: #74808b;
+        }
+
+        .summary-row strong {
+            color: #263238;
+        }
+
+        .summary-row.total {
+            border-bottom: none;
+            padding-top: 18px;
+        }
+
+        .summary-row.total span {
+            color: #263238;
+            font-weight: 700;
+        }
+
+        .summary-row.total strong {
+            font-size: 22px;
+            color: #123c69;
+        }
+
+        .balance-box {
+            margin-top: 18px;
+            padding: 17px;
+            border-radius: 9px;
+            background: #fff6e5;
+            border: 1px solid #ffe0a8;
+        }
+
+        .balance-box small {
+            display: block;
+            color: #a56a00;
+            margin-bottom: 5px;
+        }
+
+        .balance-box strong {
+            font-size: 22px;
+            color: #c87900;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 8px;
+            background: #eef6fd;
+            color: #456579;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* ================= ERRORS ================= */
+
+        .error-box {
+            background: #fdeaea;
+            color: #b71c1c;
+            border: 1px solid #f5c2c2;
+            border-radius: 8px;
+            padding: 13px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .field-error {
+            color: #c62828;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+
+            .page-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 768px) {
+
+            .sidebar {
+                width: 70px;
+                padding: 20px 8px;
+            }
+
+            .logo h2,
+            .logo p,
+            .sidebar a span:not(.icon),
+            .menu-title {
+                display: none;
+            }
+
+            .logo-icon {
+                font-size: 28px;
+            }
+
+            .sidebar a {
+                justify-content: center;
+            }
+
+            .main {
+                margin-left: 70px;
+                padding: 15px;
+            }
+
+            .patient-details {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                gap: 15px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            🏥
+        </div>
+
+        <h2>MediCare HMS</h2>
+
+        <p>
+            Hospital Management System
+        </p>
+
+    </div>
+
+
+    <div class="menu-title">
+        Main
+    </div>
+
+    <a href="{% url 'dashboard' %}">
+        <span class="icon">🏠</span>
+        <span>Dashboard</span>
+    </a>
+
+    <a href="{% url 'patient_list' %}">
+        <span class="icon">👥</span>
+        <span>Patients</span>
+    </a>
+
+
+    <div class="menu-title">
+        Departments
+    </div>
+
+    <a href="{% url 'laboratory_dashboard' %}">
+        <span class="icon">🧪</span>
+        <span>Laboratory</span>
+    </a>
+
+    <a href="{% url 'pharmacy_dashboard' %}">
+        <span class="icon">💊</span>
+        <span>Pharmacy</span>
+    </a>
+
+    <a href="{% url 'billing_dashboard' %}" class="active">
+        <span class="icon">💰</span>
+        <span>Billing</span>
+    </a>
+
+
+    <div class="menu-title">
+        Billing
+    </div>
+
+    <a href="{% url 'invoice_list' %}">
+        <span class="icon">🧾</span>
+        <span>Invoices</span>
+    </a>
+
+    <a href="{% url 'payment_list' %}">
+        <span class="icon">💳</span>
+        <span>Payments</span>
+    </a>
+
+    <a href="{% url 'billing_reports' %}">
+        <span class="icon">📊</span>
+        <span>Reports</span>
+    </a>
+
+
+    <div class="menu-title">
+        Administration
+    </div>
+
+    <a href="#">
+        <span class="icon">⚙️</span>
+        <span>Settings</span>
+    </a>
+
+    <a href="{% url 'logout' %}">
+        <span class="icon">🚪</span>
+        <span>Logout</span>
+    </a>
+
+</aside>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="page-title">
+
+            <h1>Record Patient Payment</h1>
+
+            <p>
+                Record and process a payment against a patient invoice
+            </p>
+
+        </div>
+
+
+        <a href="{% url 'invoice_detail' invoice.id %}" class="back-btn">
+            ← Back to Invoice
+        </a>
+
+    </div>
+
+
+    <div class="page-grid">
+
+
+        <!-- ================= PAYMENT FORM ================= -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <h2>Payment Information</h2>
+
+                <p>
+                    Enter the payment details carefully before submitting.
+                </p>
+
+            </div>
+
+
+            {% if form.non_field_errors %}
+
+                <div class="error-box">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- PATIENT INFORMATION -->
+
+            <div class="patient-box">
+
+                <div class="patient-header">
+
+                    <h3>
+                        Patient Information
+                    </h3>
+
+                    <span class="invoice-number">
+
+                        {{ invoice.invoice_number }}
+
+                    </span>
+
+                </div>
+
+
+                <div class="patient-details">
+
+                    <div class="detail">
+
+                        <label>Patient Name</label>
+
+                        <strong>
+
+                            {{ invoice.patient.first_name }}
+                            {{ invoice.patient.last_name }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <label>Patient Number</label>
+
+                        <strong>
+
+                            {{ invoice.patient.patient_number }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <label>Invoice Date</label>
+
+                        <strong>
+
+                            {{ invoice.created_at|date:"d M Y" }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <label>Invoice Status</label>
+
+                        <strong>
+
+                            {{ invoice.status }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <!-- PAYMENT AMOUNT -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.amount.id_for_label }}">
+
+                        Payment Amount (UGX)
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    {{ form.amount }}
+
+                    <div class="help-text">
+
+                        Enter the amount received from the patient.
+
+                    </div>
+
+                    {% for error in form.amount.errors %}
+
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- PAYMENT METHOD -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Payment Method
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <div class="payment-methods">
+
+                        {% for radio in form.payment_method %}
+
+                            <div class="method-option">
+
+                                {{ radio.tag }}
+
+                                <label
+                                    for="{{ radio.id_for_label }}"
+                                    class="method-label"
+                                >
+
+                                    {% if radio.choice_label == "Cash" %}
+
+                                        <span class="method-icon">
+                                            💵
+                                        </span>
+
+                                    {% elif radio.choice_label == "Mobile Money" %}
+
+                                        <span class="method-icon">
+                                            📱
+                                        </span>
+
+                                    {% elif radio.choice_label == "Bank" %}
+
+                                        <span class="method-icon">
+                                            🏦
+                                        </span>
+
+                                    {% elif radio.choice_label == "Card" %}
+
+                                        <span class="method-icon">
+                                            💳
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="method-icon">
+                                            💰
+                                        </span>
+
+                                    {% endif %}
+
+                                    <span>
+                                        {{ radio.choice_label }}
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    {% for error in form.payment_method.errors %}
+
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- REFERENCE NUMBER -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.reference_number.id_for_label }}">
+
+                        Reference / Transaction Number
+
+                    </label>
+
+                    {{ form.reference_number }}
+
+                    <div class="help-text">
+
+                        Required for mobile money, bank or card payments
+                        where applicable.
+
+                    </div>
+
+                    {% for error in form.reference_number.errors %}
+
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.notes.id_for_label }}">
+
+                        Payment Notes
+
+                    </label>
+
+                    {{ form.notes }}
+
+                    {% for error in form.notes.errors %}
+
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{% url 'invoice_detail' invoice.id %}"
+                        class="btn btn-cancel"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        💳 Record Payment
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- ================= INVOICE SUMMARY ================= -->
+
+        <aside class="summary-card">
+
+            <h2>
+                Invoice Summary
+            </h2>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Invoice Number
+                </span>
+
+                <strong>
+                    {{ invoice.invoice_number }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Invoice Total
+                </span>
+
+                <strong>
+                    UGX {{ invoice.total_amount|floatformat:0 }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Amount Paid
+                </span>
+
+                <strong style="color:#16834b;">
+
+                    UGX {{ invoice.amount_paid|default:"0"|floatformat:0 }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row total">
+
+                <span>
+                    Outstanding Balance
+                </span>
+
+                <strong style="color:#c87900;">
+
+                    UGX {{ invoice.balance|default:"0"|floatformat:0 }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="balance-box">
+
+                <small>
+                    Maximum Amount Receivable
+                </small>
+
+                <strong>
+                    UGX {{ invoice.balance|default:"0"|floatformat:0 }}
+                </strong>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <strong>Payment Processing</strong>
+
+                <br><br>
+
+                After the payment is successfully recorded, the
+                invoice balance should be updated automatically.
+
+                <br><br>
+
+                A receipt can then be generated for the patient.
+
+            </div>
+
+        </aside>
+
+    </div>
+
+
+    <footer>
+
+        © 2026 MediCare Hospital Management System
+        • Billing & Finance Department
+
+    </footer>
+
+</main>
+
+
+</body>
+</html>
+```

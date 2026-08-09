@@ -1,0 +1,1294 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Invoices | MediCare HMS</title>
+
+<style>
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+        background: #f4f7fb;
+        color: #263238;
+    }
+
+    /* ================= SIDEBAR ================= */
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 250px;
+        height: 100vh;
+        background: #123c69;
+        color: white;
+        padding: 25px 18px;
+        overflow-y: auto;
+    }
+
+    .logo {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .logo-icon {
+        font-size: 40px;
+        margin-bottom: 7px;
+    }
+
+    .logo h2 {
+        font-size: 20px;
+    }
+
+    .logo p {
+        font-size: 11px;
+        color: #c9d8e8;
+        margin-top: 5px;
+    }
+
+    .menu-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: #9fb8d0;
+        margin: 20px 12px 8px;
+        letter-spacing: 1px;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        margin-bottom: 5px;
+        color: #eaf2f8;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+        background: #1e5a91;
+    }
+
+    .icon {
+        width: 24px;
+        text-align: center;
+        font-size: 17px;
+    }
+
+    /* ================= MAIN ================= */
+
+    .main {
+        margin-left: 250px;
+        padding: 25px 30px;
+    }
+
+    /* ================= HEADER ================= */
+
+    .topbar {
+        background: white;
+        padding: 20px 25px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+
+    .title h1 {
+        color: #123c69;
+        font-size: 24px;
+    }
+
+    .title p {
+        color: #7c8995;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        border: none;
+        border-radius: 7px;
+        padding: 11px 16px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #1769aa;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #12558b;
+    }
+
+    .btn-secondary {
+        background: #eef2f5;
+        color: #46545f;
+    }
+
+    /* ================= SUMMARY ================= */
+
+    .summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .summary-card {
+        background: white;
+        padding: 20px;
+        border-radius: 11px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
+
+    .summary-card h4 {
+        font-size: 12px;
+        color: #7b8792;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    .summary-card strong {
+        font-size: 23px;
+        color: #263238;
+    }
+
+    .summary-card p {
+        margin-top: 6px;
+        font-size: 11px;
+        color: #8996a3;
+    }
+
+    .green-text {
+        color: #16834b !important;
+    }
+
+    .orange-text {
+        color: #d98200 !important;
+    }
+
+    .red-text {
+        color: #c62828 !important;
+    }
+
+    /* ================= FILTER PANEL ================= */
+
+    .filter-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.05);
+        margin-bottom: 22px;
+    }
+
+    .filter-title {
+        color: #123c69;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .filters {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-size: 11px;
+        color: #66747f;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    input,
+    select {
+        border: 1px solid #d6dde4;
+        border-radius: 7px;
+        padding: 11px 12px;
+        font-size: 13px;
+        outline: none;
+        background: white;
+    }
+
+    input:focus,
+    select:focus {
+        border-color: #1769aa;
+    }
+
+    /* ================= TABLE ================= */
+
+    .table-panel {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.05);
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #edf0f3;
+    }
+
+    .table-header h2 {
+        font-size: 17px;
+        color: #263238;
+    }
+
+    .record-count {
+        color: #8996a3;
+        font-size: 12px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+    }
+
+    th {
+        background: #f7f9fb;
+        color: #66747f;
+        font-size: 11px;
+        text-transform: uppercase;
+        padding: 13px 15px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 14px 15px;
+        border-bottom: 1px solid #edf0f3;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    tbody tr:hover {
+        background: #fafcfe;
+    }
+
+    .invoice-number {
+        color: #1769aa;
+        font-weight: 700;
+    }
+
+    .patient-name {
+        font-weight: 600;
+        color: #263238;
+    }
+
+    .patient-id {
+        display: block;
+        font-size: 10px;
+        color: #8996a3;
+        margin-top: 3px;
+    }
+
+    .amount {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .balance {
+        color: #c62828;
+        font-weight: 700;
+    }
+
+    /* ================= STATUS ================= */
+
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .paid {
+        background: #e7f7ef;
+        color: #16834b;
+    }
+
+    .pending {
+        background: #fff3df;
+        color: #c87900;
+    }
+
+    .partial {
+        background: #e8f1fb;
+        color: #1769aa;
+    }
+
+    .overdue {
+        background: #fdeaea;
+        color: #c62828;
+    }
+
+    /* ================= ACTIONS ================= */
+
+    .actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: inline-block;
+        padding: 7px 9px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .view {
+        background: #e8f1fb;
+        color: #1769aa;
+    }
+
+    .payment {
+        background: #e7f7ef;
+        color: #16834b;
+    }
+
+    .print {
+        background: #f1f3f5;
+        color: #52616d;
+    }
+
+    .action-btn:hover {
+        opacity: .8;
+    }
+
+    /* ================= EMPTY ================= */
+
+    .empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #8996a3;
+    }
+
+    .empty-icon {
+        font-size: 45px;
+        margin-bottom: 12px;
+    }
+
+    .empty h3 {
+        color: #52616d;
+        margin-bottom: 6px;
+    }
+
+    .empty p {
+        font-size: 13px;
+    }
+
+    /* ================= PAGINATION ================= */
+
+    .pagination {
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #edf0f3;
+    }
+
+    .pagination-info {
+        color: #8996a3;
+        font-size: 12px;
+    }
+
+    .pages {
+        display: flex;
+        gap: 5px;
+    }
+
+    .pages a,
+    .pages span {
+        min-width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .pages a {
+        color: #52616d;
+        background: #f2f5f7;
+    }
+
+    .pages .active {
+        background: #1769aa;
+        color: white;
+    }
+
+    footer {
+        text-align: center;
+        color: #8996a3;
+        font-size: 11px;
+        margin-top: 25px;
+        padding-bottom: 15px;
+    }
+
+    /* ================= RESPONSIVE ================= */
+
+    @media(max-width: 1100px) {
+
+        .summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filters {
+            grid-template-columns: 1fr 1fr;
+        }
+
+    }
+
+    @media(max-width: 768px) {
+
+        .sidebar {
+            width: 70px;
+            padding: 20px 8px;
+        }
+
+        .logo h2,
+        .logo p,
+        .sidebar a span:not(.icon),
+        .menu-title {
+            display: none;
+        }
+
+        .sidebar a {
+            justify-content: center;
+        }
+
+        .main {
+            margin-left: 70px;
+            padding: 15px;
+        }
+
+        .topbar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .summary {
+            grid-template-columns: 1fr;
+        }
+
+        .filters {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+```
+<div class="logo">
+
+    <div class="logo-icon">
+        🏥
+    </div>
+
+    <h2>MediCare HMS</h2>
+
+    <p>
+        Hospital Management System
+    </p>
+
+</div>
+
+
+<div class="menu-title">
+    Main
+</div>
+
+
+<a href="{% url 'dashboard' %}">
+
+    <span class="icon">🏠</span>
+
+    <span>
+        Dashboard
+    </span>
+
+</a>
+
+
+<a href="{% url 'patient_list' %}">
+
+    <span class="icon">👥</span>
+
+    <span>
+        Patients
+    </span>
+
+</a>
+
+
+<div class="menu-title">
+    Departments
+</div>
+
+
+<a href="{% url 'laboratory_dashboard' %}">
+
+    <span class="icon">🧪</span>
+
+    <span>
+        Laboratory
+    </span>
+
+</a>
+
+
+<a href="{% url 'pharmacy_dashboard' %}">
+
+    <span class="icon">💊</span>
+
+    <span>
+        Pharmacy
+    </span>
+
+</a>
+
+
+<a href="{% url 'billing_dashboard' %}"
+   class="active">
+
+    <span class="icon">💰</span>
+
+    <span>
+        Billing
+    </span>
+
+</a>
+
+
+<div class="menu-title">
+    Billing
+</div>
+
+
+<a href="{% url 'invoice_list' %}"
+   class="active">
+
+    <span class="icon">🧾</span>
+
+    <span>
+        Invoices
+    </span>
+
+</a>
+
+
+<a href="{% url 'payment_list' %}">
+
+    <span class="icon">💳</span>
+
+    <span>
+        Payments
+    </span>
+
+</a>
+
+
+<a href="{% url 'billing_reports' %}">
+
+    <span class="icon">📊</span>
+
+    <span>
+        Financial Reports
+    </span>
+
+</a>
+
+
+<div class="menu-title">
+    Administration
+</div>
+
+
+<a href="#">
+
+    <span class="icon">⚙️</span>
+
+    <span>
+        Settings
+    </span>
+
+</a>
+
+
+<a href="{% url 'logout' %}">
+
+    <span class="icon">🚪</span>
+
+    <span>
+        Logout
+    </span>
+
+</a>
+```
+
+</aside>
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+```
+<!-- HEADER -->
+
+<div class="topbar">
+
+    <div class="title">
+
+        <h1>Patient Invoices</h1>
+
+        <p>
+            Manage hospital invoices, payments and outstanding balances
+        </p>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <a href="{% url 'billing_dashboard' %}"
+           class="btn btn-secondary">
+
+            ← Dashboard
+
+        </a>
+
+
+        <a href="{% url 'create_invoice' %}"
+           class="btn btn-primary">
+
+            + Create Invoice
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= SUMMARY ================= -->
+
+<section class="summary">
+
+
+    <div class="summary-card">
+
+        <h4>
+            Total Invoices
+        </h4>
+
+        <strong>
+            {{ invoice_count|default:"0" }}
+        </strong>
+
+        <p>
+            All invoices
+        </p>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <h4>
+            Paid
+        </h4>
+
+        <strong class="green-text">
+
+            {{ paid_invoices|default:"0" }}
+
+        </strong>
+
+        <p>
+            Fully paid invoices
+        </p>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <h4>
+            Outstanding
+        </h4>
+
+        <strong class="orange-text">
+
+            UGX {{ outstanding_balance|default:"0"|floatformat:0 }}
+
+        </strong>
+
+        <p>
+            Amount still owed
+        </p>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <h4>
+            Overdue
+        </h4>
+
+        <strong class="red-text">
+
+            {{ overdue_count|default:"0" }}
+
+        </strong>
+
+        <p>
+            Requires attention
+        </p>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- ================= FILTER ================= -->
+
+<section class="filter-panel">
+
+    <div class="filter-title">
+        🔎 Search & Filter Invoices
+    </div>
+
+
+    <form method="GET">
+
+        <div class="filters">
+
+
+            <div class="form-group">
+
+                <label>
+                    Search
+                </label>
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ request.GET.q|default:'' }}"
+                    placeholder="Invoice number, patient name or patient ID..."
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Payment Status
+                </label>
+
+                <select name="status">
+
+                    <option value="">
+                        All statuses
+                    </option>
+
+                    <option value="Paid"
+                        {% if request.GET.status == "Paid" %}
+                            selected
+                        {% endif %}>
+                        Paid
+                    </option>
+
+                    <option value="Partial"
+                        {% if request.GET.status == "Partial" %}
+                            selected
+                        {% endif %}>
+                        Partially Paid
+                    </option>
+
+                    <option value="Pending"
+                        {% if request.GET.status == "Pending" %}
+                            selected
+                        {% endif %}>
+                        Pending
+                    </option>
+
+                    <option value="Overdue"
+                        {% if request.GET.status == "Overdue" %}
+                            selected
+                        {% endif %}>
+                        Overdue
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Date
+                </label>
+
+                <input
+                    type="date"
+                    name="date"
+                    value="{{ request.GET.date|default:'' }}"
+                >
+
+            </div>
+
+
+            <div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    Search
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </form>
+
+</section>
+
+
+
+<!-- ================= TABLE ================= -->
+
+<section class="table-panel">
+
+
+    <div class="table-header">
+
+        <h2>
+            Invoice Records
+        </h2>
+
+        <span class="record-count">
+
+            {{ invoices|length|default:"0" }}
+            records
+
+        </span>
+
+    </div>
+
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Invoice
+                    </th>
+
+                    <th>
+                        Patient
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Total
+                    </th>
+
+                    <th>
+                        Paid
+                    </th>
+
+                    <th>
+                        Balance
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for invoice in invoices %}
+
+                <tr>
+
+
+                    <!-- INVOICE -->
+
+                    <td>
+
+                        <span class="invoice-number">
+
+                            {{ invoice.invoice_number }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- PATIENT -->
+
+                    <td>
+
+                        <span class="patient-name">
+
+                            {{ invoice.patient.first_name }}
+                            {{ invoice.patient.last_name }}
+
+                        </span>
+
+
+                        {% if invoice.patient.patient_number %}
+
+                            <span class="patient-id">
+
+                                Patient ID:
+                                {{ invoice.patient.patient_number }}
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- DATE -->
+
+                    <td>
+
+                        {{ invoice.created_at|date:"d M Y" }}
+
+                        <span class="patient-id">
+
+                            {{ invoice.created_at|date:"H:i" }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- TOTAL -->
+
+                    <td class="amount">
+
+                        UGX
+                        {{ invoice.total_amount|default:"0"|floatformat:0 }}
+
+                    </td>
+
+
+                    <!-- PAID -->
+
+                    <td class="amount">
+
+                        UGX
+                        {{ invoice.paid_amount|default:"0"|floatformat:0 }}
+
+                    </td>
+
+
+                    <!-- BALANCE -->
+
+                    <td class="amount balance">
+
+                        UGX
+                        {{ invoice.balance|default:"0"|floatformat:0 }}
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+
+                        {% if invoice.status == "Paid" %}
+
+                            <span class="badge paid">
+                                Paid
+                            </span>
+
+
+                        {% elif invoice.status == "Partial" %}
+
+                            <span class="badge partial">
+                                Partially Paid
+                            </span>
+
+
+                        {% elif invoice.status == "Overdue" %}
+
+                            <span class="badge overdue">
+                                Overdue
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="badge pending">
+                                Pending
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+                        <div class="actions">
+
+
+                            <a
+                                href="{% url 'invoice_detail' invoice.id %}"
+                                class="action-btn view">
+
+                                View
+
+                            </a>
+
+
+                            {% if invoice.status != "Paid" %}
+
+                                <a
+                                    href="{% url 'record_payment' invoice.id %}"
+                                    class="action-btn payment">
+
+                                    Payment
+
+                                </a>
+
+                            {% endif %}
+
+
+                            <a
+                                href="{% url 'invoice_detail' invoice.id %}"
+                                class="action-btn print">
+
+                                Print
+
+                            </a>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+
+            {% empty %}
+
+
+                <tr>
+
+                    <td colspan="8">
+
+                        <div class="empty">
+
+                            <div class="empty-icon">
+                                🧾
+                            </div>
+
+                            <h3>
+                                No invoices found
+                            </h3>
+
+                            <p>
+                                There are currently no invoices
+                                matching your search criteria.
+                            </p>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <!-- ================= PAGINATION ================= -->
+
+    {% if invoices.has_other_pages %}
+
+        <div class="pagination">
+
+            <div class="pagination-info">
+
+                Page
+                {{ invoices.number }}
+                of
+                {{ invoices.paginator.num_pages }}
+
+            </div>
+
+
+            <div class="pages">
+
+
+                {% if invoices.has_previous %}
+
+                    <a href="?page={{ invoices.previous_page_number }}">
+
+                        ‹
+
+                    </a>
+
+                {% endif %}
+
+
+                {% for page_num in invoices.paginator.page_range %}
+
+                    {% if invoices.number == page_num %}
+
+                        <span class="active">
+                            {{ page_num }}
+                        </span>
+
+                    {% else %}
+
+                        <a href="?page={{ page_num }}">
+
+                            {{ page_num }}
+
+                        </a>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                {% if invoices.has_next %}
+
+                    <a href="?page={{ invoices.next_page_number }}">
+
+                        ›
+
+                    </a>
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+</section>
+
+
+
+<footer>
+
+    © 2026 MediCare Hospital Management System
+    • Billing & Finance Department
+
+</footer>
+```
+
+</main>
+
+</body>
+
+</html>
