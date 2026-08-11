@@ -1,0 +1,1380 @@
+```html
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Laboratory Requests | MediCare HMS</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #263238;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #123c69;
+            color: white;
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            margin-bottom: 7px;
+        }
+
+        .logo h2 {
+            font-size: 20px;
+        }
+
+        .logo p {
+            font-size: 11px;
+            color: #c9d8e8;
+            margin-top: 5px;
+        }
+
+        .menu-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #9fb8d0;
+            margin: 20px 12px 8px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 13px;
+            margin-bottom: 5px;
+            color: #eaf2f8;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #1e5a91;
+            color: white;
+        }
+
+        .icon {
+            width: 24px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            padding: 25px 30px;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            background: white;
+            min-height: 72px;
+            border-radius: 12px;
+            padding: 15px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 22px;
+        }
+
+        .page-title h1 {
+            font-size: 23px;
+            color: #123c69;
+        }
+
+        .page-title p {
+            color: #7a8793;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .notification {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eef4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 17px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info strong {
+            display: block;
+        }
+
+        .user-info small {
+            color: #8996a3;
+        }
+
+        /* ================= SUMMARY ================= */
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 17px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .summary-card h4 {
+            font-size: 12px;
+            color: #77838e;
+            font-weight: 500;
+            margin-bottom: 7px;
+        }
+
+        .summary-card strong {
+            font-size: 25px;
+        }
+
+        .summary-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .blue {
+            background: #e8f1fb;
+            color: #1769aa;
+        }
+
+        .orange {
+            background: #fff3df;
+            color: #d98200;
+        }
+
+        .green {
+            background: #e7f7ef;
+            color: #16834b;
+        }
+
+        .red {
+            background: #fdeaea;
+            color: #c62828;
+        }
+
+        /* ================= TOOLBAR ================= */
+
+        .toolbar {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 20px;
+        }
+
+        .toolbar-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .search-box input:focus {
+            border-color: #1769aa;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 11px;
+        }
+
+        select {
+            padding: 11px 14px;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            background: white;
+            min-width: 150px;
+            outline: none;
+            color: #46535e;
+        }
+
+        .btn {
+            border: none;
+            padding: 11px 17px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-primary {
+            background: #1769aa;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #12578f;
+        }
+
+        .btn-light {
+            background: #eef4f9;
+            color: #1769aa;
+        }
+
+        /* ================= REQUEST TABLE ================= */
+
+        .table-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+        .table-header h2 {
+            font-size: 17px;
+        }
+
+        .table-header span {
+            color: #8996a3;
+            font-size: 12px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1050px;
+        }
+
+        th {
+            background: #f7f9fb;
+            color: #687681;
+            text-align: left;
+            font-size: 11px;
+            padding: 13px 14px;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #edf0f3;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover td {
+            background: #fafcfe;
+        }
+
+        .request-id {
+            color: #1769aa;
+            font-weight: 700;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            color: #263238;
+        }
+
+        .patient-number {
+            color: #8996a3;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .test-name {
+            font-weight: 600;
+        }
+
+        .test-category {
+            color: #8996a3;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .doctor {
+            font-size: 12px;
+        }
+
+        .date {
+            white-space: nowrap;
+            color: #596773;
+        }
+
+        /* ================= BADGES ================= */
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .priority-routine {
+            background: #e8f1fb;
+            color: #1769aa;
+        }
+
+        .priority-urgent {
+            background: #fff3df;
+            color: #c87900;
+        }
+
+        .priority-stat {
+            background: #fdeaea;
+            color: #c62828;
+        }
+
+        .status-requested {
+            background: #eef1f4;
+            color: #65727d;
+        }
+
+        .status-collected {
+            background: #e8f1fb;
+            color: #1769aa;
+        }
+
+        .status-processing {
+            background: #fff3df;
+            color: #c87900;
+        }
+
+        .status-completed {
+            background: #e7f7ef;
+            color: #16834b;
+        }
+
+        .status-cancelled {
+            background: #fdeaea;
+            color: #c62828;
+        }
+
+        /* ================= ACTIONS ================= */
+
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            background: #f0f4f8;
+            color: #1769aa;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .action-btn:hover {
+            background: #1769aa;
+            color: white;
+        }
+
+        .action-btn.result {
+            background: #e7f7ef;
+            color: #16834b;
+        }
+
+        .action-btn.result:hover {
+            background: #16834b;
+            color: white;
+        }
+
+        /* ================= EMPTY STATE ================= */
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8996a3;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+            margin-bottom: 12px;
+        }
+
+        .empty h3 {
+            color: #596773;
+            margin-bottom: 5px;
+        }
+
+        /* ================= PAGINATION ================= */
+
+        .pagination {
+            padding: 17px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #edf0f3;
+        }
+
+        .pagination-info {
+            color: #8996a3;
+            font-size: 12px;
+        }
+
+        .pagination-links {
+            display: flex;
+            gap: 5px;
+        }
+
+        .page-link {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 9px;
+            border: 1px solid #dce3e9;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #596773;
+            font-size: 12px;
+        }
+
+        .page-link.active,
+        .page-link:hover {
+            background: #1769aa;
+            border-color: #1769aa;
+            color: white;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1100px) {
+
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 768px) {
+
+            .sidebar {
+                width: 70px;
+                padding: 20px 8px;
+            }
+
+            .logo h2,
+            .logo p,
+            .sidebar a span:not(.icon),
+            .menu-title {
+                display: none;
+            }
+
+            .sidebar a {
+                justify-content: center;
+            }
+
+            .logo-icon {
+                font-size: 27px;
+            }
+
+            .main {
+                margin-left: 70px;
+                padding: 15px;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .toolbar-row {
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            select,
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .pagination {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- ========================================================= -->
+<!-- SIDEBAR -->
+<!-- ========================================================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            🏥
+        </div>
+
+        <h2>MediCare HMS</h2>
+
+        <p>
+            Hospital Management System
+        </p>
+
+    </div>
+
+
+    <div class="menu-title">
+        Main
+    </div>
+
+    <a href="{% url 'dashboard' %}">
+        <span class="icon">🏠</span>
+        <span>Dashboard</span>
+    </a>
+
+    <a href="{% url 'patient_list' %}">
+        <span class="icon">👥</span>
+        <span>Patients</span>
+    </a>
+
+
+    <div class="menu-title">
+        Departments
+    </div>
+
+    <a href="{% url 'laboratory_dashboard' %}">
+        <span class="icon">🧪</span>
+        <span>Laboratory Dashboard</span>
+    </a>
+
+    <a href="{% url 'lab_request_list' %}" class="active">
+        <span class="icon">📋</span>
+        <span>Lab Requests</span>
+    </a>
+
+    <a href="#">
+        <span class="icon">🧬</span>
+        <span>Test Catalog</span>
+    </a>
+
+    <a href="#">
+        <span class="icon">🧪</span>
+        <span>Specimens</span>
+    </a>
+
+    <a href="#">
+        <span class="icon">📄</span>
+        <span>Lab Results</span>
+    </a>
+
+
+    <div class="menu-title">
+        Administration
+    </div>
+
+    <a href="{% url 'billing_dashboard' %}">
+        <span class="icon">💰</span>
+        <span>Billing</span>
+    </a>
+
+    <a href="#">
+        <span class="icon">📊</span>
+        <span>Reports</span>
+    </a>
+
+    <a href="#">
+        <span class="icon">⚙️</span>
+        <span>Settings</span>
+    </a>
+
+    <a href="{% url 'logout' %}">
+        <span class="icon">🚪</span>
+        <span>Logout</span>
+    </a>
+
+</aside>
+
+
+<!-- ========================================================= -->
+<!-- MAIN -->
+<!-- ========================================================= -->
+
+<main class="main">
+
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="page-title">
+
+            <h1>Laboratory Requests</h1>
+
+            <p>
+                Manage patient laboratory investigations, specimens and test processing
+            </p>
+
+        </div>
+
+
+        <div class="user-area">
+
+            <div class="notification">
+                🔔
+            </div>
+
+            <div class="user-info">
+
+                <strong>
+                    {{ request.user.username }}
+                </strong>
+
+                <small>
+                    Laboratory Staff
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- SUMMARY -->
+    <!-- ===================================================== -->
+<!-- 
+    <section class="summary">
+
+        <div class="summary-card">
+
+            <div>
+
+                <h4>Total Requests</h4>
+
+                <strong>
+                    {{ total_requests|default:"0" }}
+                </strong>
+
+            </div>
+
+            <div class="summary-icon blue">
+                📋
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div>
+
+                <h4>Pending Requests</h4>
+
+                <strong>
+                    {{ pending_requests|default:"0" }}
+                </strong>
+
+            </div>
+
+            <div class="summary-icon orange">
+                ⏳
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div>
+
+                <h4>Processing</h4>
+
+                <strong>
+                    {{ processing_requests|default:"0" }}
+                </strong>
+
+            </div>
+
+            <div class="summary-icon blue">
+                🧪
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div>
+
+                <h4>Completed Today</h4>
+
+                <strong>
+                    {{ completed_today|default:"0" }}
+                </strong>
+
+            </div>
+
+            <div class="summary-icon green">
+                ✓
+            </div>
+
+        </div>
+
+    </section> -->
+
+
+    <!-- ===================================================== -->
+    <!-- SEARCH / FILTER -->
+    <!-- ===================================================== -->
+
+    <section class="toolbar">
+
+        <form method="GET">
+
+            <div class="toolbar-row">
+
+                <div class="search-box">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ request.GET.q }}"
+                        placeholder="Search patient, request number or test..."
+                    >
+
+                </div>
+
+
+                <select name="status">
+
+                    <option value="">
+                        All Statuses
+                    </option>
+
+                    <option value="REQUESTED"
+                        {% if request.GET.status == "REQUESTED" %}selected{% endif %}>
+                        Requested
+                    </option>
+
+                    <option value="COLLECTED"
+                        {% if request.GET.status == "COLLECTED" %}selected{% endif %}>
+                        Specimen Collected
+                    </option>
+
+                    <option value="PROCESSING"
+                        {% if request.GET.status == "PROCESSING" %}selected{% endif %}>
+                        Processing
+                    </option>
+
+                    <option value="COMPLETED"
+                        {% if request.GET.status == "COMPLETED" %}selected{% endif %}>
+                        Completed
+                    </option>
+
+                    <option value="CANCELLED"
+                        {% if request.GET.status == "CANCELLED" %}selected{% endif %}>
+                        Cancelled
+                    </option>
+
+                </select>
+
+
+                <select name="priority">
+
+                    <option value="">
+                        All Priorities
+                    </option>
+
+                    <option value="ROUTINE"
+                        {% if request.GET.priority == "ROUTINE" %}selected{% endif %}>
+                        Routine
+                    </option>
+
+                    <option value="URGENT"
+                        {% if request.GET.priority == "URGENT" %}selected{% endif %}>
+                        Urgent
+                    </option>
+
+                    <option value="STAT"
+                        {% if request.GET.priority == "STAT" %}selected{% endif %}>
+                        STAT
+                    </option>
+
+                </select>
+
+
+                <button type="submit" class="btn btn-primary">
+                    🔍 Search
+                </button>
+
+
+                <a href="{% url 'lab_request_list' %}" class="btn btn-light">
+                    ↻ Reset
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- REQUEST TABLE -->
+    <!-- ===================================================== -->
+
+    <section class="table-panel">
+
+
+        <div class="table-header">
+
+            <div>
+
+                <h2>
+                    Laboratory Test Requests
+                </h2>
+
+                <span>
+                    Patient investigations awaiting processing or completion
+                </span>
+
+            </div>
+
+
+            <a href="#" class="btn btn-primary">
+                + New Lab Request
+            </a>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Request No.
+                        </th>
+
+                        <th>
+                            Patient
+                        </th>
+
+                        <th>
+                            Laboratory Test
+                        </th>
+
+                        <th>
+                            Requested By
+                        </th>
+
+                        <th>
+                            Request Date
+                        </th>
+
+                        <th>
+                            Priority
+                        </th>
+
+                        <th>
+                            Specimen
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for request_item in lab_requests %}
+
+                    <tr>
+
+
+                        <!-- REQUEST NUMBER -->
+
+                        <td>
+
+                            <span class="request-id">
+
+                                {% if request_item.request_number %}
+
+                                    {{ request_item.request_number }}
+
+                                {% else %}
+
+                                    LAB-{{ request_item.id }}
+
+                                {% endif %}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- PATIENT -->
+
+                        <td>
+
+                            <div class="patient-name">
+
+                                {{ request_item.patient.first_name }}
+
+                                {{ request_item.patient.last_name }}
+
+                            </div>
+
+                            <div class="patient-number">
+
+                                {{ request_item.patient.patient_number }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- TEST -->
+
+                        <td>
+
+                            <div class="test-name">
+
+                                {{ request_item.test }}
+
+                            </div>
+
+                            {% if request_item.test.category %}
+
+                                <div class="test-category">
+
+                                    {{ request_item.test.category }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- REQUESTING DOCTOR -->
+
+                        <td>
+
+                            <div class="doctor">
+
+                                {% if request_item.requested_by %}
+
+                                    Dr. {{ request_item.requested_by }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            <div class="date">
+
+                                {{ request_item.created_at|date:"d M Y" }}
+
+                                <br>
+
+                                <small>
+
+                                    {{ request_item.created_at|time:"H:i" }}
+
+                                </small>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- PRIORITY -->
+
+                        <td>
+
+                            {% if request_item.priority == "STAT" %}
+
+                                <span class="badge priority-stat">
+                                    STAT
+                                </span>
+
+                            {% elif request_item.priority == "URGENT" %}
+
+                                <span class="badge priority-urgent">
+                                    Urgent
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge priority-routine">
+                                    Routine
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- SPECIMEN -->
+
+                        <td>
+
+                            {% if request_item.specimen_status == "COLLECTED" %}
+
+                                <span class="badge status-collected">
+                                    Collected
+                                </span>
+
+                            {% elif request_item.specimen_status == "PROCESSING" %}
+
+                                <span class="badge status-processing">
+                                    Processing
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge status-requested">
+                                    Awaiting
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if request_item.status == "COMPLETED" %}
+
+                                <span class="badge status-completed">
+                                    Completed
+                                </span>
+
+                            {% elif request_item.status == "PROCESSING" %}
+
+                                <span class="badge status-processing">
+                                    Processing
+                                </span>
+
+                            {% elif request_item.status == "COLLECTED" %}
+
+                                <span class="badge status-collected">
+                                    Collected
+                                </span>
+
+                            {% elif request_item.status == "CANCELLED" %}
+
+                                <span class="badge status-cancelled">
+                                    Cancelled
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge status-requested">
+                                    Requested
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTIONS -->
+
+                        <td>
+
+                            <div class="actions">
+
+                                <a
+                                    href="{% url 'lab_request_detail' request_item.id %}"
+                                    class="action-btn"
+                                    title="View Request"
+                                >
+                                    👁
+                                </a>
+
+
+                                {% if request_item.status != "COMPLETED" and request_item.status != "CANCELLED" %}
+
+                                    <a
+                                        href="{% url 'lab_request_detail' request_item.id %}"
+                                        class="action-btn"
+                                        title="Process Request"
+                                    >
+                                        🧪
+                                    </a>
+
+                                {% endif %}
+
+
+                                {% if request_item.status == "COMPLETED" %}
+
+                                    <a
+                                        href="{% url 'lab_request_detail' request_item.id %}"
+                                        class="action-btn result"
+                                        title="View Result"
+                                    >
+                                        📄
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="9">
+
+                            <div class="empty">
+
+                                <div class="empty-icon">
+                                    🧪
+                                </div>
+
+                                <h3>
+                                    No laboratory requests found
+                                </h3>
+
+                                <p>
+                                    There are currently no laboratory requests
+                                    matching your search criteria.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- PAGINATION -->
+        <!-- ================================================= -->
+
+        {% if is_paginated %}
+
+            <div class="pagination">
+
+                <div class="pagination-info">
+
+                    Showing page {{ page_obj.number }}
+                    of {{ page_obj.paginator.num_pages }}
+
+                </div>
+
+
+                <div class="pagination-links">
+
+                    {% if page_obj.has_previous %}
+
+                        <a
+                            href="?page={{ page_obj.previous_page_number }}"
+                            class="page-link"
+                        >
+                            ‹
+                        </a>
+
+                    {% endif %}
+
+
+                    {% for page_num in page_obj.paginator.page_range %}
+
+                        {% if page_num == page_obj.number %}
+
+                            <span class="page-link active">
+                                {{ page_num }}
+                            </span>
+
+                        {% else %}
+
+                            <a
+                                href="?page={{ page_num }}"
+                                class="page-link"
+                            >
+                                {{ page_num }}
+                            </a>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                    {% if page_obj.has_next %}
+
+                        <a
+                            href="?page={{ page_obj.next_page_number }}"
+                            class="page-link"
+                        >
+                            ›
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <footer>
+
+        © 2026 MediCare Hospital Management System
+        • Laboratory Department
+
+    </footer>
+
+
+</main>
+
+</body>
+</html>
+```

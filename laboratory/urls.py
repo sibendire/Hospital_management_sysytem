@@ -1,57 +1,65 @@
+
 from django.urls import path
 
 from . import views
 
 
+urlpatterns = [
 
-urlpatterns=[
+    # =========================================================
+    # LABORATORY DASHBOARD
+    # =========================================================
 
-
-path(
-"dashboard/",
-views.laboratory_dashboard,
-name="laboratory_dashboard"
-),
-
-
-
-path(
-"tests/",
-views.test_list,
-name="test_list"
-),
+    path(
+        "dashboard/",
+        views.laboratory_dashboard,
+        name="laboratory_dashboard"
+    ),
 
 
+    # =========================================================
+    # LABORATORY TESTS
+    # =========================================================
 
-path(
-"tests/add/",
-views.add_test,
-name="add_test"
-),
+    path(
+        "tests/",
+        views.test_list,
+        name="test_list"
+    ),
 
-
-
-path(
-"requests/",
-views.lab_requests,
-name="lab_requests"
-),
-
-
-
-path(
-"request/add/",
-views.create_lab_request,
-name="create_lab_request"
-),
+    path(
+        "tests/add/",
+        views.add_test,
+        name="add_test"
+    ),
 
 
+    # =========================================================
+    # LABORATORY REQUESTS
+    # =========================================================
 
-path(
-"result/<int:id>/",
-views.enter_result,
-name="enter_result"
-),
+    path(
+        "requests/",
+        views.lab_requests,
+        name="lab_request_list"
+    ),
 
+    path(
+        "request/add/",
+        views.create_lab_request,
+        name="create_lab_request"
+    ),
+
+
+    # =========================================================
+    # LABORATORY RESULTS
+    # =========================================================
+
+    path(
+        "result/int:id/",
+        views.enter_result,
+        name="enter_result"
+    ),
 
 ]
+
