@@ -1,11 +1,788 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Madicine Form</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Medicine Registration | MediCare HMS
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #263238;
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,.07);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: #0b5ed7;
+            color: white;
+            padding: 25px 30px;
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .form-header p {
+            margin: 5px 0 0;
+            opacity: .9;
+        }
+
+        .form-body {
+            padding: 35px;
+        }
+
+        .section-title {
+            color: #0b5ed7;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e9ef;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #37474f;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 46px;
+            border-radius: 8px;
+            border: 1px solid #d8dee6;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0b5ed7;
+            box-shadow: 0 0 0 .2rem rgba(11,94,215,.12);
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #7a8793;
+            margin-top: 5px;
+        }
+
+        .stock-box {
+            background: #f8fafc;
+            border: 1px solid #e5eaf0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .btn-save {
+            background: #0b5ed7;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #084298;
+            color: white;
+        }
+
+        .btn-cancel {
+            padding: 12px 28px;
+            border-radius: 8px;
+        }
+
+    </style>
+
 </head>
+
+
 <body>
-    
+
+
+<div class="container page-container">
+
+
+    <div class="form-card">
+
+
+        <!-- HEADER -->
+
+        <div class="form-header">
+
+            <h2>
+                💊 Register Medicine
+            </h2>
+
+            <p>
+                Add a new medicine to the hospital pharmacy inventory.
+            </p>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <div class="form-body">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <!-- ===============================
+                     MEDICINE INFORMATION
+                ================================= -->
+
+                <div class="section-title">
+                    Medicine Information
+                </div>
+
+
+                <div class="row g-4">
+
+
+                    <!-- Medicine Name -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="medicine_name"
+                            class="form-label"
+                        >
+                            Medicine Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="medicine_name"
+                            name="medicine_name"
+                            class="form-control"
+                            placeholder="e.g. Amoxicillin"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Generic Name -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="generic_name"
+                            class="form-label"
+                        >
+                            Generic Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="generic_name"
+                            name="generic_name"
+                            class="form-control"
+                            placeholder="e.g. Amoxicillin Trihydrate"
+                            required
+                        >
+
+                        <div class="help-text">
+                            International/non-proprietary name of the medicine.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Brand Name -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="brand_name"
+                            class="form-label"
+                        >
+                            Brand Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="brand_name"
+                            name="brand_name"
+                            class="form-control"
+                            placeholder="e.g. Amoxil"
+                        >
+
+                    </div>
+
+
+                    <!-- Category -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="category"
+                            class="form-label"
+                        >
+                            Medicine Category
+                            <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="category"
+                            name="category"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="">
+                                Select category
+                            </option>
+
+                            <option value="ANTIBIOTIC">
+                                Antibiotic
+                            </option>
+
+                            <option value="ANALGESIC">
+                                Analgesic / Painkiller
+                            </option>
+
+                            <option value="ANTIMALARIAL">
+                                Antimalarial
+                            </option>
+
+                            <option value="ANTIHYPERTENSIVE">
+                                Antihypertensive
+                            </option>
+
+                            <option value="ANTIDIABETIC">
+                                Antidiabetic
+                            </option>
+
+                            <option value="ANTIFUNGAL">
+                                Antifungal
+                            </option>
+
+                            <option value="ANTIVIRAL">
+                                Antiviral
+                            </option>
+
+                            <option value="VITAMIN">
+                                Vitamins & Supplements
+                            </option>
+
+                            <option value="OTHER">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Dosage Form -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            for="dosage_form"
+                            class="form-label"
+                        >
+                            Dosage Form
+                            <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="dosage_form"
+                            name="dosage_form"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="">
+                                Select form
+                            </option>
+
+                            <option value="TABLET">
+                                Tablet
+                            </option>
+
+                            <option value="CAPSULE">
+                                Capsule
+                            </option>
+
+                            <option value="SYRUP">
+                                Syrup
+                            </option>
+
+                            <option value="SUSPENSION">
+                                Suspension
+                            </option>
+
+                            <option value="INJECTION">
+                                Injection
+                            </option>
+
+                            <option value="CREAM">
+                                Cream
+                            </option>
+
+                            <option value="OINTMENT">
+                                Ointment
+                            </option>
+
+                            <option value="DROPS">
+                                Drops
+                            </option>
+
+                            <option value="INHALER">
+                                Inhaler
+                            </option>
+
+                            <option value="OTHER">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Strength -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            for="strength"
+                            class="form-label"
+                        >
+                            Strength
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="strength"
+                            name="strength"
+                            class="form-control"
+                            placeholder="e.g. 500 mg"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Unit -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            for="unit"
+                            class="form-label"
+                        >
+                            Dispensing Unit
+                            <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="unit"
+                            name="unit"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="">
+                                Select unit
+                            </option>
+
+                            <option value="TABLET">
+                                Tablet
+                            </option>
+
+                            <option value="CAPSULE">
+                                Capsule
+                            </option>
+
+                            <option value="BOTTLE">
+                                Bottle
+                            </option>
+
+                            <option value="VIAL">
+                                Vial
+                            </option>
+
+                            <option value="TUBE">
+                                Tube
+                            </option>
+
+                            <option value="PACK">
+                                Pack
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===============================
+                     MANUFACTURER INFORMATION
+                ================================= -->
+
+                <div class="section-title mt-5">
+                    Manufacturer & Product Details
+                </div>
+
+
+                <div class="row g-4">
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="manufacturer"
+                            class="form-label"
+                        >
+                            Manufacturer
+                        </label>
+
+                        <input
+                            type="text"
+                            id="manufacturer"
+                            name="manufacturer"
+                            class="form-control"
+                            placeholder="e.g. Cipla Ltd"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="supplier"
+                            class="form-label"
+                        >
+                            Supplier
+                        </label>
+
+                        <input
+                            type="text"
+                            id="supplier"
+                            name="supplier"
+                            class="form-control"
+                            placeholder="Supplier / Distributor"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="batch_number"
+                            class="form-label"
+                        >
+                            Batch / Lot Number
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="batch_number"
+                            name="batch_number"
+                            class="form-control"
+                            placeholder="e.g. AMX2026A01"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="expiry_date"
+                            class="form-label"
+                        >
+                            Expiry Date
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="expiry_date"
+                            name="expiry_date"
+                            class="form-control"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===============================
+                     STOCK INFORMATION
+                ================================= -->
+
+                <div class="section-title mt-5">
+                    Pharmacy Stock
+                </div>
+
+
+                <div class="stock-box">
+
+                    <div class="row g-4">
+
+
+                        <div class="col-md-4">
+
+                            <label
+                                for="quantity"
+                                class="form-label"
+                            >
+                                Current Stock
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="number"
+                                id="quantity"
+                                name="quantity"
+                                class="form-control"
+                                min="0"
+                                value="0"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label
+                                for="reorder_level"
+                                class="form-label"
+                            >
+                                Reorder Level
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="number"
+                                id="reorder_level"
+                                name="reorder_level"
+                                class="form-control"
+                                min="0"
+                                value="10"
+                                required
+                            >
+
+                            <div class="help-text">
+                                Alert pharmacy staff when stock reaches this level.
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label
+                                for="unit_price"
+                                class="form-label"
+                            >
+                                Selling Price / Unit
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    UGX
+                                </span>
+
+                                <input
+                                    type="number"
+                                    id="unit_price"
+                                    name="unit_price"
+                                    class="form-control"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===============================
+                     PRESCRIPTION & STATUS
+                ================================= -->
+
+                <div class="section-title mt-5">
+                    Pharmacy Controls
+                </div>
+
+
+                <div class="row g-4">
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="prescription_required"
+                            class="form-label"
+                        >
+                            Prescription Requirement
+                        </label>
+
+                        <select
+                            id="prescription_required"
+                            name="prescription_required"
+                            class="form-select"
+                        >
+
+                            <option value="YES">
+                                Prescription Required
+                            </option>
+
+                            <option value="NO">
+                                Over-the-Counter (OTC)
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="status"
+                            class="form-label"
+                        >
+                            Medicine Status
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            class="form-select"
+                        >
+
+                            <option value="ACTIVE">
+                                Active
+                            </option>
+
+                            <option value="INACTIVE">
+                                Inactive
+                            </option>
+
+                            <option value="DISCONTINUED">
+                                Discontinued
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <label
+                            for="description"
+                            class="form-label"
+                        >
+                            Description / Pharmacy Notes
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Additional information about the medicine..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===============================
+                     ACTIONS
+                ================================= -->
+
+                <div class="d-flex justify-content-end gap-3 mt-5">
+
+                    <a
+                        href="{% url 'pharmacy_dashboard' %}"
+                        class="btn btn-outline-secondary btn-cancel"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-save"
+                    >
+                        💾 Save Medicine
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
 </body>
+
 </html>
