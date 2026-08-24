@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Prescriptions | MediCare HMS</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            background: #0b5ed7;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #084298;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #0b5ed7;
+            color: white;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 5px;
+            background: #eee;
+        }
+
+        .view-btn {
+            background: #198754;
+            color: white;
+            padding: 7px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .view-btn:hover {
+            background: #146c43;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+            📋 Prescriptions
+        </h1>
+
+        <a
+            href="{% url 'create_prescription' %}"
+            class="btn"
+        >
+            + New Prescription
+        </a>
+
+    </div>
+
+
+    <table>
+
+        <thead>
+
+        <tr>
+
+            <th>
+                Prescription #
+            </th>
+
+            <th>
+                Patient
+            </th>
+
+            <th>
+                Patient Number
+            </th>
+
+            <th>
+                Diagnosis
+            </th>
+
+            <th>
+                Prescribed By
+            </th>
+
+            <th>
+                Date
+            </th>
+
+            <th>
+                Status
+            </th>
+
+            <th>
+                Action
+            </th>
+
+        </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        {% for prescription in prescriptions %}
+
+        <tr>
+
+            <td>
+                #{{ prescription.id }}
+            </td>
+
+            <td>
+                {{ prescription.patient.first_name }}
+                {{ prescription.patient.last_name }}
+            </td>
+
+            <td>
+                {{ prescription.patient.patient_number }}
+            </td>
+
+            <td>
+                {{ prescription.diagnosis|default:"—" }}
+            </td>
+
+            <td>
+                {{ prescription.prescribed_by.username|default:"—" }}
+            </td>
+
+            <td>
+                {{ prescription.prescribed_at|date:"d M Y H:i" }}
+            </td>
+
+            <td>
+
+                <span class="status">
+
+                    {{ prescription.get_status_display }}
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <a
+                    href="{% url 'prescription_details' pk=prescription.id %}"
+                    class="view-btn"
+                >
+                    👁 View
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td
+                colspan="8"
+                style="text-align:center; padding:40px;"
+            >
+
+                📋 No prescriptions found.
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+
+</html>

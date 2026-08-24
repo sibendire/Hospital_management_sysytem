@@ -5,14 +5,10 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Medicine Registration | MediCare HMS
-    </title>
+    <title>Medicine Registration | MediCare HMS</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -122,6 +118,21 @@
             border-radius: 8px;
         }
 
+        .error-box {
+            background: #fff0f0;
+            border: 1px solid #dc3545;
+            color: #842029;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .field-error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
     </style>
 
 </head>
@@ -132,7 +143,6 @@
 
 <div class="container page-container">
 
-
     <div class="form-card">
 
 
@@ -141,11 +151,16 @@
         <div class="form-header">
 
             <h2>
-                💊 Register Medicine
+                💊
+                {% if medicine %}
+                    Edit Medicine
+                {% else %}
+                    Register Medicine
+                {% endif %}
             </h2>
 
             <p>
-                Add a new medicine to the hospital pharmacy inventory.
+                Add medicine to the hospital pharmacy inventory.
             </p>
 
         </div>
@@ -155,14 +170,45 @@
 
         <div class="form-body">
 
+
+            <!-- DISPLAY FORM ERRORS -->
+
+            {% if form.errors %}
+
+                <div class="error-box">
+
+                    <strong>
+                        Please correct the following errors:
+                    </strong>
+
+                    {{ form.non_field_errors }}
+
+                    {% for field in form %}
+
+                        {% for error in field.errors %}
+
+                            <div>
+                                <strong>{{ field.label }}:</strong>
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
             <form method="POST">
 
                 {% csrf_token %}
 
 
-                <!-- ===============================
+                <!-- =================================
                      MEDICINE INFORMATION
-                ================================= -->
+                ================================== -->
 
                 <div class="section-title">
                     Medicine Information
@@ -172,293 +218,151 @@
                 <div class="row g-4">
 
 
-                    <!-- Medicine Name -->
+                    <!-- NAME -->
 
                     <div class="col-md-6">
 
-                        <label
-                            for="medicine_name"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Medicine Name
                             <span class="required">*</span>
                         </label>
 
-                        <input
-                            type="text"
-                            id="medicine_name"
-                            name="medicine_name"
-                            class="form-control"
-                            placeholder="e.g. Amoxicillin"
-                            required
-                        >
+                        {{ form.name }}
+
+                        {% for error in form.name.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
-                    <!-- Generic Name -->
+                    <!-- GENERIC NAME -->
 
                     <div class="col-md-6">
 
-                        <label
-                            for="generic_name"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Generic Name
-                            <span class="required">*</span>
                         </label>
 
-                        <input
-                            type="text"
-                            id="generic_name"
-                            name="generic_name"
-                            class="form-control"
-                            placeholder="e.g. Amoxicillin Trihydrate"
-                            required
-                        >
+                        {{ form.generic_name }}
 
                         <div class="help-text">
-                            International/non-proprietary name of the medicine.
+                            International/non-proprietary name.
                         </div>
+
+                        {% for error in form.generic_name.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
-                    <!-- Brand Name -->
+                    <!-- BRAND NAME -->
 
                     <div class="col-md-6">
 
-                        <label
-                            for="brand_name"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Brand Name
                         </label>
 
-                        <input
-                            type="text"
-                            id="brand_name"
-                            name="brand_name"
-                            class="form-control"
-                            placeholder="e.g. Amoxil"
-                        >
+                        {{ form.brand_name }}
+
+                        {% for error in form.brand_name.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
-                    <!-- Category -->
+                    <!-- CATEGORY -->
 
                     <div class="col-md-6">
 
-                        <label
-                            for="category"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Medicine Category
                             <span class="required">*</span>
                         </label>
 
-                        <select
-                            id="category"
-                            name="category"
-                            class="form-select"
-                            required
-                        >
+                        {{ form.category }}
 
-                            <option value="">
-                                Select category
-                            </option>
-
-                            <option value="ANTIBIOTIC">
-                                Antibiotic
-                            </option>
-
-                            <option value="ANALGESIC">
-                                Analgesic / Painkiller
-                            </option>
-
-                            <option value="ANTIMALARIAL">
-                                Antimalarial
-                            </option>
-
-                            <option value="ANTIHYPERTENSIVE">
-                                Antihypertensive
-                            </option>
-
-                            <option value="ANTIDIABETIC">
-                                Antidiabetic
-                            </option>
-
-                            <option value="ANTIFUNGAL">
-                                Antifungal
-                            </option>
-
-                            <option value="ANTIVIRAL">
-                                Antiviral
-                            </option>
-
-                            <option value="VITAMIN">
-                                Vitamins & Supplements
-                            </option>
-
-                            <option value="OTHER">
-                                Other
-                            </option>
-
-                        </select>
+                        {% for error in form.category.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
-                    <!-- Dosage Form -->
+                    <!-- DOSAGE FORM -->
 
                     <div class="col-md-4">
 
-                        <label
-                            for="dosage_form"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Dosage Form
                             <span class="required">*</span>
                         </label>
 
-                        <select
-                            id="dosage_form"
-                            name="dosage_form"
-                            class="form-select"
-                            required
-                        >
+                        {{ form.dosage_form }}
 
-                            <option value="">
-                                Select form
-                            </option>
-
-                            <option value="TABLET">
-                                Tablet
-                            </option>
-
-                            <option value="CAPSULE">
-                                Capsule
-                            </option>
-
-                            <option value="SYRUP">
-                                Syrup
-                            </option>
-
-                            <option value="SUSPENSION">
-                                Suspension
-                            </option>
-
-                            <option value="INJECTION">
-                                Injection
-                            </option>
-
-                            <option value="CREAM">
-                                Cream
-                            </option>
-
-                            <option value="OINTMENT">
-                                Ointment
-                            </option>
-
-                            <option value="DROPS">
-                                Drops
-                            </option>
-
-                            <option value="INHALER">
-                                Inhaler
-                            </option>
-
-                            <option value="OTHER">
-                                Other
-                            </option>
-
-                        </select>
+                        {% for error in form.dosage_form.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
-                    <!-- Strength -->
+                    <!-- STRENGTH -->
 
                     <div class="col-md-4">
 
-                        <label
-                            for="strength"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Strength
-                            <span class="required">*</span>
                         </label>
 
-                        <input
-                            type="text"
-                            id="strength"
-                            name="strength"
-                            class="form-control"
-                            placeholder="e.g. 500 mg"
-                            required
-                        >
+                        {{ form.strength }}
+
+                        {% for error in form.strength.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
-                    <!-- Unit -->
+                    <!-- UNIT -->
 
                     <div class="col-md-4">
 
-                        <label
-                            for="unit"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Dispensing Unit
-                            <span class="required">*</span>
                         </label>
 
-                        <select
-                            id="unit"
-                            name="unit"
-                            class="form-select"
-                            required
-                        >
+                        {{ form.unit }}
 
-                            <option value="">
-                                Select unit
-                            </option>
-
-                            <option value="TABLET">
-                                Tablet
-                            </option>
-
-                            <option value="CAPSULE">
-                                Capsule
-                            </option>
-
-                            <option value="BOTTLE">
-                                Bottle
-                            </option>
-
-                            <option value="VIAL">
-                                Vial
-                            </option>
-
-                            <option value="TUBE">
-                                Tube
-                            </option>
-
-                            <option value="PACK">
-                                Pack
-                            </option>
-
-                        </select>
+                        {% for error in form.unit.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
                 </div>
 
 
-                <!-- ===============================
+                <!-- =================================
                      MANUFACTURER INFORMATION
-                ================================= -->
+                ================================== -->
 
                 <div class="section-title mt-5">
                     Manufacturer & Product Details
@@ -468,94 +372,89 @@
                 <div class="row g-4">
 
 
+                    <!-- MANUFACTURER -->
+
                     <div class="col-md-6">
 
-                        <label
-                            for="manufacturer"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Manufacturer
                         </label>
 
-                        <input
-                            type="text"
-                            id="manufacturer"
-                            name="manufacturer"
-                            class="form-control"
-                            placeholder="e.g. Cipla Ltd"
-                        >
+                        {{ form.manufacturer }}
+
+                        {% for error in form.manufacturer.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
+                    <!-- SUPPLIER -->
+
                     <div class="col-md-6">
 
-                        <label
-                            for="supplier"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Supplier
                         </label>
 
-                        <input
-                            type="text"
-                            id="supplier"
-                            name="supplier"
-                            class="form-control"
-                            placeholder="Supplier / Distributor"
-                        >
+                        {{ form.supplier }}
+
+                        {% for error in form.supplier.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
+                    <!-- BATCH -->
+
                     <div class="col-md-6">
 
-                        <label
-                            for="batch_number"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Batch / Lot Number
                             <span class="required">*</span>
                         </label>
 
-                        <input
-                            type="text"
-                            id="batch_number"
-                            name="batch_number"
-                            class="form-control"
-                            placeholder="e.g. AMX2026A01"
-                            required
-                        >
+                        {{ form.batch_number }}
+
+                        {% for error in form.batch_number.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
+                    <!-- EXPIRY -->
+
                     <div class="col-md-6">
 
-                        <label
-                            for="expiry_date"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Expiry Date
                             <span class="required">*</span>
                         </label>
 
-                        <input
-                            type="date"
-                            id="expiry_date"
-                            name="expiry_date"
-                            class="form-control"
-                            required
-                        >
+                        {{ form.expiry_date }}
+
+                        {% for error in form.expiry_date.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
                 </div>
 
 
-                <!-- ===============================
-                     STOCK INFORMATION
-                ================================= -->
+                <!-- =================================
+                     PHARMACY STOCK
+                ================================== -->
 
                 <div class="section-title mt-5">
                     Pharmacy Stock
@@ -567,62 +466,55 @@
                     <div class="row g-4">
 
 
+                        <!-- QUANTITY -->
+
                         <div class="col-md-4">
 
-                            <label
-                                for="quantity"
-                                class="form-label"
-                            >
+                            <label class="form-label">
                                 Current Stock
                                 <span class="required">*</span>
                             </label>
 
-                            <input
-                                type="number"
-                                id="quantity"
-                                name="quantity"
-                                class="form-control"
-                                min="0"
-                                value="0"
-                                required
-                            >
+                            {{ form.quantity }}
+
+                            {% for error in form.quantity.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
 
                         </div>
 
 
+                        <!-- REORDER LEVEL -->
+
                         <div class="col-md-4">
 
-                            <label
-                                for="reorder_level"
-                                class="form-label"
-                            >
+                            <label class="form-label">
                                 Reorder Level
                                 <span class="required">*</span>
                             </label>
 
-                            <input
-                                type="number"
-                                id="reorder_level"
-                                name="reorder_level"
-                                class="form-control"
-                                min="0"
-                                value="10"
-                                required
-                            >
+                            {{ form.reorder_level }}
 
                             <div class="help-text">
-                                Alert pharmacy staff when stock reaches this level.
+                                Alert when stock reaches this level.
                             </div>
+
+                            {% for error in form.reorder_level.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
 
                         </div>
 
 
+                        <!-- PRICE -->
+
                         <div class="col-md-4">
 
-                            <label
-                                for="unit_price"
-                                class="form-label"
-                            >
+                            <label class="form-label">
                                 Selling Price / Unit
                                 <span class="required">*</span>
                             </label>
@@ -633,18 +525,15 @@
                                     UGX
                                 </span>
 
-                                <input
-                                    type="number"
-                                    id="unit_price"
-                                    name="unit_price"
-                                    class="form-control"
-                                    min="0"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                    required
-                                >
+                                {{ form.unit_price }}
 
                             </div>
+
+                            {% for error in form.unit_price.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
 
                         </div>
 
@@ -653,9 +542,9 @@
                 </div>
 
 
-                <!-- ===============================
-                     PRESCRIPTION & STATUS
-                ================================= -->
+                <!-- =================================
+                     PHARMACY CONTROLS
+                ================================== -->
 
                 <div class="section-title mt-5">
                     Pharmacy Controls
@@ -665,93 +554,71 @@
                 <div class="row g-4">
 
 
+                    <!-- PRESCRIPTION -->
+
                     <div class="col-md-6">
 
-                        <label
-                            for="prescription_required"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Prescription Requirement
                         </label>
 
-                        <select
-                            id="prescription_required"
-                            name="prescription_required"
-                            class="form-select"
-                        >
+                        {{ form.prescription_required }}
 
-                            <option value="YES">
-                                Prescription Required
-                            </option>
-
-                            <option value="NO">
-                                Over-the-Counter (OTC)
-                            </option>
-
-                        </select>
+                        {% for error in form.prescription_required.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
+
+                    <!-- STATUS -->
 
                     <div class="col-md-6">
 
-                        <label
-                            for="status"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Medicine Status
                         </label>
 
-                        <select
-                            id="status"
-                            name="status"
-                            class="form-select"
-                        >
+                        {{ form.status }}
 
-                            <option value="ACTIVE">
-                                Active
-                            </option>
-
-                            <option value="INACTIVE">
-                                Inactive
-                            </option>
-
-                            <option value="DISCONTINUED">
-                                Discontinued
-                            </option>
-
-                        </select>
+                        {% for error in form.status.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
 
+                    <!-- DESCRIPTION -->
+
                     <div class="col-12">
 
-                        <label
-                            for="description"
-                            class="form-label"
-                        >
+                        <label class="form-label">
                             Description / Pharmacy Notes
                         </label>
 
-                        <textarea
-                            id="description"
-                            name="description"
-                            class="form-control"
-                            rows="4"
-                            placeholder="Additional information about the medicine..."
-                        ></textarea>
+                        {{ form.description }}
+
+                        {% for error in form.description.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
 
                     </div>
 
                 </div>
 
 
-                <!-- ===============================
-                     ACTIONS
-                ================================= -->
+                <!-- =================================
+                     BUTTONS
+                ================================== -->
 
                 <div class="d-flex justify-content-end gap-3 mt-5">
+
 
                     <a
                         href="{% url 'pharmacy_dashboard' %}"
@@ -760,12 +627,22 @@
                         Cancel
                     </a>
 
+
                     <button
                         type="submit"
                         class="btn btn-save"
                     >
-                        💾 Save Medicine
+
+                        💾
+
+                        {% if medicine %}
+                            Update Medicine
+                        {% else %}
+                            Save Medicine
+                        {% endif %}
+
                     </button>
+
 
                 </div>
 
@@ -780,8 +657,9 @@
 
 
 <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-></script>
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
 
 </body>
 

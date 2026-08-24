@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+    Pharmacy Bill {{ sale.sale_number }}
+</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+}
+
+.header {
+    text-align: center;
+}
+
+.header h1 {
+    margin-bottom: 5px;
+}
+
+.info {
+    margin-top: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+}
+
+th,
+td {
+    border: 1px solid #333;
+    padding: 10px;
+}
+
+th {
+    background: #eee;
+}
+
+.total {
+    text-align: right;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.payment {
+    margin-top: 30px;
+    padding: 15px;
+    border: 2px solid #333;
+    text-align: center;
+    font-weight: bold;
+}
+
+</style>
+
+</head>
+
+<body onload="window.print()">
+
+
+<div class="header">
+
+    <h1>
+        MediCare Hospital
+    </h1>
+
+    <h3>
+        PHARMACY DEPARTMENT
+    </h3>
+
+    <h2>
+        PHARMACY BILL
+    </h2>
+
+</div>
+
+
+<div class="info">
+
+    <strong>
+        Bill Number:
+    </strong>
+
+    {{ sale.sale_number }}
+
+    <br>
+
+    <strong>
+        Date:
+    </strong>
+
+    {{ sale.created_at|date:"d/m/Y H:i" }}
+
+    <br>
+
+    <strong>
+        Patient:
+    </strong>
+
+    {{ sale.patient_name }}
+
+    <br>
+
+    <strong>
+        Patient Number:
+    </strong>
+
+    {{ sale.patient_number|default:"-" }}
+
+</div>
+
+
+<table>
+
+<thead>
+
+<tr>
+
+    <th>#</th>
+
+    <th>Medicine</th>
+
+    <th>Quantity</th>
+
+    <th>Unit Price</th>
+
+    <th>Total</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+{% for item in sale.items.all %}
+
+<tr>
+
+    <td>
+        {{ forloop.counter }}
+    </td>
+
+    <td>
+        {{ item.medicine.name }}
+    </td>
+
+    <td>
+        {{ item.quantity }}
+    </td>
+
+    <td>
+        UGX {{ item.unit_price|floatformat:0 }}
+    </td>
+
+    <td>
+        UGX {{ item.total_price|floatformat:0 }}
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+
+<div class="total">
+
+    TOTAL AMOUNT:
+
+    UGX {{ sale.total_amount|floatformat:0 }}
+
+</div>
+
+
+<div class="payment">
+
+    PAYMENT DUE
+
+    <br><br>
+
+    PLEASE TAKE THIS BILL TO THE CASHIER
+    FOR PAYMENT.
+
+</div>
+
+
+<br>
+
+Issued By:
+{{ sale.issued_by.username }}
+
+
+</body>
+
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Prescription | MediCare HMS</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        .container-box {
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.07);
+        }
+
+        .card-header {
+            background: #123c69;
+            color: white;
+            border-radius: 14px 14px 0 0 !important;
+            padding: 20px;
+        }
+
+        .medicine-row {
+            background: #f8fafc;
+            border: 1px solid #dee5ec;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .remove-btn {
+            margin-top: 32px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container-box">
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h3 class="mb-0">
+                📋 Create Prescription
+            </h3>
+
+            <small>
+                Create a prescription for a patient
+            </small>
+
+        </div>
+
+
+        <div class="card-body p-4">
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <!-- =====================================
+                     PATIENT INFORMATION
+                ====================================== -->
+
+                <h5 class="mb-3">
+                    Patient Information
+                </h5>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Patient
+                    </label>
+
+                    {{ prescription_form.patient }}
+
+                    {% if prescription_form.patient.errors %}
+
+                        <div class="text-danger">
+                            {{ prescription_form.patient.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Diagnosis
+                    </label>
+
+                    {{ prescription_form.diagnosis }}
+
+                </div>
+
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        Notes
+                    </label>
+
+                    {{ prescription_form.notes }}
+
+                </div>
+
+
+                <hr>
+
+
+                <!-- =====================================
+                     MEDICINES
+                ====================================== -->
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <h5>
+                        💊 Prescribed Medicines
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="addMedicine()"
+                    >
+                        + Add Medicine
+                    </button>
+
+                </div>
+
+
+                <div id="medicineContainer">
+
+                    <div class="medicine-row">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Medicine
+                                </label>
+
+                                <select
+                                    name="medicine[]"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select medicine
+                                    </option>
+
+                                    {% for medicine in medicines %}
+
+                                        <option value="{{ medicine.id }}">
+
+                                            {{ medicine.name }}
+
+                                            {% if medicine.strength %}
+                                                - {{ medicine.strength }}
+                                            {% endif %}
+
+                                            (Stock: {{ medicine.quantity }})
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-2">
+
+                                <label class="form-label">
+                                    Dosage
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="dosage[]"
+                                    class="form-control"
+                                    placeholder="500mg"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-2">
+
+                                <label class="form-label">
+                                    Frequency
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="frequency[]"
+                                    class="form-control"
+                                    placeholder="3 times daily"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-2">
+
+                                <label class="form-label">
+                                    Duration
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="duration[]"
+                                    class="form-control"
+                                    placeholder="5 days"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-2">
+
+                                <label class="form-label">
+                                    Quantity
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="quantity[]"
+                                    class="form-control"
+                                    min="1"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-10">
+
+                                <label class="form-label">
+                                    Instructions
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="instructions[]"
+                                    class="form-control"
+                                    placeholder="e.g. Take after meals"
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-2">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger remove-btn w-100"
+                                    onclick="removeMedicine(this)"
+                                >
+                                    Remove
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <hr class="mt-4">
+
+
+                <div class="d-flex justify-content-between">
+
+                    <a
+                        href="{% url 'prescription_list' %}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                    >
+                        💾 Create Prescription
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function addMedicine() {
+
+    const container =
+        document.getElementById(
+            "medicineContainer"
+        );
+
+    const firstRow =
+        container.querySelector(
+            ".medicine-row"
+        );
+
+    const newRow =
+        firstRow.cloneNode(true);
+
+    newRow.querySelectorAll(
+        "input"
+    ).forEach(function(input) {
+
+        input.value = "";
+
+    });
+
+    newRow.querySelector(
+        "select"
+    ).selectedIndex = 0;
+
+    container.appendChild(newRow);
+}
+
+
+function removeMedicine(button) {
+
+    const rows =
+        document.querySelectorAll(
+            ".medicine-row"
+        );
+
+    if (rows.length === 1) {
+
+        alert(
+            "At least one medicine is required."
+        );
+
+        return;
+    }
+
+    button
+        .closest(".medicine-row")
+        .remove();
+}
+
+</script>
+
+</body>
+
+</html>

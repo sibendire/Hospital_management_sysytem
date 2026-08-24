@@ -1,520 +1,612 @@
 {% load static %}
 
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-```
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-<title>Pharmacy Dashboard | MediCare HMS</title>
+    <title>Pharmacy Dashboard | MediCare HMS</title>
 
-<style>
+    <style>
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Segoe UI", Arial, sans-serif;
-    }
-
-    body {
-        background: #f4f7fb;
-        color: #1f2937;
-    }
-
-
-    /* =====================================================
-       SIDEBAR
-    ===================================================== */
-
-    .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 260px;
-        height: 100vh;
-        background: #123c69;
-        color: white;
-        padding: 25px 18px;
-        overflow-y: auto;
-    }
-
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 0 10px 30px;
-        border-bottom: 1px solid rgba(255,255,255,.15);
-        margin-bottom: 25px;
-    }
-
-    .brand-icon {
-        width: 45px;
-        height: 45px;
-        border-radius: 12px;
-        background: #198754;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
-
-    .brand h2 {
-        font-size: 18px;
-    }
-
-    .brand span {
-        display: block;
-        font-size: 12px;
-        color: #cbd5e1;
-        margin-top: 3px;
-    }
-
-
-    .menu-title {
-        font-size: 11px;
-        text-transform: uppercase;
-        color: #9fb4c9;
-        margin: 20px 12px 10px;
-        letter-spacing: 1px;
-    }
-
-
-    .sidebar a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: #e8f0f7;
-        padding: 13px 14px;
-        margin-bottom: 5px;
-        border-radius: 9px;
-        transition: .2s;
-        font-size: 14px;
-    }
-
-    .sidebar a:hover,
-    .sidebar a.active {
-        background: #198754;
-        color: white;
-    }
-
-    .sidebar .logout {
-        margin-top: 25px;
-        background: rgba(220,53,69,.15);
-        color: #ffb3b9;
-    }
-
-    .sidebar .logout:hover {
-        background: #dc3545;
-        color: white;
-    }
-
-
-    /* =====================================================
-       MAIN CONTENT
-    ===================================================== */
-
-    .main {
-        margin-left: 260px;
-        min-height: 100vh;
-        padding: 25px 30px;
-    }
-
-
-    /* =====================================================
-       TOP BAR
-    ===================================================== */
-
-    .topbar {
-        background: white;
-        min-height: 72px;
-        border-radius: 14px;
-        padding: 15px 22px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 3px 12px rgba(0,0,0,.06);
-        margin-bottom: 25px;
-    }
-
-    .page-title h1 {
-        font-size: 25px;
-        color: #123c69;
-    }
-
-    .page-title p {
-        font-size: 13px;
-        color: #6b7280;
-        margin-top: 4px;
-    }
-
-    .user-area {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .user-avatar {
-        width: 42px;
-        height: 42px;
-        background: #198754;
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-
-    .user-info strong {
-        display: block;
-        font-size: 14px;
-    }
-
-    .user-info span {
-        font-size: 12px;
-        color: #6b7280;
-    }
-
-
-    /* =====================================================
-       STATISTICS
-    ===================================================== */
-
-    .stats {
-        display: grid;
-        grid-template-columns:
-            repeat(auto-fit, minmax(220px, 1fr));
-
-        gap: 18px;
-        margin-bottom: 25px;
-    }
-
-    .stat-card {
-        background: white;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0 3px 12px rgba(0,0,0,.06);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-card::after {
-        content: "";
-        position: absolute;
-        right: -20px;
-        top: -20px;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: rgba(25,135,84,.08);
-    }
-
-    .stat-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .stat-icon {
-        width: 45px;
-        height: 45px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-    }
-
-    .green {
-        background: #e7f6ee;
-        color: #198754;
-    }
-
-    .blue {
-        background: #e7f0fb;
-        color: #0d6efd;
-    }
-
-    .orange {
-        background: #fff3cd;
-        color: #997404;
-    }
-
-    .red {
-        background: #f8d7da;
-        color: #b02a37;
-    }
-
-    .stat-card h4 {
-        color: #6b7280;
-        font-size: 13px;
-        margin-top: 15px;
-    }
-
-    .stat-number {
-        font-size: 30px;
-        font-weight: 700;
-        margin-top: 5px;
-        color: #123c69;
-    }
-
-
-    /* =====================================================
-       QUICK ACTIONS
-    ===================================================== */
-
-    .section-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .section-title h2 {
-        font-size: 19px;
-        color: #123c69;
-    }
-
-    .section-title a {
-        color: #198754;
-        font-size: 13px;
-        text-decoration: none;
-    }
-
-
-    .quick-actions {
-        display: grid;
-        grid-template-columns:
-            repeat(auto-fit, minmax(200px, 1fr));
-
-        gap: 15px;
-        margin-bottom: 28px;
-    }
-
-    .action {
-        background: white;
-        border-radius: 13px;
-        padding: 20px;
-        box-shadow: 0 3px 12px rgba(0,0,0,.06);
-        text-decoration: none;
-        color: #1f2937;
-        transition: .2s;
-        border: 1px solid #eef1f5;
-    }
-
-    .action:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,.1);
-    }
-
-    .action-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        background: #e7f6ee;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 21px;
-        margin-bottom: 12px;
-    }
-
-    .action h3 {
-        font-size: 15px;
-        margin-bottom: 5px;
-    }
-
-    .action p {
-        font-size: 12px;
-        color: #6b7280;
-        line-height: 1.5;
-    }
-
-
-    /* =====================================================
-       LOWER DASHBOARD
-    ===================================================== */
-
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-
-    .panel {
-        background: white;
-        border-radius: 14px;
-        box-shadow: 0 3px 12px rgba(0,0,0,.06);
-        overflow: hidden;
-    }
-
-    .panel-header {
-        padding: 18px 20px;
-        border-bottom: 1px solid #edf0f4;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .panel-header h3 {
-        color: #123c69;
-        font-size: 16px;
-    }
-
-    .panel-header a {
-        color: #198754;
-        font-size: 12px;
-        text-decoration: none;
-    }
-
-    .panel-body {
-        padding: 20px;
-    }
-
-
-    /* Alerts */
-
-    .alert-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 13px 0;
-        border-bottom: 1px solid #f0f2f5;
-    }
-
-    .alert-item:last-child {
-        border-bottom: none;
-    }
-
-    .alert-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .alert-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 9px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .alert-item strong {
-        display: block;
-        font-size: 13px;
-    }
-
-    .alert-item span {
-        color: #6b7280;
-        font-size: 11px;
-    }
-
-    .badge {
-        padding: 5px 9px;
-        border-radius: 20px;
-        font-size: 10px;
-        font-weight: 600;
-    }
-
-    .badge-danger {
-        background: #f8d7da;
-        color: #b02a37;
-    }
-
-    .badge-warning {
-        background: #fff3cd;
-        color: #997404;
-    }
-
-    .badge-success {
-        background: #d1e7dd;
-        color: #146c43;
-    }
-
-
-    /* =====================================================
-       FOOTER
-    ===================================================== */
-
-    footer {
-        text-align: center;
-        color: #8a94a6;
-        font-size: 12px;
-        padding: 30px 0 10px;
-    }
-
-
-    /* =====================================================
-       RESPONSIVE
-    ===================================================== */
-
-    @media(max-width: 900px) {
-
-        .sidebar {
-            width: 75px;
-            padding: 20px 10px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
         }
 
-        .brand h2,
-        .brand span,
-        .sidebar a span,
-        .menu-title {
-            display: none;
+        body {
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: #123c69;
+            color: white;
+            padding: 25px 18px;
+            overflow-y: auto;
         }
 
         .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 30px;
+            border-bottom: 1px solid rgba(255,255,255,.15);
+            margin-bottom: 25px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: #198754;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .brand h2 {
+            font-size: 18px;
+        }
+
+        .brand span {
+            display: block;
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-top: 3px;
+        }
+
+        .menu-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #9fb4c9;
+            margin: 20px 12px 10px;
+            letter-spacing: 1px;
         }
 
         .sidebar a {
-            justify-content: center;
-            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #e8f0f7;
+            padding: 13px 14px;
+            margin-bottom: 5px;
+            border-radius: 9px;
+            transition: .2s;
+            font-size: 14px;
         }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #198754;
+            color: white;
+        }
+
+        .sidebar .logout {
+            margin-top: 25px;
+            background: rgba(220,53,69,.15);
+            color: #ffb3b9;
+        }
+
+        .sidebar .logout:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
 
         .main {
-            margin-left: 75px;
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 25px 30px;
         }
 
-        .dashboard-grid {
-            grid-template-columns: 1fr;
-        }
 
-    }
-
-
-    @media(max-width: 600px) {
-
-        .main {
-            padding: 15px;
-        }
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
 
         .topbar {
-            align-items: flex-start;
+            background: white;
+            min-height: 72px;
+            border-radius: 14px;
+            padding: 15px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,.06);
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            font-size: 25px;
+            color: #123c69;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            background: #198754;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-info strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .user-info span {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 13px 16px;
+            border-radius: 9px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .message.success {
+            background: #d1e7dd;
+            color: #146c43;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #b02a37;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #997404;
+        }
+
+        .message.info {
+            background: #cff4fc;
+            color: #055160;
+        }
+
+
+        /* =====================================================
+           STATISTICS
+        ===================================================== */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(25,135,84,.08);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .green {
+            background: #e7f6ee;
+            color: #198754;
+        }
+
+        .blue {
+            background: #e7f0fb;
+            color: #0d6efd;
+        }
+
+        .orange {
+            background: #fff3cd;
+            color: #997404;
+        }
+
+        .red {
+            background: #f8d7da;
+            color: #b02a37;
+        }
+
+        .purple {
+            background: #eee5ff;
+            color: #6f42c1;
+        }
+
+        .stat-card h4 {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: 700;
+            margin-top: 5px;
+            color: #123c69;
+        }
+
+        .stat-description {
+            font-size: 11px;
+            color: #8a94a6;
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
+           QUICK ACTIONS
+        ===================================================== */
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title h2 {
+            font-size: 19px;
+            color: #123c69;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
+            margin-bottom: 28px;
         }
 
-        .user-info {
-            display: none;
+        .action {
+            background: white;
+            border-radius: 13px;
+            padding: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.06);
+            text-decoration: none;
+            color: #1f2937;
+            transition: .2s;
+            border: 1px solid #eef1f5;
         }
 
-    }
+        .action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.1);
+        }
 
-</style>
-```
+        .action-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #e7f6ee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            margin-bottom: 12px;
+        }
+
+        .action h3 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .action p {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           LOWER DASHBOARD
+        ===================================================== */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.06);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #edf0f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            color: #123c69;
+            font-size: 16px;
+        }
+
+        .panel-header a {
+            color: #198754;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+
+        /* =====================================================
+           ALERTS
+        ===================================================== */
+
+        .alert-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-item strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .alert-item span {
+            color: #6b7280;
+            font-size: 11px;
+        }
+
+        .badge {
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #b02a37;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #997404;
+        }
+
+        .badge-success {
+            background: #d1e7dd;
+            color: #146c43;
+        }
+
+        .badge-info {
+            background: #cff4fc;
+            color: #055160;
+        }
+
+        .badge-purple {
+            background: #eee5ff;
+            color: #6f42c1;
+        }
+
+
+        /* =====================================================
+           RECENT ACTIVITY
+        ===================================================== */
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e7f0fb;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .activity-content span {
+            display: block;
+            font-size: 11px;
+            color: #8a94a6;
+            margin-top: 3px;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+            text-align: center;
+            color: #8a94a6;
+            font-size: 12px;
+            padding: 30px 0 10px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width: 900px) {
+
+            .sidebar {
+                width: 75px;
+                padding: 20px 10px;
+            }
+
+            .brand h2,
+            .brand span,
+            .sidebar a span:not(:first-child),
+            .menu-title {
+                display: none;
+            }
+
+            .brand {
+                justify-content: center;
+            }
+
+            .sidebar a {
+                justify-content: center;
+                font-size: 20px;
+            }
+
+            .main {
+                margin-left: 75px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        @media(max-width: 600px) {
+
+            .main {
+                padding: 15px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+    </style>
 
 </head>
 
+
 <body>
+
 
 <!-- =========================================================
      SIDEBAR
@@ -522,618 +614,915 @@
 
 <aside class="sidebar">
 
-```
-<div class="brand">
+    <div class="brand">
 
-    <div class="brand-icon">
-        💊
-    </div>
+        <div class="brand-icon">
+            💊
+        </div>
 
-    <div>
+        <div>
 
-        <h2>MediCare Pharmacy</h2>
-
-        <span>Hospital Management System</span>
-
-    </div>
-
-</div>
-
-
-<div class="menu-title">
-    Pharmacy
-</div>
-
-
-<a href="{% url 'pharmacy_dashboard' %}"
-   class="active">
-
-    <span>📊</span>
-    <span>Dashboard</span>
-
-</a>
-
-
-<a href="{% url 'medicine_list' %}">
-
-    <span>💊</span>
-    <span>Medicine Inventory</span>
-
-</a>
-
-
-<a href="{% url 'add_medicine' %}">
-
-    <span>➕</span>
-    <span>Add Medicine</span>
-
-</a>
-
-
-<div class="menu-title">
-    Operations
-</div>
-
-
-<a href="#">
-
-    <span>📋</span>
-    <span>Prescriptions</span>
-
-</a>
-
-
-<a href="#">
-
-    <span>💉</span>
-    <span>Dispensing</span>
-
-</a>
-
-
-<a href="#">
-
-    <span>🚚</span>
-    <span>Purchases</span>
-
-</a>
-
-
-<a href="#">
-
-    <span>🏢</span>
-    <span>Suppliers</span>
-
-</a>
-
-
-<div class="menu-title">
-    Reports
-</div>
-
-
-<a href="#">
-
-    <span>📈</span>
-    <span>Pharmacy Reports</span>
-
-</a>
-
-
-<a href="#">
-
-    <span>⚠️</span>
-    <span>Stock Alerts</span>
-
-</a>
-
-
-<a href="{% url 'dashboard' %}">
-
-    <span>🏠</span>
-    <span>Hospital Dashboard</span>
-
-</a>
-
-
-<a href="{% url 'logout' %}"
-   class="logout">
-
-    <span>🚪</span>
-    <span>Logout</span>
-
-</a>
-```
-
-</aside>
-
-<!-- =========================================================
-     MAIN CONTENT
-========================================================= -->
-
-<main class="main">
-
-```
-<!-- TOP BAR -->
-
-<div class="topbar">
-
-    <div class="page-title">
-
-        <h1>Pharmacy Dashboard</h1>
-
-        <p>
-            Monitor medicines, inventory and pharmacy operations.
-        </p>
-
-    </div>
-
-
-    <div class="user-area">
-
-        <div class="user-info">
-
-            <strong>
-                {{ request.user.username }}
-            </strong>
+            <h2>MediCare Pharmacy</h2>
 
             <span>
-                Pharmacy Staff
+                Hospital Management System
             </span>
 
         </div>
 
-        <div class="user-avatar">
+    </div>
 
-            {{ request.user.username|first|upper }}
+
+    <div class="menu-title">
+        Pharmacy
+    </div>
+
+
+    <a href="{% url 'pharmacy_dashboard' %}"
+       class="active">
+
+        <span>📊</span>
+        <span>Dashboard</span>
+
+    </a>
+
+
+    <a href="{% url 'medicine_list' %}">
+
+        <span>💊</span>
+        <span>Medicine Inventory</span>
+
+    </a>
+
+
+    <a href="{% url 'add_medicine' %}">
+
+        <span>➕</span>
+        <span>Add Medicine</span>
+
+    </a>
+
+
+    <div class="menu-title">
+        Operations
+    </div>
+
+
+    <a href="#">
+
+        <span>📋</span>
+        <span>Prescriptions</span>
+
+    </a>
+
+
+    <!-- IMPORTANT:
+         New architecture uses dispense_medicine
+         instead of old sell_medicine
+    -->
+
+    <a href="{% url 'dispense_medicine' %}">
+
+        <span>💉</span>
+        <span>Dispensing</span>
+
+    </a>
+
+
+    <a href="{% url 'medicine_sales' %}">
+
+        <span>💰</span>
+        <span>Sales History</span>
+
+    </a>
+
+
+    <a href="#">
+
+        <span>🚚</span>
+        <span>Purchases</span>
+
+    </a>
+
+
+    <a href="#">
+
+        <span>🏢</span>
+        <span>Suppliers</span>
+
+    </a>
+
+
+    <div class="menu-title">
+        Reports
+    </div>
+
+
+    <a href="#">
+
+        <span>📈</span>
+        <span>Pharmacy Reports</span>
+
+    </a>
+
+
+    <a href="{% url 'medicine_list' %}">
+
+        <span>⚠️</span>
+        <span>Stock Alerts</span>
+
+    </a>
+
+
+    <a href="{% url 'dashboard' %}">
+
+        <span>🏠</span>
+        <span>Hospital Dashboard</span>
+
+    </a>
+
+
+    <a href="{% url 'logout' %}"
+       class="logout">
+
+        <span>🚪</span>
+        <span>Logout</span>
+
+    </a>
+
+</aside>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="main">
+
+
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+    <div class="topbar">
+
+        <div class="page-title">
+
+            <h1>
+                Pharmacy Dashboard
+            </h1>
+
+            <p>
+                Monitor medicines, inventory and pharmacy operations.
+            </p>
 
         </div>
 
-    </div>
 
-</div>
+        <div class="user-area">
+
+            <div class="user-info">
+
+                <strong>
+                    {{ request.user.username }}
+                </strong>
+
+                <span>
+                    Pharmacy Staff
+                </span>
+
+            </div>
 
 
-<!-- =====================================================
-     STATISTICS
-====================================================== -->
+            <div class="user-avatar">
 
-<div class="stats">
+                {{ request.user.username|first|upper }}
 
-
-    <div class="stat-card">
-
-        <div class="stat-header">
-
-            <div class="stat-icon blue">
-                💊
             </div>
 
         </div>
 
-        <h4>Total Medicines</h4>
+    </div>
 
-        <div class="stat-number">
-            {{ medicine_count|default:"0" }}
+
+    <!-- =====================================================
+         DJANGO MESSAGES
+    ====================================================== -->
+
+    {% if messages %}
+
+        <div class="messages">
+
+            {% for message in messages %}
+
+                <div class="message {{ message.tags }}">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <div class="stats">
+
+
+        <!-- TOTAL MEDICINES -->
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <div class="stat-icon blue">
+                    💊
+                </div>
+
+            </div>
+
+            <h4>
+                Total Medicines
+            </h4>
+
+            <div class="stat-number">
+                {{ medicine_count|default:"0" }}
+            </div>
+
+            <div class="stat-description">
+                Registered medicines
+            </div>
+
+        </div>
+
+
+        <!-- AVAILABLE -->
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <div class="stat-icon green">
+                    📦
+                </div>
+
+            </div>
+
+            <h4>
+                Medicines In Stock
+            </h4>
+
+            <div class="stat-number">
+                {{ available_stock|default:"0" }}
+            </div>
+
+            <div class="stat-description">
+                Currently available
+            </div>
+
+        </div>
+
+
+        <!-- LOW STOCK -->
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <div class="stat-icon orange">
+                    ⚠️
+                </div>
+
+            </div>
+
+            <h4>
+                Low Stock Items
+            </h4>
+
+            <div class="stat-number">
+                {{ low_stock|default:"0" }}
+            </div>
+
+            <div class="stat-description">
+                Require replenishment
+            </div>
+
+        </div>
+
+
+        <!-- OUT OF STOCK -->
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <div class="stat-icon red">
+                    📦
+                </div>
+
+            </div>
+
+            <h4>
+                Out of Stock
+            </h4>
+
+            <div class="stat-number">
+                {{ out_of_stock|default:"0" }}
+            </div>
+
+            <div class="stat-description">
+                Currently unavailable
+            </div>
+
+        </div>
+
+
+        <!-- EXPIRED -->
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <div class="stat-icon red">
+                    ⏰
+                </div>
+
+            </div>
+
+            <h4>
+                Expired Medicines
+            </h4>
+
+            <div class="stat-number">
+                {{ expired|default:"0" }}
+            </div>
+
+            <div class="stat-description">
+                Must not be dispensed
+            </div>
+
+        </div>
+
+
+        <!-- EXPIRING SOON -->
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <div class="stat-icon purple">
+                    📅
+                </div>
+
+            </div>
+
+            <h4>
+                Expiring Soon
+            </h4>
+
+            <div class="stat-number">
+                {{ expiring_soon|default:"0" }}
+            </div>
+
+            <div class="stat-description">
+                Expiring within 30 days
+            </div>
+
         </div>
 
     </div>
 
 
-    <div class="stat-card">
+    <!-- =====================================================
+         QUICK ACTIONS
+    ====================================================== -->
 
-        <div class="stat-header">
+    <div class="section-title">
 
-            <div class="stat-icon green">
+        <h2>
+            Quick Actions
+        </h2>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+
+        <!-- ADD -->
+
+        <a href="{% url 'add_medicine' %}"
+           class="action">
+
+            <div class="action-icon">
+                ➕
+            </div>
+
+            <h3>
+                Add Medicine
+            </h3>
+
+            <p>
+                Register a new medicine into the pharmacy inventory.
+            </p>
+
+        </a>
+
+
+        <!-- INVENTORY -->
+
+        <a href="{% url 'medicine_list' %}"
+           class="action">
+
+            <div class="action-icon">
                 📦
             </div>
 
-        </div>
-
-        <h4>Medicines In Stock</h4>
-
-        <div class="stat-number">
-            {{ available_stock|default:"0" }}
-        </div>
-
-    </div>
-
-
-    <div class="stat-card">
-
-        <div class="stat-header">
-
-            <div class="stat-icon orange">
-                ⚠️
-            </div>
-
-        </div>
-
-        <h4>Low Stock Items</h4>
-
-        <div class="stat-number">
-            {{ low_stock|default:"0" }}
-        </div>
-
-    </div>
-
-
-    <div class="stat-card">
-
-        <div class="stat-header">
-
-            <div class="stat-icon red">
-                ⏰
-            </div>
-
-        </div>
-
-        <h4>Expired Medicines</h4>
-
-        <div class="stat-number">
-            {{ expired|default:"0" }}
-        </div>
-
-    </div>
-
-
-</div>
-
-
-<!-- =====================================================
-     QUICK ACTIONS
-====================================================== -->
-
-<div class="section-title">
-
-    <h2>Quick Actions</h2>
-
-</div>
-
-
-<div class="quick-actions">
-
-
-    <a href="{% url 'add_medicine' %}"
-       class="action">
-
-        <div class="action-icon">
-            ➕
-        </div>
-
-        <h3>Add Medicine</h3>
-
-        <p>
-            Register a new medicine into the pharmacy inventory.
-        </p>
-
-    </a>
-
-
-    <a href="{% url 'medicine_list' %}"
-       class="action">
-
-        <div class="action-icon">
-            📦
-        </div>
-
-        <h3>Manage Inventory</h3>
-
-        <p>
-            View, update and manage current pharmacy stock.
-        </p>
-
-    </a>
-
-
-    <a href="#"
-       class="action">
-
-        <div class="action-icon">
-            💉
-        </div>
-
-        <h3>Dispense Medicine</h3>
-
-        <p>
-            Dispense prescribed medicines to registered patients.
-        </p>
-
-    </a>
-
-
-    <a href="#"
-       class="action">
-
-        <div class="action-icon">
-            🚚
-        </div>
-
-        <h3>Receive Stock</h3>
-
-        <p>
-            Record medicine purchases and update inventory.
-        </p>
-
-    </a>
-
-
-</div>
-
-
-<!-- =====================================================
-     LOWER PANELS
-====================================================== -->
-
-<div class="dashboard-grid">
-
-
-    <!-- STOCK ALERTS -->
-
-    <div class="panel">
-
-        <div class="panel-header">
-
             <h3>
-                ⚠️ Inventory Alerts
+                Manage Inventory
             </h3>
 
-            <a href="{% url 'medicine_list' %}">
-                View Inventory
-            </a>
+            <p>
+                View, update and manage current pharmacy stock.
+            </p>
 
-        </div>
-
-
-        <div class="panel-body">
+        </a>
 
 
-            <div class="alert-item">
+        <!-- DISPENSE -->
 
-                <div class="alert-info">
+        <a href="{% url 'dispense_medicine' %}"
+           class="action">
 
-                    <div class="alert-icon orange">
-                        ⚠️
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Low Stock Medicines
-                        </strong>
-
-                        <span>
-                            Medicines requiring replenishment
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <span class="badge badge-warning">
-
-                    {{ low_stock|default:"0" }}
-
-                </span>
-
+            <div class="action-icon">
+                💉
             </div>
-
-
-            <div class="alert-item">
-
-                <div class="alert-info">
-
-                    <div class="alert-icon red">
-                        ⏰
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Expired Medicines
-                        </strong>
-
-                        <span>
-                            Medicines that should not be dispensed
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <span class="badge badge-danger">
-
-                    {{ expired|default:"0" }}
-
-                </span>
-
-            </div>
-
-
-            <div class="alert-item">
-
-                <div class="alert-info">
-
-                    <div class="alert-icon green">
-                        ✓
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Inventory System
-                        </strong>
-
-                        <span>
-                            Pharmacy inventory is operational
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <span class="badge badge-success">
-                    Active
-                </span>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-
-    <!-- PHARMACY OPERATIONS -->
-
-    <div class="panel">
-
-        <div class="panel-header">
 
             <h3>
-                🏥 Pharmacy Operations
+                Dispense Medicine
             </h3>
+
+            <p>
+                Dispense one or more medicines to a patient and automatically deduct stock.
+            </p>
+
+        </a>
+
+
+        <!-- SALES -->
+
+        <a href="{% url 'medicine_sales' %}"
+           class="action">
+
+            <div class="action-icon">
+                💰
+            </div>
+
+            <h3>
+                Sales History
+            </h3>
+
+            <p>
+                View pharmacy bills, medicines issued and transaction history.
+            </p>
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         LOWER DASHBOARD
+    ====================================================== -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- =================================================
+             INVENTORY ALERTS
+        ================================================== -->
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <h3>
+                    ⚠️ Inventory Alerts
+                </h3>
+
+                <a href="{% url 'medicine_list' %}">
+                    View Inventory
+                </a>
+
+            </div>
+
+
+            <div class="panel-body">
+
+
+                <!-- LOW STOCK -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon orange">
+                            ⚠️
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Low Stock Medicines
+                            </strong>
+
+                            <span>
+                                Medicines requiring replenishment
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-warning">
+                        {{ low_stock|default:"0" }}
+                    </span>
+
+                </div>
+
+
+                <!-- OUT OF STOCK -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon red">
+                            📦
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Out of Stock
+                            </strong>
+
+                            <span>
+                                Medicines currently unavailable
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-danger">
+                        {{ out_of_stock|default:"0" }}
+                    </span>
+
+                </div>
+
+
+                <!-- EXPIRED -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon red">
+                            ⏰
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Expired Medicines
+                            </strong>
+
+                            <span>
+                                Medicines that must not be dispensed
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-danger">
+                        {{ expired|default:"0" }}
+                    </span>
+
+                </div>
+
+
+                <!-- EXPIRING -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon orange">
+                            📅
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Expiring Soon
+                            </strong>
+
+                            <span>
+                                Medicines expiring within 30 days
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-warning">
+                        {{ expiring_soon|default:"0" }}
+                    </span>
+
+                </div>
+
+
+                <!-- SYSTEM -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon green">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Inventory System
+                            </strong>
+
+                            <span>
+                                Pharmacy inventory is operational
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-success">
+                        Active
+                    </span>
+
+                </div>
+
+            </div>
 
         </div>
 
 
-        <div class="panel-body">
+        <!-- =================================================
+             PHARMACY OPERATIONS
+        ================================================== -->
 
+        <div class="panel">
 
-            <div class="alert-item">
+            <div class="panel-header">
 
-                <div class="alert-info">
-
-                    <div class="alert-icon blue">
-                        📋
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Prescriptions
-                        </strong>
-
-                        <span>
-                            Review patient prescriptions
-                        </span>
-
-                    </div>
-
-                </div>
-
-                <span class="badge badge-success">
-                    Coming Soon
-                </span>
+                <h3>
+                    🏥 Pharmacy Operations
+                </h3>
 
             </div>
 
 
-            <div class="alert-item">
+            <div class="panel-body">
 
-                <div class="alert-info">
 
-                    <div class="alert-icon green">
-                        💉
+                <!-- PRESCRIPTIONS -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon blue">
+                            📋
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Prescriptions
+                            </strong>
+
+                            <span>
+                                Review patient prescriptions
+                            </span>
+
+                        </div>
+
                     </div>
 
-                    <div>
 
-                        <strong>
-                            Dispensing
-                        </strong>
-
-                        <span>
-                            Dispense medicines to patients
-                        </span>
-
-                    </div>
+                    <span class="badge badge-info">
+                        Coming Soon
+                    </span>
 
                 </div>
 
-                <span class="badge badge-success">
-                    Coming Soon
-                </span>
 
-            </div>
+                <!-- DISPENSING -->
 
+                <div class="alert-item">
 
-            <div class="alert-item">
+                    <div class="alert-info">
 
-                <div class="alert-info">
+                        <div class="alert-icon green">
+                            💉
+                        </div>
 
-                    <div class="alert-icon blue">
-                        🚚
-                    </div>
+                        <div>
 
-                    <div>
+                            <strong>
+                                Medicine Dispensing
+                            </strong>
 
-                        <strong>
-                            Stock Purchases
-                        </strong>
+                            <span>
+                                Issue medicines to patients
+                            </span>
 
-                        <span>
-                            Receive and record new stock
-                        </span>
+                        </div>
 
                     </div>
+
+
+                    <a href="{% url 'dispense_medicine' %}"
+                       class="badge badge-success">
+
+                        Open
+
+                    </a>
 
                 </div>
 
-                <span class="badge badge-success">
-                    Coming Soon
-                </span>
 
-            </div>
+                <!-- SALES -->
 
+                <div class="alert-item">
 
-            <div class="alert-item">
+                    <div class="alert-info">
 
-                <div class="alert-info">
+                        <div class="alert-icon blue">
+                            💰
+                        </div>
 
-                    <div class="alert-icon green">
-                        📈
-                    </div>
+                        <div>
 
-                    <div>
+                            <strong>
+                                Pharmacy Bills
+                            </strong>
 
-                        <strong>
-                            Pharmacy Reports
-                        </strong>
+                            <span>
+                                View pharmacy transactions
+                            </span>
 
-                        <span>
-                            View pharmacy performance reports
-                        </span>
+                        </div>
 
                     </div>
+
+
+                    <a href="{% url 'medicine_sales' %}"
+                       class="badge badge-info">
+
+                        View
+
+                    </a>
 
                 </div>
 
-                <span class="badge badge-success">
-                    Coming Soon
-                </span>
+
+                <!-- PURCHASES -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon green">
+                            🚚
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Stock Purchases
+                            </strong>
+
+                            <span>
+                                Receive and record new stock
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-info">
+                        Coming Soon
+                    </span>
+
+                </div>
+
+
+                <!-- SUPPLIERS -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon purple">
+                            🏢
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Suppliers
+                            </strong>
+
+                            <span>
+                                Manage pharmacy suppliers
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-info">
+                        Coming Soon
+                    </span>
+
+                </div>
+
+
+                <!-- REPORTS -->
+
+                <div class="alert-item">
+
+                    <div class="alert-info">
+
+                        <div class="alert-icon blue">
+                            📈
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Pharmacy Reports
+                            </strong>
+
+                            <span>
+                                Analyze pharmacy performance
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <span class="badge badge-info">
+                        Coming Soon
+                    </span>
+
+                </div>
 
             </div>
-
 
         </div>
 
     </div>
 
 
-</div>
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
 
+    <footer>
 
-<footer>
+        © 2026 MediCare Hospital Management System
+        • Pharmacy Department
 
-    © 2026 MediCare Hospital Management System
-    • Pharmacy Department
+    </footer>
 
-</footer>
-```
 
 </main>
 

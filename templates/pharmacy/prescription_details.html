@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Prescription #{{ prescription.id }}
+    </title>
+
+</head>
+
+<body>
+
+<h1>
+    Prescription #{{ prescription.id }}
+</h1>
+
+
+<h2>
+    Patient Information
+</h2>
+
+<p>
+    <strong>Name:</strong>
+
+    {{ prescription.patient.first_name }}
+    {{ prescription.patient.last_name }}
+</p>
+
+<p>
+    <strong>Patient Number:</strong>
+
+    {{ prescription.patient.patient_number }}
+</p>
+
+<p>
+    <strong>Gender:</strong>
+
+    {{ prescription.patient.gender }}
+</p>
+
+<p>
+    <strong>Blood Group:</strong>
+
+    {{ prescription.patient.blood_group|default:"Not specified" }}
+</p>
+
+
+<h2>
+    Prescription Information
+</h2>
+
+<p>
+    <strong>Diagnosis:</strong>
+
+    {{ prescription.diagnosis }}
+</p>
+
+<p>
+    <strong>Doctor:</strong>
+
+    {{ prescription.prescribed_by.username }}
+</p>
+
+<p>
+    <strong>Date:</strong>
+
+    {{ prescription.prescribed_at|date:"d M Y H:i" }}
+</p>
+
+<p>
+    <strong>Status:</strong>
+
+    {{ prescription.get_status_display }}
+</p>
+
+
+<h2>
+    Medicines
+</h2>
+
+
+<table border="1" cellpadding="10">
+
+    <thead>
+
+    <tr>
+
+        <th>
+            Medicine
+        </th>
+
+        <th>
+            Strength
+        </th>
+
+        <th>
+            Dosage
+        </th>
+
+        <th>
+            Frequency
+        </th>
+
+        <th>
+            Duration
+        </th>
+
+        <th>
+            Quantity
+        </th>
+
+        <th>
+            Instructions
+        </th>
+
+    </tr>
+
+    </thead>
+
+
+    <tbody>
+
+    {% for item in prescription.items.all %}
+
+    <tr>
+
+        <td>
+            {{ item.medicine.name }}
+        </td>
+
+        <td>
+            {{ item.medicine.strength }}
+        </td>
+
+        <td>
+            {{ item.dosage }}
+        </td>
+
+        <td>
+            {{ item.frequency }}
+        </td>
+
+        <td>
+            {{ item.duration }}
+        </td>
+
+        <td>
+            {{ item.quantity }}
+        </td>
+
+        <td>
+            {{ item.instructions }}
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+
+<br>
+
+<a href="{% url 'prescription_list' %}">
+    ← Back to Prescriptions
+</a>
+
+</body>
+
+</html>

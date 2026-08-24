@@ -1,0 +1,681 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Medicine Sales | MediCare HMS</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #1f2937;
+        }
+
+        .container-page {
+            max-width: 1500px;
+            margin: 35px auto;
+        }
+
+        .card-box {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .07);
+            overflow: hidden;
+        }
+
+        .page-header {
+            background: #123c69;
+            color: white;
+            padding: 25px 30px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .page-header p {
+            color: #dbe7f3;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            padding: 25px;
+        }
+
+        table {
+            vertical-align: middle;
+        }
+
+        thead th {
+            background: #f1f5f9 !important;
+            color: #334155;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        tbody td {
+            font-size: 13px;
+        }
+
+        .sale-number {
+            font-weight: 700;
+            color: #123c69;
+        }
+
+        .patient-name {
+            font-weight: 600;
+        }
+
+        .medicine-item {
+            padding: 7px 0;
+            border-bottom: 1px solid #eef1f5;
+        }
+
+        .medicine-item:last-child {
+            border-bottom: none;
+        }
+
+        .medicine-name {
+            font-weight: 600;
+            color: #123c69;
+        }
+
+        .medicine-details {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .quantity-badge {
+            background: #e7f0fb;
+            color: #0d6efd;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .payment-paid {
+            background: #d1e7dd;
+            color: #146c43;
+        }
+
+        .payment-pending {
+            background: #fff3cd;
+            color: #997404;
+        }
+
+        .payment-partial {
+            background: #cff4fc;
+            color: #055160;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .total {
+            font-weight: 700;
+            color: #123c69;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 70px 30px;
+            color: #777;
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.05);
+            border: 1px solid #edf0f4;
+        }
+
+        .summary-card small {
+            color: #6b7280;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .summary-card strong {
+            font-size: 22px;
+            color: #123c69;
+        }
+
+        @media(max-width: 900px) {
+
+            .container-page {
+                margin: 15px;
+            }
+
+            .summary-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media(max-width: 600px) {
+
+            .summary-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container container-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="card-box mb-4">
+
+        <div class="page-header d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h2>
+                    💊 Medicine Sales
+                </h2>
+
+                <p class="mb-0">
+                    Medicine dispensing and sales history
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'dispense_medicine' %}"
+                class="btn btn-light"
+            >
+
+                ➕ Issue Medicine
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="summary-row">
+
+
+        <div class="summary-card">
+
+            <small>
+                Total Transactions
+            </small>
+
+            <strong>
+                {{ sales|length }}
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <small>
+                Current Date
+            </small>
+
+            <strong>
+                {% now "d M Y" %}
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <small>
+                Pharmacy
+            </small>
+
+            <strong>
+                MediCare
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <small>
+                Status
+            </small>
+
+            <strong>
+                Active
+            </strong>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         SALES TABLE
+    ====================================================== -->
+
+    <div class="card-box">
+
+
+        <div class="table-container">
+
+
+            {% if sales %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>Sale Number</th>
+
+                            <th>Date</th>
+
+                            <th>Patient</th>
+
+                            <th>Medicines</th>
+
+                            <th>Total Amount</th>
+
+                            <th>Payment</th>
+
+                            <th>Issued By</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                        {% for sale in sales %}
+
+                            <tr>
+
+
+                                <!-- NUMBER -->
+
+                                <td>
+
+                                    {{ forloop.counter }}
+
+                                </td>
+
+
+                                <!-- SALE NUMBER -->
+
+                                <td>
+
+                                    <span class="sale-number">
+
+                                        {{ sale.sale_number }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- DATE -->
+
+                                <td>
+
+                                    {% if sale.sale_date %}
+
+                                        {{ sale.sale_date|date:"d M Y H:i" }}
+
+                                    {% else %}
+
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- PATIENT -->
+
+                                <td>
+
+                                    <div class="patient-name">
+
+                                        {{ sale.patient_name }}
+
+                                    </div>
+
+
+                                    {% if sale.patient_number %}
+
+                                        <small class="text-muted">
+
+                                            {{ sale.patient_number }}
+
+                                        </small>
+
+                                    {% else %}
+
+                                        <small class="text-muted">
+
+                                            No patient number
+
+                                        </small>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- MEDICINES -->
+
+                                <td style="min-width:280px;">
+
+
+                                    {% for item in sale.items.all %}
+
+                                        <div class="medicine-item">
+
+
+                                            <div class="d-flex justify-content-between align-items-center">
+
+
+                                                <div>
+
+                                                    <div class="medicine-name">
+
+                                                        {{ item.medicine.name }}
+
+                                                    </div>
+
+
+                                                    {% if item.medicine.strength %}
+
+                                                        <div class="medicine-details">
+
+                                                            {{ item.medicine.strength }}
+
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                </div>
+
+
+                                                <span class="quantity-badge">
+
+                                                    Qty:
+                                                    {{ item.quantity }}
+
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="medicine-details">
+
+                                                UGX
+                                                {{ item.unit_price|floatformat:2 }}
+
+                                                ×
+
+                                                {{ item.quantity }}
+
+                                                =
+
+                                                UGX
+                                                {{ item.total_price|floatformat:2 }}
+
+                                            </div>
+
+
+                                        </div>
+
+                                    {% empty %}
+
+                                        <span class="text-muted">
+
+                                            No medicines recorded
+
+                                        </span>
+
+                                    {% endfor %}
+
+
+                                </td>
+
+
+                                <!-- TOTAL -->
+
+                                <td>
+
+                                    <span class="total">
+
+                                        UGX
+                                        {{ sale.total_amount|floatformat:2 }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- PAYMENT -->
+
+                                <td>
+
+
+                                    {% if sale.payment_status == "PAID" %}
+
+                                        <span class="badge payment-paid">
+
+                                            Paid
+
+                                        </span>
+
+
+                                    {% elif sale.payment_status == "PARTIAL" %}
+
+                                        <span class="badge payment-partial">
+
+                                            Partial
+
+                                        </span>
+
+
+                                    {% elif sale.payment_status == "PENDING" %}
+
+                                        <span class="badge payment-pending">
+
+                                            Pending
+
+                                        </span>
+
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+
+                                            {{ sale.payment_status }}
+
+                                        </span>
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                                <!-- ISSUED BY -->
+
+                                <td>
+
+                                    {% if sale.issued_by %}
+
+                                        {{ sale.issued_by.username }}
+
+                                    {% else %}
+
+                                        <span class="text-muted">
+
+                                            System
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ACTION -->
+
+                                <td>
+
+                                    <a
+                                        href="{% url 'pharmacy_receipt' sale_id=sale.id %}"
+                                        class="btn btn-sm btn-outline-primary"
+                                    >
+
+                                        🧾 Receipt
+
+                                    </a>
+
+                                </td>
+
+
+                            </tr>
+
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty">
+
+
+                    <div class="empty-icon">
+                        💊
+                    </div>
+
+
+                    <h4>
+                        No Medicine Sales Yet
+                    </h4>
+
+
+                    <p>
+
+                        Medicines issued or sold to patients
+                        will appear here.
+
+                    </p>
+
+
+                    <a
+                        href="{% url 'dispense_medicine' %}"
+                        class="btn btn-primary"
+                    >
+
+                        ➕ Issue First Medicine
+
+                    </a>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+</body>
+
+</html>
