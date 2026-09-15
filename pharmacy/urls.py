@@ -86,7 +86,7 @@ urlpatterns = [
         name="confirm_pharmacy_payment"
     ),
 
-  path(
+ path(
     "prescriptions/",
     views.prescription_list,
     name="prescription_list"
@@ -102,5 +102,11 @@ path(
     "prescriptions/<int:pk>/",
     views.prescription_details,
     name="prescription_details"
+),
+
+path(
+    "reports/",
+    views.pharmacy_reports,
+    name="pharmacy_reports"
 ),
 ]

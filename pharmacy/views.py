@@ -10,15 +10,42 @@ from .models import (
     Medicine,
     PharmacySale,
     PharmacySaleItem,
+    PharmacyAuditLog,
     Prescription,
     PrescriptionItem,
 )
 
-from .forms import (
-    MedicineForm,
-    PrescriptionForm,
-    PrescriptionItemForm,
+# from .forms import (
+#     MedicineForm,
+#     PrescriptionForm,
+#     PrescriptionItemForm,
+# )
+from laboratory.models import LabRequest, LabResult
+from django.db.models import (
+    F,
+    Sum,
+    Count,
+    Q,
+    DecimalField,
+    ExpressionWrapper,
 )
+from django.db.models.functions import Coalesce
+from django.http import HttpResponse
+from django.utils.dateparse import parse_date
+
+from datetime import timedelta
+# from io import BytesIO
+# from openpyxl import Workbook
+# from reportlab.lib import colors
+# from reportlab.lib.pagesizes import A4, landscape
+# from reportlab.lib.styles import getSampleStyleSheet
+# from reportlab.platypus import (
+#     SimpleDocTemplate,
+#     Table,
+#     TableStyle,
+#     Paragraph,
+#     Spacer,
+# )
 
 
 # =========================================================
@@ -230,173 +257,13 @@ def delete_medicine(request, id):
 # =========================================================
 # DISPENSE MEDICINE
 # =========================================================
-
+@login_required
 @transaction.atomic
 def dispense_medicine(request):
 
     if request.method == "POST":
 
-        patient_name = request.POST.get(
-            "patient_name",
-            ""
-        ).strip()
-
-        patient_number = request.POST.get(
-            "patient_number",
-            ""
-        ).strip()
-
-        medicine_ids = request.POST.getlist(
-            "medicine_id[]"
-        )
-
-        quantities = request.POST.getlist(
-            "quantity[]"
-        )
-
-        # -------------------------------------------------
-        # VALIDATE PATIENT
-        # -------------------------------------------------
-
-        if not patient_name:
-
-            messages.error(
-                request,
-                "Patient name is required."
-            )
-
-            return redirect("dispense_medicine")
-
-        # -------------------------------------------------
-        # VALIDATE MEDICINES
-        # -------------------------------------------------
-
-        if not medicine_ids:
-
-            messages.error(
-                request,
-                "Please add at least one medicine."
-            )
-
-            return redirect("dispense_medicine")
-
-        if len(medicine_ids) != len(quantities):
-
-            messages.error(
-                request,
-                "Invalid medicine information."
-            )
-
-            return redirect("dispense_medicine")
-
-        # -------------------------------------------------
-        # PREPARE ITEMS
-        # -------------------------------------------------
-
-        sale_items = []
-
-        grand_total = Decimal("0.00")
-
-        # -------------------------------------------------
-        # VALIDATE EVERYTHING
-        # -------------------------------------------------
-
-        for medicine_id, quantity_value in zip(
-            medicine_ids,
-            quantities
-        ):
-
-            try:
-
-                quantity = int(quantity_value)
-
-                if quantity <= 0:
-                    raise ValueError
-
-            except (ValueError, TypeError):
-
-                messages.error(
-                    request,
-                    "Invalid medicine quantity."
-                )
-
-                return redirect("dispense_medicine")
-
-            # -------------------------------------------------
-            # LOCK MEDICINE
-            # -------------------------------------------------
-
-            medicine = (
-                Medicine.objects
-                .select_for_update()
-                .filter(
-                    id=medicine_id,
-                    status="ACTIVE"
-                )
-                .first()
-            )
-
-            if not medicine:
-
-                messages.error(
-                    request,
-                    "One of the selected medicines is unavailable."
-                )
-
-                return redirect("dispense_medicine")
-
-            # -------------------------------------------------
-            # CHECK EXPIRY
-            # -------------------------------------------------
-
-            if (
-                medicine.expiry_date
-                and medicine.expiry_date < timezone.now().date()
-            ):
-
-                messages.error(
-                    request,
-                    f"{medicine.name} has expired "
-                    f"and cannot be issued."
-                )
-
-                return redirect("dispense_medicine")
-
-            # -------------------------------------------------
-            # CHECK STOCK
-            # -------------------------------------------------
-
-            if quantity > medicine.quantity:
-
-                messages.error(
-                    request,
-                    f"Insufficient stock for {medicine.name}. "
-                    f"Available: {medicine.quantity}, "
-                    f"Requested: {quantity}."
-                )
-
-                return redirect("dispense_medicine")
-
-            # -------------------------------------------------
-            # CALCULATE PRICE
-            # -------------------------------------------------
-
-            unit_price = medicine.unit_price
-
-            total_price = unit_price * quantity
-
-            sale_items.append({
-                "medicine": medicine,
-                "quantity": quantity,
-                "unit_price": unit_price,
-                "total_price": total_price,
-            })
-
-            grand_total += total_price
-
-        # -------------------------------------------------
-        # CREATE SALE
-        # -------------------------------------------------
+        # ... validation ...
 
         sale = PharmacySale.objects.create(
             patient_name=patient_name,
@@ -406,11 +273,6 @@ def dispense_medicine(request):
             payment_status="PENDING"
         )
 
-        # -------------------------------------------------
-        # CREATE SALE ITEMS
-        # AND DEDUCT STOCK
-        # -------------------------------------------------
-
         for item in sale_items:
 
             PharmacySaleItem.objects.create(
@@ -418,6 +280,7 @@ def dispense_medicine(request):
                 medicine=item["medicine"],
                 quantity=item["quantity"],
                 unit_price=item["unit_price"],
+                cost_price=item["cost_price"],
                 total_price=item["total_price"]
             )
 
@@ -432,9 +295,21 @@ def dispense_medicine(request):
                 ]
             )
 
-        # -------------------------------------------------
-        # SUCCESS
-        # -------------------------------------------------
+        # =================================================
+        # AUDIT LOG
+        # =================================================
+
+        PharmacyAuditLog.objects.create(
+            user=request.user,
+            action="MEDICINE_DISPENSED",
+            reference=sale.sale_number,
+            description=(
+                f"Pharmacy sale {sale.sale_number} created for "
+                f"{patient_name}. Total amount: "
+                f"UGX {grand_total}"
+            ),
+            ip_address=request.META.get("REMOTE_ADDR")
+        )
 
         messages.success(
             request,
@@ -446,10 +321,6 @@ def dispense_medicine(request):
             "pharmacy_receipt",
             sale_id=sale.id
         )
-
-    # -----------------------------------------------------
-    # GET
-    # -----------------------------------------------------
 
     medicines = (
         Medicine.objects
@@ -566,25 +437,21 @@ def confirm_pharmacy_payment(request, sale_id):
     paid_amount = sale.total_amount
 
     sale.payment_status = "PAID"
-
     sale.payment_method = payment_method
-
-    sale.paid_amount = paid_amount
-
+    sale.amount_paid = paid_amount
     sale.paid_by = request.user
-
     sale.paid_at = timezone.now()
 
     sale.save(
-        update_fields=[
-            "payment_status",
-            "payment_method",
-            "paid_amount",
-            "paid_by",
-            "paid_at",
-            "updated_at",
-        ]
-    )
+    update_fields=[
+        "payment_status",
+        "payment_method",
+        "amount_paid",
+        "paid_by",
+        "paid_at",
+        "updated_at",
+    ]
+)
 
     messages.success(
         request,
@@ -651,203 +518,127 @@ def create_prescription(request):
 
     if request.method == "POST":
 
-        prescription_form = PrescriptionForm(
-            request.POST
-        )
+        prescription_form = PrescriptionForm(request.POST)
 
-        medicine_ids = request.POST.getlist(
-            "medicine[]"
-        )
+        if prescription_form.is_valid():
 
-        dosages = request.POST.getlist(
-            "dosage[]"
-        )
-
-        frequencies = request.POST.getlist(
-            "frequency[]"
-        )
-
-        durations = request.POST.getlist(
-            "duration[]"
-        )
-
-        quantities = request.POST.getlist(
-            "quantity[]"
-        )
-
-        instructions = request.POST.getlist(
-            "instructions[]"
-        )
-
-        # ---------------------------------------------
-        # VALIDATE PRESCRIPTION
-        # ---------------------------------------------
-
-        if not prescription_form.is_valid():
-
-            return render(
-                request,
-                "pharmacy/create_prescription.html",
-                {
-                    "prescription_form": prescription_form,
-                    "medicines": Medicine.objects.filter(
-                        status="ACTIVE",
-                        quantity__gt=0
-                    ).order_by("name"),
-                }
+            prescription = prescription_form.save(
+                commit=False
             )
 
-        # ---------------------------------------------
-        # CHECK MEDICINES
-        # ---------------------------------------------
+            prescription.prescribed_by = request.user
 
-        if not medicine_ids:
+            prescription.save()
 
-            messages.error(
-                request,
-                "Please add at least one medicine."
+            # ---------------------------------------------
+            # PRESCRIPTION ITEMS
+            # ---------------------------------------------
+
+            medicine_ids = request.POST.getlist(
+                "medicine[]"
             )
 
-            return redirect(
-                "create_prescription"
+            dosages = request.POST.getlist(
+                "dosage[]"
             )
 
-        # ---------------------------------------------
-        # CHECK ARRAY LENGTHS
-        # ---------------------------------------------
-
-        if not (
-            len(medicine_ids)
-            == len(dosages)
-            == len(frequencies)
-            == len(durations)
-            == len(quantities)
-            == len(instructions)
-        ):
-
-            messages.error(
-                request,
-                "Invalid prescription medicine information."
+            frequencies = request.POST.getlist(
+                "frequency[]"
             )
 
-            return redirect(
-                "create_prescription"
+            durations = request.POST.getlist(
+                "duration[]"
             )
 
-        # ---------------------------------------------
-        # CREATE PRESCRIPTION
-        # ---------------------------------------------
+            quantities = request.POST.getlist(
+                "quantity[]"
+            )
 
-        prescription = prescription_form.save(
-            commit=False
-        )
+            instructions = request.POST.getlist(
+                "instructions[]"
+            )
 
-        prescription.prescribed_by = request.user
+            for i in range(len(medicine_ids)):
 
-        prescription.status = "PENDING"
+                if not medicine_ids[i]:
+                    continue
 
-        prescription.save()
-
-        # ---------------------------------------------
-        # CREATE PRESCRIPTION ITEMS
-        # ---------------------------------------------
-
-        for i in range(len(medicine_ids)):
-
-            try:
-
-                medicine_id = medicine_ids[i]
+                medicine = get_object_or_404(
+                    Medicine,
+                    id=medicine_ids[i],
+                    status="ACTIVE"
+                )
 
                 quantity = int(
                     quantities[i]
                 )
 
-                if quantity <= 0:
-                    raise ValueError
+                PrescriptionItem.objects.create(
 
-            except (
-                ValueError,
-                TypeError
-            ):
+                    prescription=prescription,
 
-                messages.error(
-                    request,
-                    "Invalid medicine quantity."
+                    medicine=medicine,
+
+                    dosage=dosages[i],
+
+                    frequency=frequencies[i],
+
+                    duration=durations[i],
+
+                    quantity=quantity,
+
+                    instructions=(
+                        instructions[i]
+                        if i < len(instructions)
+                        else ""
+                    )
                 )
 
-                raise transaction.TransactionManagementError(
-                    "Invalid prescription quantity."
-                )
-
-            medicine = get_object_or_404(
-                Medicine,
-                id=medicine_id,
-                status="ACTIVE"
+            messages.success(
+                request,
+                f"Prescription #{prescription.id} "
+                f"created successfully."
             )
 
-            # -----------------------------------------
-            # CHECK EXPIRY
-            # -----------------------------------------
-
-            if medicine.expiry_date:
-
-                if (
-                    medicine.expiry_date
-                    < timezone.now().date()
-                ):
-
-                    messages.error(
-                        request,
-                        f"{medicine.name} has expired."
-                    )
-
-                    raise transaction.TransactionManagementError(
-                        "Expired medicine."
-                    )
-
-            # -----------------------------------------
-            # CREATE ITEM
-            # -----------------------------------------
-
-            PrescriptionItem.objects.create(
-
-                prescription=prescription,
-
-                medicine=medicine,
-
-                dosage=dosages[i].strip(),
-
-                frequency=frequencies[i].strip(),
-
-                duration=durations[i].strip(),
-
-                quantity=quantity,
-
-                instructions=instructions[i].strip()
-                if instructions[i]
-                else ""
+            return redirect(
+                "prescription_details",
+                pk=prescription.id
             )
 
-        # ---------------------------------------------
-        # SUCCESS
-        # ---------------------------------------------
+    else:
 
-        messages.success(
-            request,
-            f"Prescription #{prescription.id} "
-            f"created successfully."
+        prescription_form = PrescriptionForm()
+
+    # ---------------------------------------------
+    # PATIENT
+    # ---------------------------------------------
+
+    patient_id = request.GET.get(
+        "patient"
+    )
+
+    lab_results = LabResult.objects.none()
+
+    if patient_id:
+
+        lab_results = (
+            LabResult.objects
+            .select_related(
+                "lab_request",
+                "lab_request__test"
+            )
+            .filter(
+                lab_request__patient_id=patient_id,
+                lab_request__status="Completed"
+            )
+            .order_by(
+                "-result_date"
+            )
         )
 
-        return redirect(
-            "prescription_details",
-            pk=prescription.id
-        )
-
-    # =================================================
-    # GET
-    # =================================================
-
-    prescription_form = PrescriptionForm()
+    # ---------------------------------------------
+    # MEDICINES
+    # ---------------------------------------------
 
     medicines = (
         Medicine.objects
@@ -864,5 +655,366 @@ def create_prescription(request):
         {
             "prescription_form": prescription_form,
             "medicines": medicines,
+            "lab_results": lab_results,
+            "selected_patient": patient_id,
         }
+    )
+
+# =========================================================
+# PHARMACY REPORTS
+# =========================================================
+
+@login_required
+def pharmacy_reports(request):
+
+    today = timezone.now().date()
+
+    date_from = request.GET.get("date_from")
+    date_to = request.GET.get("date_to")
+    category = request.GET.get("category")
+    payment_method = request.GET.get("payment_method")
+
+    if not date_from:
+        date_from = today.replace(day=1).isoformat()
+
+    if not date_to:
+        date_to = today.isoformat()
+
+    start_date = parse_date(date_from)
+    end_date = parse_date(date_to)
+
+    if not start_date:
+        start_date = today.replace(day=1)
+
+    if not end_date:
+        end_date = today
+
+    end_datetime = timezone.make_aware(
+        timezone.datetime.combine(
+            end_date + timedelta(days=1),
+            timezone.datetime.min.time()
+        )
+    )
+
+    start_datetime = timezone.make_aware(
+        timezone.datetime.combine(
+            start_date,
+            timezone.datetime.min.time()
+        )
+    )
+
+    # -----------------------------------------------------
+    # SALES
+    # -----------------------------------------------------
+
+    sales = PharmacySale.objects.filter(
+        sale_date__gte=start_datetime,
+        sale_date__lt=end_datetime
+    )
+
+    if payment_method:
+        sales = sales.filter(
+            payment_method=payment_method
+        )
+
+    total_sales = sales.count()
+
+    total_revenue = (
+        sales.filter(payment_status="PAID")
+        .aggregate(
+            total=Coalesce(
+                Sum("amount_paid"),
+                Decimal("0.00")
+            )
+        )["total"]
+    )
+
+    outstanding = (
+        sales.filter(
+            payment_status__in=["PENDING", "PARTIAL"]
+        )
+        .aggregate(
+            total=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F("total_amount") - F("amount_paid"),
+                        output_field=DecimalField(
+                            max_digits=12,
+                            decimal_places=2
+                        )
+                    )
+                ),
+                Decimal("0.00")
+            )
+        )["total"]
+    )
+
+    total_billed = (
+        sales.aggregate(
+            total=Coalesce(
+                Sum("total_amount"),
+                Decimal("0.00")
+            )
+        )["total"]
+    )
+
+    # -----------------------------------------------------
+    # SALE ITEMS
+    # -----------------------------------------------------
+
+    sale_items = PharmacySaleItem.objects.filter(
+        sale__sale_date__gte=start_datetime,
+        sale__sale_date__lt=end_datetime
+    )
+
+    if category:
+        sale_items = sale_items.filter(
+            medicine__category=category
+        )
+
+    total_items_sold = (
+        sale_items.aggregate(
+            total=Coalesce(
+                Sum("quantity"),
+                0
+            )
+        )["total"]
+    )
+
+    total_cost = (
+        sale_items.aggregate(
+            total=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F("cost_price") * F("quantity"),
+                        output_field=DecimalField(
+                            max_digits=14,
+                            decimal_places=2
+                        )
+                    )
+                ),
+                Decimal("0.00")
+            )
+        )["total"]
+    )
+
+    total_profit = (
+        sale_items.aggregate(
+            total=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F("total_price")
+                        - (
+                            F("cost_price")
+                            * F("quantity")
+                        ),
+                        output_field=DecimalField(
+                            max_digits=14,
+                            decimal_places=2
+                        )
+                    )
+                ),
+                Decimal("0.00")
+            )
+        )["total"]
+    )
+
+    if total_revenue:
+        profit_margin = (
+            total_profit / total_revenue
+        ) * Decimal("100")
+    else:
+        profit_margin = Decimal("0.00")
+
+    # -----------------------------------------------------
+    # INVENTORY
+    # -----------------------------------------------------
+
+    medicines = Medicine.objects.all()
+
+    inventory_value = (
+        medicines.aggregate(
+            total=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F("quantity") * F("cost_price"),
+                        output_field=DecimalField(
+                            max_digits=16,
+                            decimal_places=2
+                        )
+                    )
+                ),
+                Decimal("0.00")
+            )
+        )["total"]
+    )
+
+    selling_value = (
+        medicines.aggregate(
+            total=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F("quantity") * F("unit_price"),
+                        output_field=DecimalField(
+                            max_digits=16,
+                            decimal_places=2
+                        )
+                    )
+                ),
+                Decimal("0.00")
+            )
+        )["total"]
+    )
+
+    low_stock = medicines.filter(
+        quantity__gt=0,
+        quantity__lte=F("reorder_level")
+    ).count()
+
+    out_of_stock = medicines.filter(
+        quantity=0
+    ).count()
+
+    expired = medicines.filter(
+        expiry_date__lt=today
+    ).count()
+
+    expiring_30 = medicines.filter(
+        expiry_date__gte=today,
+        expiry_date__lte=today + timedelta(days=30)
+    ).count()
+
+    # -----------------------------------------------------
+    # PRESCRIPTIONS
+    # -----------------------------------------------------
+
+    prescriptions = Prescription.objects.filter(
+        prescribed_at__gte=start_datetime,
+        prescribed_at__lt=end_datetime
+    )
+
+    prescription_count = prescriptions.count()
+
+    pending_prescriptions = prescriptions.filter(
+        status="PENDING"
+    ).count()
+
+    dispensed_prescriptions = prescriptions.filter(
+        status="DISPENSED"
+    ).count()
+
+    # -----------------------------------------------------
+    # PAYMENT BREAKDOWN
+    # -----------------------------------------------------
+
+    payment_breakdown = (
+        sales.filter(payment_status="PAID")
+        .values("payment_method")
+        .annotate(
+            total=Sum("amount_paid"),
+            count=Count("id")
+        )
+        .order_by("-total")
+    )
+
+    # -----------------------------------------------------
+    # CATEGORY BREAKDOWN
+    # -----------------------------------------------------
+
+    category_breakdown = (
+        sale_items
+        .values(
+            "medicine__category"
+        )
+        .annotate(
+            quantity=Sum("quantity"),
+            revenue=Sum("total_price")
+        )
+        .order_by("-revenue")
+    )
+
+    # -----------------------------------------------------
+    # FAST MOVING
+    # -----------------------------------------------------
+
+    fast_moving = (
+        sale_items
+        .values(
+            "medicine__name"
+        )
+        .annotate(
+            quantity_sold=Sum("quantity"),
+            revenue=Sum("total_price")
+        )
+        .order_by("-quantity_sold")[:10]
+    )
+
+    # -----------------------------------------------------
+    # SLOW MOVING
+    # -----------------------------------------------------
+
+    slow_moving = (
+        sale_items
+        .values(
+            "medicine__name"
+        )
+        .annotate(
+            quantity_sold=Sum("quantity"),
+            revenue=Sum("total_price")
+        )
+        .order_by("quantity_sold")[:10]
+    )
+
+    # -----------------------------------------------------
+    # EXPIRY
+    # -----------------------------------------------------
+
+    expiry_date_90 = today + timedelta(days=90)
+
+    expiry_medicines = medicines.filter(
+        expiry_date__lte=expiry_date_90
+    ).order_by("expiry_date")
+
+    context = {
+        "date_from": start_date,
+        "date_to": end_date,
+
+        "total_sales": total_sales,
+        "total_billed": total_billed,
+        "total_revenue": total_revenue,
+        "outstanding": outstanding,
+
+        "total_items_sold": total_items_sold,
+        "total_cost": total_cost,
+        "total_profit": total_profit,
+        "profit_margin": profit_margin,
+
+        "inventory_value": inventory_value,
+        "selling_value": selling_value,
+
+        "low_stock": low_stock,
+        "out_of_stock": out_of_stock,
+        "expired": expired,
+        "expiring_30": expiring_30,
+
+        "prescription_count": prescription_count,
+        "pending_prescriptions": pending_prescriptions,
+        "dispensed_prescriptions": dispensed_prescriptions,
+
+        "payment_breakdown": payment_breakdown,
+        "category_breakdown": category_breakdown,
+
+        "fast_moving": fast_moving,
+        "slow_moving": slow_moving,
+
+        "expiry_medicines": expiry_medicines,
+
+        "categories": Medicine.CATEGORY_CHOICES,
+        "payment_methods": PharmacySale.PAYMENT_METHOD_CHOICES,
+    }
+
+    return render(
+        request,
+        "pharmacy/reports.html",
+        context
     )

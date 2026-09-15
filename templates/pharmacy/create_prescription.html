@@ -101,50 +101,72 @@
                      PATIENT INFORMATION
                 ====================================== -->
 
-                <h5 class="mb-3">
-                    Patient Information
-                </h5>
+               <h5 class="mb-3">
+    Patient Information
+</h5>
+
+<div class="mb-3">
+
+    <label class="form-label">
+        Patient
+    </label>
+
+    {{ prescription_form.patient }}
+
+    {% if prescription_form.patient.errors %}
+
+        <div class="text-danger">
+            {{ prescription_form.patient.errors }}
+
+        </div>
+
+    {% endif %}
+
+</div>
 
 
-                <div class="mb-3">
+<!-- LAB RESULTS -->
 
-                    <label class="form-label">
-                        Patient
-                    </label>
+<div
+    id="labResultsSection"
+    class="mt-4"
+    style="display:none;"
+>
 
-                    {{ prescription_form.patient }}
+    <div class="card border-0 shadow-sm">
 
-                    {% if prescription_form.patient.errors %}
+        <div class="card-header bg-info text-white">
 
-                        <div class="text-danger">
-                            {{ prescription_form.patient.errors }}
-                        </div>
+            <h5 class="mb-0">
+                🧪 Laboratory Results
+            </h5>
 
-                    {% endif %}
+            <small>
+                Completed laboratory results for this patient
+            </small>
 
-                </div>
+        </div>
+
+        <div class="card-body">
+
+            <div id="labResults"></div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
-                <div class="mb-3">
+<div class="mb-3 mt-4">
 
-                    <label class="form-label">
-                        Diagnosis
-                    </label>
+    <label class="form-label">
+        Diagnosis
+    </label>
 
-                    {{ prescription_form.diagnosis }}
+    {{ prescription_form.diagnosis }}
 
-                </div>
-
-
-                <div class="mb-4">
-
-                    <label class="form-label">
-                        Notes
-                    </label>
-
-                    {{ prescription_form.notes }}
-
-                </div>
+</div>
 
 
                 <hr>
@@ -406,3 +428,297 @@ function removeMedicine(button) {
 </body>
 
 </html>
+<script>
+
+function addMedicine() {
+
+    const container =
+        document.getElementById(
+            "medicineContainer"
+        );
+
+    const firstRow =
+        container.querySelector(
+            ".medicine-row"
+        );
+
+    const newRow =
+        firstRow.cloneNode(true);
+
+    newRow.querySelectorAll(
+        "input"
+    ).forEach(function(input) {
+
+        input.value = "";
+
+    });
+
+    newRow.querySelector(
+        "select"
+    ).selectedIndex = 0;
+
+    container.appendChild(newRow);
+}
+
+
+function removeMedicine(button) {
+
+    const rows =
+        document.querySelectorAll(
+            ".medicine-row"
+        );
+
+    if (rows.length === 1) {
+
+        alert(
+            "At least one medicine is required."
+        );
+
+        return;
+    }
+
+    button
+        .closest(".medicine-row")
+        .remove();
+}
+
+
+/* =====================================================
+   LOAD PATIENT LAB RESULTS
+===================================================== */
+
+const patientSelect =
+    document.getElementById(
+        "id_patient"
+    );
+
+
+patientSelect.addEventListener(
+    "change",
+    function() {
+
+        const patientId =
+            this.value;
+
+        const section =
+            document.getElementById(
+                "labResultsSection"
+            );
+
+        const container =
+            document.getElementById(
+                "labResults"
+            );
+
+
+        if (!patientId) {
+
+            section.style.display = "none";
+
+            container.innerHTML = "";
+
+            return;
+        }
+
+
+        section.style.display = "block";
+
+
+        container.innerHTML = `
+            <div class="text-center p-4">
+
+                <div
+                    class="spinner-border text-primary"
+                    role="status"
+                ></div>
+
+                <p class="mt-2">
+                    Loading laboratory results...
+                </p>
+
+            </div>
+        `;
+
+
+        fetch(
+            `/laboratory/patient/${patientId}/results/`
+        )
+
+        .then(function(response) {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load laboratory results."
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(function(results) {
+
+            if (results.length === 0) {
+
+                container.innerHTML = `
+
+                    <div class="alert alert-warning">
+
+                        <strong>
+                            No completed laboratory results.
+                        </strong>
+
+                        <br>
+
+                        This patient does not have
+                        completed laboratory results.
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            let html = `
+
+                <div class="table-responsive">
+
+                    <table
+                        class="table table-bordered
+                               table-hover align-middle"
+                    >
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Laboratory Test
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Result
+                                </th>
+
+                                <th>
+                                    Interpretation
+                                </th>
+
+                                <th>
+                                    Sample #
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+            `;
+
+
+            results.forEach(function(result) {
+
+                html += `
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                ${result.test}
+                            </strong>
+                        </td>
+
+                        <td>
+                            ${result.category}
+                        </td>
+
+                        <td>
+                            <strong>
+                                ${result.result}
+                            </strong>
+                        </td>
+
+                        <td>
+                            ${result.interpretation}
+                        </td>
+
+                        <td>
+                            ${result.sample_number}
+                        </td>
+
+                        <td>
+                            ${result.date}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            });
+
+
+            html += `
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="alert alert-info">
+
+                    <strong>
+                        Doctor's Note:
+                    </strong>
+
+                    Review the laboratory findings
+                    before prescribing medication.
+
+                </div>
+
+            `;
+
+
+            container.innerHTML = html;
+
+        })
+
+        .catch(function(error) {
+
+            console.error(error);
+
+            container.innerHTML = `
+
+                <div class="alert alert-danger">
+
+                    <strong>
+                        Unable to load laboratory results.
+                    </strong>
+
+                    <br>
+
+                    Please try again or contact
+                    the laboratory department.
+
+                </div>
+
+            `;
+
+        });
+
+    }
+);
+
+</script>

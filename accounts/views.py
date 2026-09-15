@@ -123,15 +123,14 @@ def logout_view(request):
         "home"
     )
 
-
 @login_required
 def dashboard(request):
 
-    # Count the actual patients in the database
-    patients_count = Patient.objects.count()
+    patients = Patient.objects.order_by("-created_at")
 
     context = {
-        "patients_count": patients_count,
+        "patients_count": patients.count(),
+        "patients": patients[:5],
     }
 
     return render(

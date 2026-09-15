@@ -52,6 +52,11 @@ path(
     "billing/",
     include("billing.urls")
 ),
+
+ path(
+        "wards/",
+        include("wards.urls")
+    ),
 ]
 
 

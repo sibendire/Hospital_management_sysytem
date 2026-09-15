@@ -18,27 +18,29 @@ class MedicineForm(forms.ModelForm):
 
         model = Medicine
 
-        fields = [
-            "name",
-            "generic_name",
-            "brand_name",
-            "category",
-            "dosage_form",
-            "strength",
-            "unit",
-            "manufacturer",
-            "supplier",
-            "batch_number",
-            "expiry_date",
-            "quantity",
-            "reorder_level",
-            "unit_price",
-            "prescription_required",
-            "status",
-            "description",
-        ]
+    fields = [
+    "name",
+    "generic_name",
+    "brand_name",
+    "category",
+    "dosage_form",
+    "strength",
+    "unit",
+    "manufacturer",
+    "supplier",
+    "batch_number",
+    "expiry_date",
+    "quantity",
+    "reorder_level",
+    "unit_price",
+    "cost_price",
+    "prescription_required",
+    "controlled_substance",
+    "status",
+    "description",
+    ]
 
-        widgets = {
+    widgets = {
 
             "name": forms.TextInput(
                 attrs={
@@ -137,6 +139,20 @@ class MedicineForm(forms.ModelForm):
                 }
             ),
 
+"cost_price": forms.NumberInput(
+    attrs={
+        "class": "form-control",
+        "min": "0",
+        "step": "0.01",
+        "placeholder": "Purchase / Cost Price"
+    }
+),
+
+"controlled_substance": forms.CheckboxInput(
+    attrs={
+        "class": "form-check-input"
+    }
+),
             "prescription_required": forms.Select(
                 attrs={
                     "class": "form-select"

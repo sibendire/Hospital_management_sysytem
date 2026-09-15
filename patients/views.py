@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -45,21 +44,18 @@ def patient_list(request):
             "patients": patients
         }
     )
-
-
 @login_required
 def dashboard(request):
 
-    # Get the actual number of patients
-    patients_count = Patient.objects.count()
+    patients = Patient.objects.order_by("-created_at")
 
     context = {
-        "patients_count": patients_count,
+        "patients_count": patients.count(),
+        "patients": patients[:5],
     }
 
     return render(
         request,
-        "accounts/dashboard.html",
+        "dashboard.html",
         context
     )
-

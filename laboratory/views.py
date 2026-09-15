@@ -1,11 +1,13 @@
-from django.shortcuts import render,redirect,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
-from .models import LabTest,LabRequest,LabResult
+from .models import LabTest, LabRequest, LabResult
 
 from .forms import (
     LabTestForm,
     LabRequestForm,
-    LabResultForm
+    LabResultForm,
 )
 
 
@@ -230,3 +232,48 @@ def enter_result(request,id):
         }
 
     )
+@login_required
+def patient_lab_results(request, patient_id):
+
+    results = (
+        LabResult.objects
+        .select_related(
+            "lab_request",
+            "lab_request__test",
+            "lab_request__patient",
+        )
+        .filter(
+            lab_request__patient_id=patient_id,
+            lab_request__status="Completed"
+        )
+        .order_by("-result_date")
+    )
+
+    data = []
+
+    for result in results:
+
+        data.append({
+            "test": result.lab_request.test.name,
+
+            "category": result.lab_request.test.category,
+
+            "result": result.result,
+
+            "interpretation": (
+                result.interpretation
+                or "No interpretation provided"
+            ),
+
+            "technician": result.technician,
+
+            "sample_number": (
+                result.lab_request.sample_number
+            ),
+
+            "date": result.result_date.strftime(
+                "%d %b %Y %H:%M"
+            ),
+        })
+
+    return JsonResponse(data, safe=False)
