@@ -329,7 +329,7 @@
 
                                         <option
                                             value="{{ medicine.id }}"
-                                            data-price="{{ medicine.unit_price }}"
+                                            data-price="{{ medicine.selling_price }}"
                                             data-stock="{{ medicine.quantity }}"
                                         >
 
@@ -343,7 +343,7 @@
                                             {{ medicine.quantity }}
 
                                             | UGX
-                                            {{ medicine.unit_price|floatformat:2 }}
+                                            {{ medicine.selling_price|floatformat:2 }}
 
                                         </option>
 

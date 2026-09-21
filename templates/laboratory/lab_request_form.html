@@ -1,98 +1,348 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<title>New Laboratory Request</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>New Laboratory Request</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        .page-container {
+            max-width: 1000px;
+            margin: 50px auto;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #0f62fe;
+            color: white;
+            padding: 25px;
+        }
+
+        .card-header h3 {
+            margin-bottom: 5px;
+        }
+
+        .card-body {
+            padding: 35px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 7px;
+            color: #343a40;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ced4da;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0f62fe;
+            box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.15);
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .info-box {
+            background: #e7f1ff;
+            border-left: 4px solid #0f62fe;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .system-field {
+            background: #f8f9fa;
+        }
+
+        .btn-save {
+            background: #198754;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+        }
+
+        .btn-save:hover {
+            background: #146c43;
+            color: white;
+        }
+
+        .btn-back {
+            padding: 12px 25px;
+            border-radius: 8px;
+        }
+
+        .field-help {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+    </style>
 
 </head>
 
-<body class="bg-light">
 
-<div class="container mt-5">
+<body>
 
-<div class="card shadow-lg">
+<div class="container">
 
-<div class="card-header bg-primary text-white">
+    <div class="page-container">
 
-<h3>🧪 New Laboratory Request</h3>
+        <div class="card">
+
+            <!-- HEADER -->
+
+            <div class="card-header">
+
+                <h3>
+                    🧪 New Laboratory Request
+                </h3>
+
+                <small>
+                    Create a laboratory request for a patient
+                </small>
+
+            </div>
+
+
+            <!-- BODY -->
+
+            <div class="card-body">
+
+                <!-- SYSTEM INFORMATION -->
+
+                <div class="info-box">
+
+                    <strong>
+                        Laboratory Request Information
+                    </strong>
+
+                    <p class="mb-0 mt-1">
+
+                        The laboratory sample number is generated
+                        automatically by the hospital system after
+                        the request is saved.
+
+                    </p>
+
+                </div>
+
+
+                <!-- FORM ERRORS -->
+
+                {% if form.non_field_errors %}
+
+                    <div class="alert alert-danger">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+
+                    <!-- PATIENT -->
+
+                    <div class="mb-4">
+
+                        <label for="{{ form.patient.id_for_label }}">
+
+                            Patient
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+                        {{ form.patient }}
+
+                        {% if form.patient.errors %}
+
+                            <div class="text-danger small mt-1">
+
+                                {{ form.patient.errors }}
+
+                            </div>
+
+                        {% endif %}
+
+                        <div class="field-help">
+
+                            Select the patient requiring the laboratory test.
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LABORATORY TEST -->
+
+                    <div class="mb-4">
+
+                        <label for="{{ form.test.id_for_label }}">
+
+                            Laboratory Test
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+                        {{ form.test }}
+
+                        {% if form.test.errors %}
+
+                            <div class="text-danger small mt-1">
+
+                                {{ form.test.errors }}
+
+                            </div>
+
+                        {% endif %}
+
+                        <div class="field-help">
+
+                            Select the required laboratory investigation.
+                            The category and current price are displayed
+                            automatically.
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- REQUESTED BY -->
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-4">
+
+                            <label>
+                                Requested By
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control system-field"
+                                value="{{ request.user.get_full_name|default:request.user.username }}"
+                                readonly
+                            >
+
+                            <div class="field-help">
+
+                                Automatically recorded from the
+                                logged-in healthcare worker.
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- SAMPLE NUMBER -->
+
+                        <div class="col-md-6 mb-4">
+
+                            <label>
+                                Sample Number
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control system-field"
+                                value="Generated automatically"
+                                readonly
+                            >
+
+                            <div class="field-help">
+
+                                The system generates the laboratory
+                                sample number after saving.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="border-top pt-4 mt-2">
+
+                        <button
+                            type="submit"
+                            class="btn btn-save"
+                        >
+                            💾 Save Laboratory Request
+                        </button>
+
+                        <a
+                            href="{% url 'laboratory_dashboard' %}"
+                            class="btn btn-secondary btn-back ms-2"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="card-body">
 
-<form method="POST">
-
-{% csrf_token %}
-
-<div class="row">
-
-<div class="col-md-6 mb-3">
-
-<label class="form-label">Patient</label>
-
-{{ form.patient }}
-
-</div>
-
-<div class="col-md-6 mb-3">
-
-<label class="form-label">Laboratory Test</label>
-
-{{ form.test }}
-
-</div>
-
-<div class="col-md-6 mb-3">
-
-<label class="form-label">Sample Number</label>
-
-{{ form.sample_number }}
-
-</div>
-
-<div class="col-md-6 mb-3">
-
-<label class="form-label">Requested By</label>
-
-{{ form.requested_by }}
-
-</div>
-
-<div class="col-md-6 mb-3">
-
-<label class="form-label">Status</label>
-
-{{ form.status }}
-
-</div>
-
-</div>
-
-<hr>
-
-<button class="btn btn-success">
-
-Save Laboratory Request
-
-</button>
-
-<a href="{% url 'laboratory_dashboard' %}" class="btn btn-secondary">
-
-Cancel
-
-</a>
-
-</form>
-
-</div>
-
-</div>
-
-</div>
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
 
 </body>
+
 </html>

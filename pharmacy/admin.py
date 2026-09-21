@@ -15,7 +15,7 @@ class MedicineAdmin(admin.ModelAdmin):
 
         "quantity",
 
-        "unit_price",
+        "buying_price",
 
         "expiry_date",
 

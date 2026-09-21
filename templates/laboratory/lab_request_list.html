@@ -1,13 +1,20 @@
-```html
 {% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Laboratory Requests | MediCare HMS</title>
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Laboratory Requests | MediCare HMS
+    </title>
 
     <style>
 
@@ -136,7 +143,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 17px;
         }
 
         .user-info {
@@ -155,7 +161,7 @@
 
         .summary {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 17px;
             margin-bottom: 22px;
         }
@@ -206,11 +212,6 @@
             color: #16834b;
         }
 
-        .red {
-            background: #fdeaea;
-            color: #c62828;
-        }
-
         /* ================= TOOLBAR ================= */
 
         .toolbar {
@@ -225,13 +226,10 @@
             display: flex;
             gap: 12px;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
         }
 
         .search-box {
             flex: 1;
-            min-width: 250px;
             position: relative;
         }
 
@@ -242,10 +240,6 @@
             border-radius: 8px;
             outline: none;
             font-size: 13px;
-        }
-
-        .search-box input:focus {
-            border-color: #1769aa;
         }
 
         .search-icon {
@@ -259,9 +253,8 @@
             border: 1px solid #dce3e9;
             border-radius: 8px;
             background: white;
-            min-width: 150px;
+            min-width: 160px;
             outline: none;
-            color: #46535e;
         }
 
         .btn {
@@ -282,16 +275,12 @@
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #12578f;
-        }
-
         .btn-light {
             background: #eef4f9;
             color: #1769aa;
         }
 
-        /* ================= REQUEST TABLE ================= */
+        /* ================= TABLE ================= */
 
         .table-panel {
             background: white;
@@ -324,7 +313,6 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1050px;
         }
 
         th {
@@ -334,7 +322,6 @@
             font-size: 11px;
             padding: 13px 14px;
             text-transform: uppercase;
-            letter-spacing: .3px;
             white-space: nowrap;
         }
 
@@ -356,7 +343,6 @@
 
         .patient-name {
             font-weight: 600;
-            color: #263238;
         }
 
         .patient-number {
@@ -375,10 +361,6 @@
             margin-top: 3px;
         }
 
-        .doctor {
-            font-size: 12px;
-        }
-
         .date {
             white-space: nowrap;
             color: #596773;
@@ -395,22 +377,7 @@
             white-space: nowrap;
         }
 
-        .priority-routine {
-            background: #e8f1fb;
-            color: #1769aa;
-        }
-
-        .priority-urgent {
-            background: #fff3df;
-            color: #c87900;
-        }
-
-        .priority-stat {
-            background: #fdeaea;
-            color: #c62828;
-        }
-
-        .status-requested {
+        .status-pending {
             background: #eef1f4;
             color: #65727d;
         }
@@ -430,11 +397,6 @@
             color: #16834b;
         }
 
-        .status-cancelled {
-            background: #fdeaea;
-            color: #c62828;
-        }
-
         /* ================= ACTIONS ================= */
 
         .actions {
@@ -452,13 +414,6 @@
             text-decoration: none;
             background: #f0f4f8;
             color: #1769aa;
-            font-size: 14px;
-            transition: .2s;
-        }
-
-        .action-btn:hover {
-            background: #1769aa;
-            color: white;
         }
 
         .action-btn.result {
@@ -466,12 +421,7 @@
             color: #16834b;
         }
 
-        .action-btn.result:hover {
-            background: #16834b;
-            color: white;
-        }
-
-        /* ================= EMPTY STATE ================= */
+        /* ================= EMPTY ================= */
 
         .empty {
             text-align: center;
@@ -489,116 +439,44 @@
             margin-bottom: 5px;
         }
 
-        /* ================= PAGINATION ================= */
-
-        .pagination {
-            padding: 17px 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #edf0f3;
-        }
-
-        .pagination-info {
+        footer {
+            text-align: center;
+            padding: 25px;
             color: #8996a3;
             font-size: 12px;
         }
 
-        .pagination-links {
-            display: flex;
-            gap: 5px;
-        }
-
-        .page-link {
-            min-width: 32px;
-            height: 32px;
-            padding: 0 9px;
-            border: 1px solid #dce3e9;
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #596773;
-            font-size: 12px;
-        }
-
-        .page-link.active,
-        .page-link:hover {
-            background: #1769aa;
-            border-color: #1769aa;
-            color: white;
-        }
-
         /* ================= RESPONSIVE ================= */
 
-        @media (max-width: 1100px) {
-
-            .summary {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-        }
-
-        @media (max-width: 768px) {
-
-            .sidebar {
-                width: 70px;
-                padding: 20px 8px;
-            }
-
-            .logo h2,
-            .logo p,
-            .sidebar a span:not(.icon),
-            .menu-title {
-                display: none;
-            }
-
-            .sidebar a {
-                justify-content: center;
-            }
-
-            .logo-icon {
-                font-size: 27px;
-            }
-
-            .main {
-                margin-left: 70px;
-                padding: 15px;
-            }
+        @media (max-width: 900px) {
 
             .summary {
                 grid-template-columns: 1fr;
             }
 
-            .topbar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
             .toolbar-row {
+                flex-direction: column;
                 align-items: stretch;
             }
 
-            .search-box {
-                min-width: 100%;
+            .sidebar {
+                width: 70px;
             }
 
-            select,
-            .btn {
-                width: 100%;
-                justify-content: center;
+            .sidebar span:not(.icon),
+            .logo h2,
+            .logo p,
+            .menu-title {
+                display: none;
             }
 
-            .pagination {
-                flex-direction: column;
-                gap: 12px;
+            .main {
+                margin-left: 70px;
             }
-
         }
 
     </style>
+
 </head>
 
 <body>
@@ -623,7 +501,6 @@
 
     </div>
 
-
     <div class="menu-title">
         Main
     </div>
@@ -638,7 +515,6 @@
         <span>Patients</span>
     </a>
 
-
     <div class="menu-title">
         Departments
     </div>
@@ -648,44 +524,19 @@
         <span>Laboratory Dashboard</span>
     </a>
 
-    <a href="{% url 'lab_request_list' %}" class="active">
+    <a href="{% url 'lab_requests' %}" class="active">
         <span class="icon">📋</span>
         <span>Lab Requests</span>
     </a>
 
-    <a href="#">
+    <a href="{% url 'test_list' %}">
         <span class="icon">🧬</span>
         <span>Test Catalog</span>
     </a>
 
-    <a href="#">
-        <span class="icon">🧪</span>
-        <span>Specimens</span>
-    </a>
-
-    <a href="#">
-        <span class="icon">📄</span>
-        <span>Lab Results</span>
-    </a>
-
-
-    <div class="menu-title">
-        Administration
-    </div>
-
     <a href="{% url 'billing_dashboard' %}">
         <span class="icon">💰</span>
         <span>Billing</span>
-    </a>
-
-    <a href="#">
-        <span class="icon">📊</span>
-        <span>Reports</span>
-    </a>
-
-    <a href="#">
-        <span class="icon">⚙️</span>
-        <span>Settings</span>
     </a>
 
     <a href="{% url 'logout' %}">
@@ -702,21 +553,21 @@
 
 <main class="main">
 
-
     <!-- TOPBAR -->
 
     <div class="topbar">
 
         <div class="page-title">
 
-            <h1>Laboratory Requests</h1>
+            <h1>
+                Laboratory Requests
+            </h1>
 
             <p>
-                Manage patient laboratory investigations, specimens and test processing
+                Manage patient laboratory investigations
             </p>
 
         </div>
-
 
         <div class="user-area">
 
@@ -744,14 +595,16 @@
     <!-- ===================================================== -->
     <!-- SUMMARY -->
     <!-- ===================================================== -->
-<!-- 
+
     <section class="summary">
 
         <div class="summary-card">
 
             <div>
 
-                <h4>Total Requests</h4>
+                <h4>
+                    Total Requests
+                </h4>
 
                 <strong>
                     {{ total_requests|default:"0" }}
@@ -770,7 +623,9 @@
 
             <div>
 
-                <h4>Pending Requests</h4>
+                <h4>
+                    Pending
+                </h4>
 
                 <strong>
                     {{ pending_requests|default:"0" }}
@@ -789,29 +644,12 @@
 
             <div>
 
-                <h4>Processing</h4>
+                <h4>
+                    Completed
+                </h4>
 
                 <strong>
-                    {{ processing_requests|default:"0" }}
-                </strong>
-
-            </div>
-
-            <div class="summary-icon blue">
-                🧪
-            </div>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <div>
-
-                <h4>Completed Today</h4>
-
-                <strong>
-                    {{ completed_today|default:"0" }}
+                    {{ completed_requests|default:"0" }}
                 </strong>
 
             </div>
@@ -822,11 +660,11 @@
 
         </div>
 
-    </section> -->
+    </section>
 
 
     <!-- ===================================================== -->
-    <!-- SEARCH / FILTER -->
+    <!-- SEARCH -->
     <!-- ===================================================== -->
 
     <section class="toolbar">
@@ -844,8 +682,8 @@
                     <input
                         type="text"
                         name="q"
-                        value="{{ request.GET.q }}"
-                        placeholder="Search patient, request number or test..."
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="Search patient, sample number or test..."
                     >
 
                 </div>
@@ -857,64 +695,57 @@
                         All Statuses
                     </option>
 
-                    <option value="REQUESTED"
-                        {% if request.GET.status == "REQUESTED" %}selected{% endif %}>
-                        Requested
+                    <option
+                        value="PENDING"
+                        {% if request.GET.status == "PENDING" %}
+                            selected
+                        {% endif %}
+                    >
+                        Pending
                     </option>
 
-                    <option value="COLLECTED"
-                        {% if request.GET.status == "COLLECTED" %}selected{% endif %}>
-                        Specimen Collected
+                    <option
+                        value="SAMPLE_COLLECTED"
+                        {% if request.GET.status == "SAMPLE_COLLECTED" %}
+                            selected
+                        {% endif %}
+                    >
+                        Sample Collected
                     </option>
 
-                    <option value="PROCESSING"
-                        {% if request.GET.status == "PROCESSING" %}selected{% endif %}>
+                    <option
+                        value="PROCESSING"
+                        {% if request.GET.status == "PROCESSING" %}
+                            selected
+                        {% endif %}
+                    >
                         Processing
                     </option>
 
-                    <option value="COMPLETED"
-                        {% if request.GET.status == "COMPLETED" %}selected{% endif %}>
+                    <option
+                        value="COMPLETED"
+                        {% if request.GET.status == "COMPLETED" %}
+                            selected
+                        {% endif %}
+                    >
                         Completed
                     </option>
 
-                    <option value="CANCELLED"
-                        {% if request.GET.status == "CANCELLED" %}selected{% endif %}>
-                        Cancelled
-                    </option>
-
                 </select>
 
 
-                <select name="priority">
-
-                    <option value="">
-                        All Priorities
-                    </option>
-
-                    <option value="ROUTINE"
-                        {% if request.GET.priority == "ROUTINE" %}selected{% endif %}>
-                        Routine
-                    </option>
-
-                    <option value="URGENT"
-                        {% if request.GET.priority == "URGENT" %}selected{% endif %}>
-                        Urgent
-                    </option>
-
-                    <option value="STAT"
-                        {% if request.GET.priority == "STAT" %}selected{% endif %}>
-                        STAT
-                    </option>
-
-                </select>
-
-
-                <button type="submit" class="btn btn-primary">
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
                     🔍 Search
                 </button>
 
 
-                <a href="{% url 'lab_request_list' %}" class="btn btn-light">
+                <a
+                    href="{% url 'lab_requests' %}"
+                    class="btn btn-light"
+                >
                     ↻ Reset
                 </a>
 
@@ -931,7 +762,6 @@
 
     <section class="table-panel">
 
-
         <div class="table-header">
 
             <div>
@@ -946,8 +776,10 @@
 
             </div>
 
-
-            <a href="#" class="btn btn-primary">
+            <a
+                href="{% url 'create_lab_request' %}"
+                class="btn btn-primary"
+            >
                 + New Lab Request
             </a>
 
@@ -963,7 +795,7 @@
                     <tr>
 
                         <th>
-                            Request No.
+                            Sample No.
                         </th>
 
                         <th>
@@ -980,14 +812,6 @@
 
                         <th>
                             Request Date
-                        </th>
-
-                        <th>
-                            Priority
-                        </th>
-
-                        <th>
-                            Specimen
                         </th>
 
                         <th>
@@ -1009,22 +833,13 @@
 
                     <tr>
 
-
-                        <!-- REQUEST NUMBER -->
+                        <!-- SAMPLE NUMBER -->
 
                         <td>
 
                             <span class="request-id">
 
-                                {% if request_item.request_number %}
-
-                                    {{ request_item.request_number }}
-
-                                {% else %}
-
-                                    LAB-{{ request_item.id }}
-
-                                {% endif %}
+                                {{ request_item.sample_number }}
 
                             </span>
 
@@ -1038,7 +853,6 @@
                             <div class="patient-name">
 
                                 {{ request_item.patient.first_name }}
-
                                 {{ request_item.patient.last_name }}
 
                             </div>
@@ -1058,40 +872,32 @@
 
                             <div class="test-name">
 
-                                {{ request_item.test }}
+                                {{ request_item.test.name }}
 
                             </div>
 
-                            {% if request_item.test.category %}
+                            <div class="test-category">
 
-                                <div class="test-category">
+                                {{ request_item.test.category }}
 
-                                    {{ request_item.test.category }}
-
-                                </div>
-
-                            {% endif %}
+                            </div>
 
                         </td>
 
 
-                        <!-- REQUESTING DOCTOR -->
+                        <!-- REQUESTED BY -->
 
                         <td>
 
-                            <div class="doctor">
+                            {% if request_item.requested_by %}
 
-                                {% if request_item.requested_by %}
+                                {{ request_item.requested_by.get_full_name|default:request_item.requested_by.username }}
 
-                                    Dr. {{ request_item.requested_by }}
+                            {% else %}
 
-                                {% else %}
+                                —
 
-                                    —
-
-                                {% endif %}
-
-                            </div>
+                            {% endif %}
 
                         </td>
 
@@ -1102,13 +908,13 @@
 
                             <div class="date">
 
-                                {{ request_item.created_at|date:"d M Y" }}
+                                {{ request_item.requested_date|date:"d M Y" }}
 
                                 <br>
 
                                 <small>
 
-                                    {{ request_item.created_at|time:"H:i" }}
+                                    {{ request_item.requested_date|time:"H:i" }}
 
                                 </small>
 
@@ -1117,92 +923,32 @@
                         </td>
 
 
-                        <!-- PRIORITY -->
-
-                        <td>
-
-                            {% if request_item.priority == "STAT" %}
-
-                                <span class="badge priority-stat">
-                                    STAT
-                                </span>
-
-                            {% elif request_item.priority == "URGENT" %}
-
-                                <span class="badge priority-urgent">
-                                    Urgent
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge priority-routine">
-                                    Routine
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- SPECIMEN -->
-
-                        <td>
-
-                            {% if request_item.specimen_status == "COLLECTED" %}
-
-                                <span class="badge status-collected">
-                                    Collected
-                                </span>
-
-                            {% elif request_item.specimen_status == "PROCESSING" %}
-
-                                <span class="badge status-processing">
-                                    Processing
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge status-requested">
-                                    Awaiting
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
                         <!-- STATUS -->
 
                         <td>
 
-                            {% if request_item.status == "COMPLETED" %}
+                            {% if request_item.status == "Completed" %}
 
                                 <span class="badge status-completed">
                                     Completed
                                 </span>
 
-                            {% elif request_item.status == "PROCESSING" %}
+                            {% elif request_item.status == "Processing" %}
 
                                 <span class="badge status-processing">
                                     Processing
                                 </span>
 
-                            {% elif request_item.status == "COLLECTED" %}
+                            {% elif request_item.status == "Sample Collected" %}
 
                                 <span class="badge status-collected">
-                                    Collected
-                                </span>
-
-                            {% elif request_item.status == "CANCELLED" %}
-
-                                <span class="badge status-cancelled">
-                                    Cancelled
+                                    Sample Collected
                                 </span>
 
                             {% else %}
 
-                                <span class="badge status-requested">
-                                    Requested
+                                <span class="badge status-pending">
+                                    Pending
                                 </span>
 
                             {% endif %}
@@ -1216,36 +962,24 @@
 
                             <div class="actions">
 
-                                <a
-                                    href="{% url 'lab_request_detail' request_item.id %}"
-                                    class="action-btn"
-                                    title="View Request"
-                                >
-                                    👁
-                                </a>
-
-
-                                {% if request_item.status != "COMPLETED" and request_item.status != "CANCELLED" %}
+                                {% if request_item.status == "Completed" %}
 
                                     <a
-                                        href="{% url 'lab_request_detail' request_item.id %}"
-                                        class="action-btn"
-                                        title="Process Request"
-                                    >
-                                        🧪
-                                    </a>
-
-                                {% endif %}
-
-
-                                {% if request_item.status == "COMPLETED" %}
-
-                                    <a
-                                        href="{% url 'lab_request_detail' request_item.id %}"
+                                        href="#"
                                         class="action-btn result"
-                                        title="View Result"
+                                        title="Result available"
                                     >
                                         📄
+                                    </a>
+
+                                {% else %}
+
+                                    <a
+                                        href="{% url 'enter_result' request_item.id %}"
+                                        class="action-btn"
+                                        title="Enter Result"
+                                    >
+                                        🧪
                                     </a>
 
                                 {% endif %}
@@ -1256,12 +990,11 @@
 
                     </tr>
 
-
                 {% empty %}
 
                     <tr>
 
-                        <td colspan="9">
+                        <td colspan="7">
 
                             <div class="empty">
 
@@ -1274,8 +1007,7 @@
                                 </h3>
 
                                 <p>
-                                    There are currently no laboratory requests
-                                    matching your search criteria.
+                                    There are currently no laboratory requests.
                                 </p>
 
                             </div>
@@ -1292,76 +1024,6 @@
 
         </div>
 
-
-        <!-- ================================================= -->
-        <!-- PAGINATION -->
-        <!-- ================================================= -->
-
-        {% if is_paginated %}
-
-            <div class="pagination">
-
-                <div class="pagination-info">
-
-                    Showing page {{ page_obj.number }}
-                    of {{ page_obj.paginator.num_pages }}
-
-                </div>
-
-
-                <div class="pagination-links">
-
-                    {% if page_obj.has_previous %}
-
-                        <a
-                            href="?page={{ page_obj.previous_page_number }}"
-                            class="page-link"
-                        >
-                            ‹
-                        </a>
-
-                    {% endif %}
-
-
-                    {% for page_num in page_obj.paginator.page_range %}
-
-                        {% if page_num == page_obj.number %}
-
-                            <span class="page-link active">
-                                {{ page_num }}
-                            </span>
-
-                        {% else %}
-
-                            <a
-                                href="?page={{ page_num }}"
-                                class="page-link"
-                            >
-                                {{ page_num }}
-                            </a>
-
-                        {% endif %}
-
-                    {% endfor %}
-
-
-                    {% if page_obj.has_next %}
-
-                        <a
-                            href="?page={{ page_obj.next_page_number }}"
-                            class="page-link"
-                        >
-                            ›
-                        </a>
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-        {% endif %}
-
     </section>
 
 
@@ -1372,9 +1034,8 @@
 
     </footer>
 
-
 </main>
 
 </body>
+
 </html>
-```

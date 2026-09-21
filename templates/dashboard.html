@@ -1,3 +1,4 @@
+```html
 {% load static %}
 
 <!DOCTYPE html>
@@ -21,10 +22,20 @@
 
     <style>
 
+        /* =========================================================
+           GLOBAL
+        ========================================================= */
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+            min-height: 100%;
         }
 
 
@@ -39,12 +50,14 @@
 
             color: #161616;
 
+            overflow-x: hidden;
+
         }
 
 
-        /* =========================
+        /* =========================================================
            HEADER
-        ========================= */
+        ========================================================= */
 
         .header {
 
@@ -84,10 +97,16 @@
 
             gap: 15px;
 
+            min-width: 240px;
+
         }
 
 
         .menu-button {
+
+            width: 40px;
+
+            height: 40px;
 
             background: transparent;
 
@@ -98,6 +117,21 @@
             cursor: pointer;
 
             color: #161616;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 4px;
+
+        }
+
+
+        .menu-button:hover {
+
+            background: #f4f4f4;
 
         }
 
@@ -113,6 +147,8 @@
             font-size: 18px;
 
             font-weight: 600;
+
+            white-space: nowrap;
 
         }
 
@@ -133,12 +169,20 @@
 
             justify-content: center;
 
+            flex-shrink: 0;
+
         }
 
+
+        /* =========================================================
+           HEADER SEARCH
+        ========================================================= */
 
         .header-search {
 
             width: 420px;
+
+            max-width: 100%;
 
             height: 40px;
 
@@ -173,6 +217,10 @@
         }
 
 
+        /* =========================================================
+           HEADER RIGHT
+        ========================================================= */
+
         .header-right {
 
             display: flex;
@@ -181,10 +229,18 @@
 
             gap: 20px;
 
+            min-width: 240px;
+
+            justify-content: flex-end;
+
         }
 
 
         .header-icon {
+
+            width: 40px;
+
+            height: 40px;
 
             border: none;
 
@@ -193,6 +249,15 @@
             font-size: 19px;
 
             cursor: pointer;
+
+            border-radius: 4px;
+
+        }
+
+
+        .header-icon:hover {
+
+            background: #f4f4f4;
 
         }
 
@@ -228,6 +293,8 @@
 
             font-weight: 600;
 
+            flex-shrink: 0;
+
         }
 
 
@@ -240,6 +307,13 @@
         }
 
 
+        .user-info strong {
+
+            white-space: nowrap;
+
+        }
+
+
         .user-info small {
 
             color: #6f6f6f;
@@ -247,9 +321,9 @@
         }
 
 
-        /* =========================
+        /* =========================================================
            SIDEBAR
-        ========================= */
+        ========================================================= */
 
         .sidebar {
 
@@ -263,28 +337,91 @@
 
             width: 240px;
 
-            background: white;
+            background: #ffffff;
 
             border-right:
                 1px solid #e0e0e0;
 
             z-index: 900;
 
-            transition: .2s ease;
+            display: flex;
+
+            flex-direction: column;
+
+            overflow: hidden;
+
+            transition:
+                width 0.2s ease;
 
         }
 
 
-        .sidebar.collapsed {
+        /* =========================================================
+           SIDEBAR NAVIGATION - SCROLLABLE
+        ========================================================= */
 
-            width: 64px;
+        .sidebar-navigation {
+
+            flex: 1;
+
+            min-height: 0;
+
+            overflow-y: auto;
+
+            overflow-x: hidden;
+
+            padding: 15px 8px 20px;
+
+            scrollbar-width: thin;
+
+            scrollbar-color:
+                #c6c6c6
+                transparent;
 
         }
 
+
+        /* =========================================================
+           SIDEBAR SCROLLBAR
+        ========================================================= */
+
+        .sidebar-navigation::-webkit-scrollbar {
+
+            width: 7px;
+
+        }
+
+
+        .sidebar-navigation::-webkit-scrollbar-track {
+
+            background: transparent;
+
+        }
+
+
+        .sidebar-navigation::-webkit-scrollbar-thumb {
+
+            background: #c6c6c6;
+
+            border-radius: 10px;
+
+        }
+
+
+        .sidebar-navigation::-webkit-scrollbar-thumb:hover {
+
+            background: #8d8d8d;
+
+        }
+
+
+        /* =========================================================
+           SIDEBAR NAV
+        ========================================================= */
 
         .sidebar nav {
 
-            padding: 15px 8px;
+            width: 100%;
 
         }
 
@@ -297,7 +434,11 @@
 
             gap: 14px;
 
-            padding: 12px 14px;
+            width: 100%;
+
+            min-height: 44px;
+
+            padding: 11px 14px;
 
             margin-bottom: 3px;
 
@@ -307,7 +448,13 @@
 
             font-size: 14px;
 
-            transition: .15s;
+            white-space: nowrap;
+
+            border-radius: 4px;
+
+            transition:
+                background 0.15s ease,
+                color 0.15s ease;
 
         }
 
@@ -335,12 +482,22 @@
 
         .nav-link i {
 
-            font-size: 18px;
+            width: 20px;
 
             min-width: 20px;
 
+            font-size: 18px;
+
+            text-align: center;
+
+            flex-shrink: 0;
+
         }
 
+
+        /* =========================================================
+           SIDEBAR SECTION TITLES
+        ========================================================= */
 
         .nav-section {
 
@@ -352,22 +509,83 @@
 
             padding: 20px 14px 8px;
 
+            white-space: nowrap;
+
         }
 
 
+        /* =========================================================
+           DIVIDER
+        ========================================================= */
+
         .sidebar-divider {
 
-            border-top:
-                1px solid #e0e0e0;
+            height: 1px;
+
+            background: #e0e0e0;
 
             margin: 15px 8px;
 
         }
 
 
-        /* =========================
+        /* =========================================================
+           COLLAPSED SIDEBAR
+        ========================================================= */
+
+        .sidebar.collapsed {
+
+            width: 64px;
+
+        }
+
+
+        .sidebar.collapsed .nav-link {
+
+            justify-content: center;
+
+            gap: 0;
+
+            padding-left: 0;
+
+            padding-right: 0;
+
+        }
+
+
+        .sidebar.collapsed .nav-link span {
+
+            display: none;
+
+        }
+
+
+        .sidebar.collapsed .nav-section {
+
+            display: none;
+
+        }
+
+
+        .sidebar.collapsed .nav-link i {
+
+            margin: 0;
+
+        }
+
+
+        .sidebar.collapsed .sidebar-divider {
+
+            margin-left: 8px;
+
+            margin-right: 8px;
+
+        }
+
+
+        /* =========================================================
            MAIN
-        ========================= */
+        ========================================================= */
 
         .main {
 
@@ -376,7 +594,11 @@
             padding:
                 94px 30px 40px;
 
-            transition: .2s ease;
+            min-height:
+                calc(100vh - 64px);
+
+            transition:
+                margin-left 0.2s ease;
 
         }
 
@@ -388,9 +610,9 @@
         }
 
 
-        /* =========================
+        /* =========================================================
            PAGE HEADER
-        ========================= */
+        ========================================================= */
 
         .page-header {
 
@@ -423,9 +645,9 @@
         }
 
 
-        /* =========================
+        /* =========================================================
            STATISTICS
-        ========================= */
+        ========================================================= */
 
         .statistics {
 
@@ -486,9 +708,9 @@
         }
 
 
-        /* =========================
+        /* =========================================================
            CONTENT
-        ========================= */
+        ========================================================= */
 
         .content-grid {
 
@@ -508,6 +730,8 @@
 
             border:
                 1px solid #e0e0e0;
+
+            overflow: hidden;
 
         }
 
@@ -548,9 +772,16 @@
         }
 
 
-        /* =========================
+        .view-link:hover {
+
+            text-decoration: underline;
+
+        }
+
+
+        /* =========================================================
            PATIENT TABLE
-        ========================= */
+        ========================================================= */
 
         table {
 
@@ -626,9 +857,9 @@
         }
 
 
-        /* =========================
+        /* =========================================================
            QUICK ACTIONS
-        ========================= */
+        ========================================================= */
 
         .quick-actions {
 
@@ -687,6 +918,8 @@
 
             justify-content: center;
 
+            flex-shrink: 0;
+
         }
 
 
@@ -708,11 +941,11 @@
         }
 
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+        /* =========================================================
+           RESPONSIVE - TABLET
+        ========================================================= */
 
-        @media(max-width: 1000px) {
+        @media (max-width: 1000px) {
 
             .statistics {
 
@@ -721,11 +954,13 @@
 
             }
 
+
             .content-grid {
 
                 grid-template-columns: 1fr;
 
             }
+
 
             .header-search {
 
@@ -736,13 +971,18 @@
         }
 
 
-        @media(max-width: 700px) {
+        /* =========================================================
+           RESPONSIVE - MOBILE
+        ========================================================= */
+
+        @media (max-width: 700px) {
 
             .sidebar {
 
                 width: 64px;
 
             }
+
 
             .sidebar span,
             .nav-section {
@@ -751,11 +991,33 @@
 
             }
 
+
+            .sidebar .nav-link {
+
+                justify-content: center;
+
+                gap: 0;
+
+                padding-left: 0;
+
+                padding-right: 0;
+
+            }
+
+
+            .sidebar .nav-link i {
+
+                margin: 0;
+
+            }
+
+
             .main {
 
                 margin-left: 64px;
 
             }
+
 
             .header-search {
 
@@ -763,15 +1025,80 @@
 
             }
 
+
             .user-info {
 
                 display: none;
 
             }
 
+
             .statistics {
 
                 grid-template-columns: 1fr;
+
+            }
+
+
+            .header-left {
+
+                min-width: auto;
+
+            }
+
+
+            .header-right {
+
+                min-width: auto;
+
+                gap: 5px;
+
+            }
+
+        }
+
+
+        /* =========================================================
+           SMALL MOBILE
+        ========================================================= */
+
+        @media (max-width: 450px) {
+
+            .header {
+
+                padding: 0 10px;
+
+            }
+
+
+            .header-icon {
+
+                display: none;
+
+            }
+
+
+            .main {
+
+                padding:
+                    90px 15px 30px;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 23px;
+
+            }
+
+
+            th,
+            td {
+
+                padding-left: 10px;
+
+                padding-right: 10px;
 
             }
 
@@ -785,9 +1112,9 @@
 <body>
 
 
-<!-- =========================
+<!-- =========================================================
      HEADER
-========================= -->
+========================================================= -->
 
 <header class="header">
 
@@ -797,6 +1124,8 @@
         <button
             class="menu-button"
             onclick="toggleSidebar()"
+            type="button"
+            aria-label="Toggle sidebar"
         >
 
             <i class="bi bi-list"></i>
@@ -837,14 +1166,22 @@
 
     <div class="header-right">
 
-        <button class="header-icon">
+        <button
+            class="header-icon"
+            type="button"
+            aria-label="Notifications"
+        >
 
             <i class="bi bi-bell"></i>
 
         </button>
 
 
-        <button class="header-icon">
+        <button
+            class="header-icon"
+            type="button"
+            aria-label="Help"
+        >
 
             <i class="bi bi-question-circle"></i>
 
@@ -883,9 +1220,9 @@
 
 
 
-<!-- =========================
+<!-- =========================================================
      SIDEBAR
-========================= -->
+========================================================= -->
 
 <aside
     id="sidebar"
@@ -893,225 +1230,229 @@
 >
 
 
-    <nav>
+    <div class="sidebar-navigation">
 
+        <nav>
 
-        <div class="nav-section">
-            Main
-        </div>
 
+            <div class="nav-section">
+                Main
+            </div>
 
-        <a
-            href="{% url 'dashboard' %}"
-            class="nav-link active"
-        >
 
-            <i class="bi bi-grid"></i>
+            <a
+                href="{% url 'dashboard' %}"
+                class="nav-link active"
+            >
 
-            <span>
-                Dashboard
-            </span>
+                <i class="bi bi-grid"></i>
 
-        </a>
+                <span>
+                    Dashboard
+                </span>
 
+            </a>
 
 
-        <div class="nav-section">
-            Patient Management
-        </div>
 
+            <div class="nav-section">
+                Patient Management
+            </div>
 
-        <a
-            href="{% url 'add_patient' %}"
-            class="nav-link"
-        >
 
-            <i class="bi bi-person-plus"></i>
+            <a
+                href="{% url 'add_patient' %}"
+                class="nav-link"
+            >
 
-            <span>
-                Register Patient
-            </span>
+                <i class="bi bi-person-plus"></i>
 
-        </a>
+                <span>
+                    Register Patient
+                </span>
 
+            </a>
 
-        <a
-            href="{% url 'patient_list' %}"
-            class="nav-link"
-        >
 
-            <i class="bi bi-people"></i>
+            <a
+                href="{% url 'patient_list' %}"
+                class="nav-link"
+            >
 
-            <span>
-                Patient Records
-            </span>
+                <i class="bi bi-people"></i>
 
-        </a>
+                <span>
+                    Patient Records
+                </span>
 
+            </a>
 
-        <a
-            href="#"
-            class="nav-link"
-        >
 
-            <i class="bi bi-search"></i>
+            <a
+                href="#"
+                class="nav-link"
+            >
 
-            <span>
-                Patient Search
-            </span>
+                <i class="bi bi-search"></i>
 
-        </a>
+                <span>
+                    Patient Search
+                </span>
 
+            </a>
 
 
-        <div class="nav-section">
-            Clinical
-        </div>
 
+            <div class="nav-section">
+                Clinical
+            </div>
 
-        <a
-            href="{% url 'wards:dashboard' %}"
-            class="nav-link"
-        >
 
-            <i class="bi bi-hospital"></i>
+            <a
+                href="{% url 'wards:dashboard' %}"
+                class="nav-link"
+            >
 
-            <span>
-                Ward Management
-            </span>
+                <i class="bi bi-hospital"></i>
 
-        </a>
+                <span>
+                    Ward Management
+                </span>
 
+            </a>
 
-        <a
-            href="#"
-            class="nav-link"
-        >
 
-            <i class="bi bi-calendar-check"></i>
+            <a
+                href="#"
+                class="nav-link"
+            >
 
-            <span>
-                Appointments
-            </span>
+                <i class="bi bi-calendar-check"></i>
 
-        </a>
+                <span>
+                    Appointments
+                </span>
 
+            </a>
 
 
-        <div class="nav-section">
-            Services
-        </div>
 
+            <div class="nav-section">
+                Services
+            </div>
 
-        <a
-            href="{% url 'pharmacy_dashboard' %}"
-            class="nav-link"
-        >
 
-            <i class="bi bi-capsule"></i>
+            <a
+                href="{% url 'pharmacy_dashboard' %}"
+                class="nav-link"
+            >
 
-            <span>
-                Pharmacy
-            </span>
+                <i class="bi bi-capsule"></i>
 
-        </a>
+                <span>
+                    Pharmacy
+                </span>
 
+            </a>
 
-        <a
-            href="{% url 'laboratory_dashboard' %}"
-            class="nav-link"
-        >
 
-            <i class="bi bi-eyedropper"></i>
+            <a
+                href="{% url 'laboratory_dashboard' %}"
+                class="nav-link"
+            >
 
-            <span>
-                Laboratory
-            </span>
+                <i class="bi bi-eyedropper"></i>
 
-        </a>
+                <span>
+                    Laboratory
+                </span>
 
+            </a>
 
-        <a
-            href="{% url 'billing_dashboard' %}"
-            class="nav-link"
-        >
 
-            <i class="bi bi-receipt"></i>
+            <a
+                href="{% url 'billing_dashboard' %}"
+                class="nav-link"
+            >
 
-            <span>
-                Billing
-            </span>
+                <i class="bi bi-receipt"></i>
 
-        </a>
+                <span>
+                    Billing
+                </span>
 
+            </a>
 
 
-        <div class="sidebar-divider"></div>
 
+            <div class="sidebar-divider"></div>
 
-        <div class="nav-section">
-            Administration
-        </div>
 
 
-        <a
-            href="#"
-            class="nav-link"
-        >
+            <div class="nav-section">
+                Administration
+            </div>
 
-            <i class="bi bi-bar-chart"></i>
 
-            <span>
-                Reports
-            </span>
+            <a
+                href="#"
+                class="nav-link"
+            >
 
-        </a>
+                <i class="bi bi-bar-chart"></i>
 
+                <span>
+                    Reports
+                </span>
 
-        <a
-            href="#"
-            class="nav-link"
-        >
+            </a>
 
-            <i class="bi bi-gear"></i>
 
-            <span>
-                Settings
-            </span>
+            <a
+                href="#"
+                class="nav-link"
+            >
 
-        </a>
+                <i class="bi bi-gear"></i>
 
+                <span>
+                    Settings
+                </span>
 
-        <a
-            href="{% url 'logout' %}"
-            class="nav-link"
-        >
+            </a>
 
-            <i class="bi bi-box-arrow-right"></i>
 
-            <span>
-                Logout
-            </span>
+            <a
+                href="{% url 'logout' %}"
+                class="nav-link"
+            >
 
-        </a>
+                <i class="bi bi-box-arrow-right"></i>
 
+                <span>
+                    Logout
+                </span>
 
-    </nav>
+            </a>
+
+
+        </nav>
+
+    </div>
 
 
 </aside>
 
 
 
-<!-- =========================
+<!-- =========================================================
      MAIN
-========================= -->
+========================================================= -->
 
 <main class="main">
 
 
     <div class="page-header">
-
 
         <div>
 
@@ -1125,12 +1466,13 @@
 
         </div>
 
-
     </div>
 
 
 
-    <!-- STATISTICS -->
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
 
     <section class="statistics">
 
@@ -1192,9 +1534,7 @@
             </div>
 
             <div class="stat-number">
-
                 0
-
             </div>
 
         </div>
@@ -1204,136 +1544,168 @@
 
 
 
-    <!-- CONTENT -->
+    <!-- =====================================================
+         CONTENT
+    ====================================================== -->
 
     <section class="content-grid">
 
 
-        <!-- RECENT PATIENTS -->
+        <!-- =================================================
+             RECENT PATIENTS
+        ================================================== -->
 
-     <div class="panel">
-
-    <div class="panel-header">
-
-        <h2>
-            Recent Patients
-        </h2>
-
-        <a
-            href="{% url 'patient_list' %}"
-            class="view-link"
-        >
-            View all
-        </a>
-
-    </div>
+        <div class="panel">
 
 
-   <table>
+            <div class="panel-header">
 
-    <thead>
+                <h2>
+                    Recent Patients
+                </h2>
 
-        <tr>
 
-            <th>Patient Number</th>
+                <a
+                    href="{% url 'patient_list' %}"
+                    class="view-link"
+                >
+                    View all
+                </a>
 
-            <th>Patient</th>
-
-            <th>Gender</th>
-
-            <th>Phone</th>
-
-            <th>Status</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
-
-        {% for patient in patients %}
-
-        <tr>
-
-            <td>
-
-                <span class="patient-number">
-
-                    {{ patient.patient_number }}
-
-                </span>
-
-            </td>
-
-            <td class="patient-name">
-
-                {{ patient.first_name }}
-                {{ patient.last_name }}
-
-            </td>
-
-            <td>
-
-                {{ patient.gender }}
-
-            </td>
-
-            <td>
-
-                {{ patient.phone }}
-
-            </td>
-
-            <td>
-
-                <span class="status status-active">
-
-                    Active
-
-                </span>
-
-            </td>
-
-        </tr>
-
-        {% empty %}
-
-        <tr>
-
-            <td
-                colspan="5"
-                style="
-                    text-align:center;
-                    padding:40px;
-                    color:#6f6f6f;
-                "
-            >
-
-                <i
-                    class="bi bi-people"
-                    style="font-size:35px;"
-                ></i>
-
-                <div style="margin-top:10px;">
-
-                    No patients registered yet.
-
-                </div>
-
-            </td>
-
-        </tr>
-
-        {% endfor %}
-
-    </tbody>
-
-</table>
-</div>
+            </div>
 
 
 
-        <!-- QUICK ACTIONS -->
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Patient Number
+                        </th>
+
+                        <th>
+                            Patient
+                        </th>
+
+                        <th>
+                            Gender
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for patient in patients %}
+
+                    <tr>
+
+                        <td>
+
+                            <span class="patient-number">
+
+                                {{ patient.patient_number }}
+
+                            </span>
+
+                        </td>
+
+
+                        <td class="patient-name">
+
+                            {{ patient.first_name }}
+                            {{ patient.last_name }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ patient.gender }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ patient.phone }}
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="status status-active">
+
+                                Active
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            style="
+                                text-align:center;
+                                padding:40px;
+                                color:#6f6f6f;
+                            "
+                        >
+
+                            <i
+                                class="bi bi-people"
+                                style="font-size:35px;"
+                            ></i>
+
+
+                            <div
+                                style="margin-top:10px;"
+                            >
+
+                                No patients registered yet.
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             QUICK ACTIONS
+        ================================================== -->
 
         <div class="panel">
 
@@ -1345,6 +1717,7 @@
                 </h2>
 
             </div>
+
 
 
             <div class="quick-actions">
@@ -1360,6 +1733,7 @@
                         <i class="bi bi-person-plus"></i>
 
                     </div>
+
 
                     <div>
 
@@ -1388,6 +1762,7 @@
 
                     </div>
 
+
                     <div>
 
                         <strong>
@@ -1415,6 +1790,7 @@
 
                     </div>
 
+
                     <div>
 
                         <strong>
@@ -1441,6 +1817,7 @@
                         <i class="bi bi-capsule"></i>
 
                     </div>
+
 
                     <div>
 
@@ -1470,6 +1847,10 @@
 
 
 
+<!-- =========================================================
+     SIDEBAR JAVASCRIPT
+========================================================= -->
+
 <script>
 
 function toggleSidebar() {
@@ -1487,3 +1868,4 @@ function toggleSidebar() {
 </body>
 
 </html>
+

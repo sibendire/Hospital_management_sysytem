@@ -515,6 +515,31 @@
                         <div class="col-md-4">
 
                             <label class="form-label">
+                                Buying Price / Unit
+                                <span class="required">*</span>
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    UGX
+                                </span>
+
+                                {{ form.buying_price }}
+
+                            </div>
+
+                            {% for error in form.buying_price.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+
+                         <div class="col-md-4">
+
+                            <label class="form-label">
                                 Selling Price / Unit
                                 <span class="required">*</span>
                             </label>
@@ -525,18 +550,17 @@
                                     UGX
                                 </span>
 
-                                {{ form.unit_price }}
+                                {{ form.selling_price }}
 
                             </div>
 
-                            {% for error in form.unit_price.errors %}
+                            {% for error in form.selling_price.errors %}
                                 <div class="field-error">
                                     {{ error }}
                                 </div>
                             {% endfor %}
 
                         </div>
-
                     </div>
 
                 </div>

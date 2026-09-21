@@ -1,12 +1,29 @@
 from django import forms
 from .models import Patient
 
+
 class PatientForm(forms.ModelForm):
+
     class Meta:
         model = Patient
-        fields = "__all__"
+
+        fields = [
+            "first_name",
+            "last_name",
+            "gender",
+            "date_of_birth",
+            "national_id",
+            "phone",
+            "email",
+            "address",
+            "blood_group",
+            "photo",
+            "next_of_kin",
+            "next_of_kin_phone",
+        ]
 
         widgets = {
+
             "first_name": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "First Name"
@@ -26,25 +43,25 @@ class PatientForm(forms.ModelForm):
                 "type": "date"
             }),
 
-            "patient_number": forms.TextInput(attrs={
-                "class": "form-control"
-            }),
-
             "national_id": forms.TextInput(attrs={
-                "class": "form-control"
+                "class": "form-control",
+                "placeholder": "National ID"
             }),
 
             "phone": forms.TextInput(attrs={
-                "class": "form-control"
+                "class": "form-control",
+                "placeholder": "Phone Number"
             }),
 
             "email": forms.EmailInput(attrs={
-                "class": "form-control"
+                "class": "form-control",
+                "placeholder": "Email Address"
             }),
 
             "address": forms.Textarea(attrs={
                 "class": "form-control",
-                "rows": 3
+                "rows": 3,
+                "placeholder": "Address"
             }),
 
             "blood_group": forms.Select(attrs={
@@ -56,10 +73,12 @@ class PatientForm(forms.ModelForm):
             }),
 
             "next_of_kin": forms.TextInput(attrs={
-                "class": "form-control"
+                "class": "form-control",
+                "placeholder": "Next of Kin"
             }),
 
             "next_of_kin_phone": forms.TextInput(attrs={
-                "class": "form-control"
+                "class": "form-control",
+                "placeholder": "Next of Kin Phone"
             }),
         }

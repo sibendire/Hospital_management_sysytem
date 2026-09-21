@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from patients.models import Patient
 
@@ -11,14 +12,12 @@ from patients.models import Patient
 class LabTest(models.Model):
 
     CATEGORY = (
-
         ("Hematology", "Hematology"),
         ("Chemistry", "Chemistry"),
         ("Microbiology", "Microbiology"),
         ("Parasitology", "Parasitology"),
         ("Urinalysis", "Urinalysis"),
         ("Immunology", "Immunology"),
-
     )
 
     name = models.CharField(
@@ -32,7 +31,8 @@ class LabTest(models.Model):
 
     price = models.DecimalField(
         max_digits=10,
-        decimal_places=2
+        decimal_places=2,
+        default=0.00
     )
 
     description = models.TextField(
@@ -51,23 +51,21 @@ class LabTest(models.Model):
 
 
 # =========================================================
-# LAB REQUEST
+# LABORATORY REQUEST
 # =========================================================
 
 class LabRequest(models.Model):
 
     STATUS = (
-
         ("Pending", "Pending"),
         ("Sample Collected", "Sample Collected"),
         ("Processing", "Processing"),
         ("Completed", "Completed"),
-
     )
 
     patient = models.ForeignKey(
         Patient,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="lab_requests"
     )
 
@@ -79,7 +77,9 @@ class LabRequest(models.Model):
 
     sample_number = models.CharField(
         max_length=50,
-        unique=True
+        unique=True,
+        blank=True,
+        editable=False
     )
 
     status = models.CharField(
@@ -100,6 +100,28 @@ class LabRequest(models.Model):
         related_name="lab_requests"
     )
 
+    def save(self, *args, **kwargs):
+
+        # Generate the sample number only once.
+        if not self.sample_number:
+
+            # First save allows Django/MySQL to generate the ID.
+            super().save(*args, **kwargs)
+
+            year = timezone.now().year
+
+            self.sample_number = (
+                f"LAB-{year}-{self.pk:06d}"
+            )
+
+            super().save(
+                update_fields=["sample_number"]
+            )
+
+            return
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.sample_number
 
@@ -108,7 +130,7 @@ class LabRequest(models.Model):
 
 
 # =========================================================
-# LAB RESULT
+# LABORATORY RESULT
 # =========================================================
 
 class LabResult(models.Model):

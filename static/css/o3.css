@@ -1,356 +1,393 @@
+css
+/* =========================================================
+   ROOT VARIABLES
+========================================================= */
+
 :root {
-
     --header-height: 64px;
-
     --sidebar-width: 240px;
 
     --background: #f4f4f4;
-
     --surface: #ffffff;
-
     --border: #e0e0e0;
 
     --text: #161616;
-
     --muted: #6f6f6f;
 
     --primary: #0f62fe;
-
     --success: #24a148;
-
     --warning: #f1c21b;
-
     --danger: #da1e28;
-
 }
 
+
+/* =========================================================
+   GLOBAL RESET
+========================================================= */
 
 * {
     box-sizing: border-box;
 }
 
 
+html,
 body {
-
     margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100%;
 
     font-family:
         Arial,
         Helvetica,
         sans-serif;
 
-    background:
-        var(--background);
-
-    color:
-        var(--text);
-
+    background: var(--background);
+    color: var(--text);
 }
 
 
-/* HEADER */
+/* =========================================================
+   BODY
+========================================================= */
+
+body {
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   APPLICATION SHELL
+========================================================= */
+
+.app-shell {
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 .top-header {
+    height: var(--header-height);
 
-    height:
-        var(--header-height);
+    background: #ffffff;
 
-    background:
-        #ffffff;
+    border-bottom: 1px solid var(--border);
 
-    border-bottom:
-        1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    display:
-        flex;
+    padding: 0 20px;
 
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    padding:
-        0 20px;
-
-    position:
-        fixed;
+    position: fixed;
 
     top: 0;
-
     left: 0;
-
     right: 0;
 
     z-index: 1000;
-
 }
 
 
+/* =========================================================
+   HEADER LEFT
+========================================================= */
+
 .header-left {
+    display: flex;
+    align-items: center;
 
-    display:
-        flex;
+    gap: 15px;
 
-    align-items:
-        center;
-
-    gap:
-        15px;
-
-    min-width:
-        240px;
-
+    min-width: 240px;
 }
 
 
 .menu-button {
+    width: 40px;
+    height: 40px;
 
     border: none;
 
     background: transparent;
 
+    color: var(--text);
+
     font-size: 23px;
 
     cursor: pointer;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 4px;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
 }
 
 
+.menu-button:hover {
+    background: #f4f4f4;
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
 .brand {
+    display: flex;
+    align-items: center;
 
-    display:
-        flex;
+    gap: 10px;
 
-    align-items:
-        center;
+    font-size: 16px;
 
-    gap:
-        10px;
+    font-weight: 600;
 
-    font-weight:
-        600;
-
+    white-space: nowrap;
 }
 
 
 .brand-icon {
-
     width: 34px;
-
     height: 34px;
 
-    background:
-        var(--primary);
+    background: var(--primary);
 
-    color:
-        white;
+    color: #ffffff;
 
-    display:
-        flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
+    flex-shrink: 0;
 }
 
 
-.header-center {
+/* =========================================================
+   HEADER CENTER
+========================================================= */
 
+.header-center {
     flex: 1;
 
-    display:
-        flex;
+    display: flex;
+    justify-content: center;
 
-    justify-content:
-        center;
-
+    padding: 0 20px;
 }
 
 
 .global-search {
+    width: 420px;
+    max-width: 100%;
 
-    width:
-        420px;
+    height: 40px;
 
-    height:
-        40px;
+    background: #f4f4f4;
 
-    background:
-        #f4f4f4;
+    border-bottom: 1px solid #8d8d8d;
 
-    border-bottom:
-        1px solid #8d8d8d;
+    display: flex;
+    align-items: center;
 
-    display:
-        flex;
+    gap: 10px;
 
-    align-items:
-        center;
+    padding: 0 12px;
+}
 
-    gap:
-        10px;
 
-    padding:
-        0 12px;
+.global-search i {
+    color: #525252;
 
+    flex-shrink: 0;
 }
 
 
 .global-search input {
+    border: none;
 
-    border:
-        none;
+    outline: none;
 
-    outline:
-        none;
+    background: transparent;
 
-    background:
-        transparent;
+    width: 100%;
 
-    width:
-        100%;
+    font-size: 14px;
 
+    color: var(--text);
+}
+
+
+.global-search input::placeholder {
+    color: #6f6f6f;
 }
 
 
 .search-shortcut {
+    border: 1px solid #aaa;
 
-    border:
-        1px solid #aaa;
+    padding: 2px 7px;
 
-    padding:
-        2px 7px;
+    font-size: 12px;
 
-    font-size:
-        12px;
+    color: #525252;
 
+    flex-shrink: 0;
 }
 
 
+/* =========================================================
+   HEADER RIGHT
+========================================================= */
+
 .header-right {
+    display: flex;
+    align-items: center;
 
-    display:
-        flex;
+    gap: 12px;
 
-    align-items:
-        center;
+    min-width: 240px;
 
-    gap:
-        12px;
-
+    justify-content: flex-end;
 }
 
 
 .header-button {
+    width: 40px;
+    height: 40px;
 
-    border:
-        none;
+    border: none;
 
-    background:
-        transparent;
+    background: transparent;
 
-    font-size:
-        19px;
+    color: var(--text);
 
+    font-size: 19px;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 4px;
+
+    transition:
+        background 0.15s ease;
 }
 
 
+.header-button:hover {
+    background: #f4f4f4;
+}
+
+
+/* =========================================================
+   USER MENU
+========================================================= */
+
 .user-menu {
+    display: flex;
+    align-items: center;
 
-    display:
-        flex;
+    gap: 9px;
 
-    align-items:
-        center;
+    padding-left: 10px;
 
-    gap:
-        9px;
-
-    padding-left:
-        10px;
-
+    cursor: pointer;
 }
 
 
 .avatar {
+    width: 36px;
+    height: 36px;
 
-    width:
-        36px;
+    border-radius: 50%;
 
-    height:
-        36px;
+    background: var(--primary);
 
-    border-radius:
-        50%;
+    color: #ffffff;
 
-    background:
-        #0f62fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    color:
-        white;
+    font-weight: 600;
 
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    font-weight:
-        600;
-
+    flex-shrink: 0;
 }
 
 
 .user-details {
+    display: flex;
 
-    display:
-        flex;
+    flex-direction: column;
 
-    flex-direction:
-        column;
+    min-width: 0;
+}
 
+
+.user-details strong {
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    max-width: 130px;
 }
 
 
 .user-details small {
+    color: var(--muted);
 
-    color:
-        var(--muted);
+    font-size: 12px;
 
+    white-space: nowrap;
 }
 
 
-/* BODY */
+.user-menu > i {
+    font-size: 12px;
+
+    color: #525252;
+}
+
+
+/* =========================================================
+   APPLICATION BODY
+========================================================= */
 
 .application-body {
+    display: flex;
 
-    display:
-        flex;
+    padding-top: var(--header-height);
 
-    padding-top:
-        var(--header-height);
-
+    min-height: 100vh;
 }
 
 
-/* =========================
+/* =========================================================
    SIDEBAR
-========================= */
+========================================================= */
 
 .sidebar {
-
     position: fixed;
 
-    left: 0;
-
     top: var(--header-height);
+
+    left: 0;
 
     bottom: 0;
 
@@ -364,88 +401,82 @@ body {
 
     flex-direction: column;
 
-    transition: width .2s ease;
-
-    /* Prevent the entire sidebar from expanding */
     overflow: hidden;
 
+    z-index: 900;
+
+    transition:
+        width 0.2s ease;
 }
 
 
-.sidebar.collapsed {
-
-    width: 64px;
-
-}
-
-
-/* =========================
+/* =========================================================
    SIDEBAR NAVIGATION
-========================= */
+   THIS AREA SCROLLS
+========================================================= */
 
 .sidebar-navigation {
-
-    padding: 15px 8px 25px;
-
-    /* This is the important part */
     flex: 1;
+
+    min-height: 0;
 
     overflow-y: auto;
 
     overflow-x: hidden;
 
-    /* Firefox */
+    padding: 15px 8px 20px;
+
     scrollbar-width: thin;
 
-    scrollbar-color: #c6c6c6 transparent;
-
+    scrollbar-color:
+        #c6c6c6
+        transparent;
 }
 
 
-/* Chrome / Edge / Safari */
+/* =========================================================
+   SIDEBAR SCROLLBAR
+   CHROME / EDGE / SAFARI
+========================================================= */
+
 .sidebar-navigation::-webkit-scrollbar {
-
     width: 6px;
-
 }
 
 
 .sidebar-navigation::-webkit-scrollbar-track {
-
     background: transparent;
-
 }
 
 
 .sidebar-navigation::-webkit-scrollbar-thumb {
-
     background: #c6c6c6;
 
     border-radius: 10px;
-
 }
 
 
 .sidebar-navigation::-webkit-scrollbar-thumb:hover {
-
     background: #8d8d8d;
-
 }
 
 
-/* =========================
-   NAV ITEMS
-========================= */
+/* =========================================================
+   NAVIGATION ITEMS
+========================================================= */
 
 .nav-item {
-
     display: flex;
 
     align-items: center;
 
-    gap: 15px;
+    gap: 14px;
 
-    padding: 12px 14px;
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 11px 14px;
 
     margin-bottom: 3px;
 
@@ -457,160 +488,356 @@ body {
 
     white-space: nowrap;
 
+    border-radius: 4px;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
 }
 
 
-.nav-item:hover {
+/* =========================================================
+   NAVIGATION ICONS
+========================================================= */
 
+.nav-item i {
+    width: 20px;
+
+    min-width: 20px;
+
+    font-size: 18px;
+
+    text-align: center;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   NAVIGATION HOVER
+========================================================= */
+
+.nav-item:hover {
     background: #f4f4f4;
 
     color: #161616;
-
 }
 
 
-.nav-item.active {
+/* =========================================================
+   ACTIVE NAVIGATION ITEM
+========================================================= */
 
+.nav-item.active {
     background: #e8f1ff;
 
     color: var(--primary);
 
+    font-weight: 600;
+
     border-left: 3px solid var(--primary);
-
 }
 
 
-.nav-item i {
-
-    font-size: 18px;
-
-    min-width: 20px;
-
-    flex-shrink: 0;
-
-}
-
-
-/* =========================
-   DIVIDER
-========================= */
+/* =========================================================
+   SIDEBAR DIVIDER
+========================================================= */
 
 .sidebar-divider {
+    height: 1px;
 
-    border-top: 1px solid var(--border);
+    background: var(--border);
 
     margin: 15px 8px;
-
 }
 
 
-/* =========================
+/* =========================================================
    SIDEBAR FOOTER
-========================= */
+   FOOTER STAYS VISIBLE
+========================================================= */
 
 .sidebar-footer {
-
-    margin-top: auto;
+    flex-shrink: 0;
 
     padding: 15px;
 
     background: #ffffff;
 
     border-top: 1px solid var(--border);
-
-    flex-shrink: 0;
-
 }
 
 
+/* =========================================================
+   SYSTEM STATUS
+========================================================= */
+
 .system-status {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
 
     font-size: 12px;
 
     color: var(--muted);
-
 }
 
 
 .status-dot {
-
     width: 8px;
 
     height: 8px;
 
-    display: inline-block;
+    min-width: 8px;
 
     border-radius: 50%;
 
     background: var(--success);
-
-    margin-right: 6px;
-
 }
 
 
-.system-status {
+/* =========================================================
+   COLLAPSED SIDEBAR
+========================================================= */
 
-    font-size:
-        12px;
-
-    color:
-        var(--muted);
-
+.sidebar.collapsed {
+    width: 64px;
 }
 
 
-.status-dot {
+/* Hide text when collapsed */
 
-    width:
-        8px;
-
-    height:
-        8px;
-
-    display:
-        inline-block;
-
-    border-radius:
-        50%;
-
-    background:
-        var(--success);
-
-    margin-right:
-        6px;
-
+.sidebar.collapsed .nav-item span {
+    display: none;
 }
 
 
-/* MAIN */
+/* Center icons */
+
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+
+    gap: 0;
+
+    padding-left: 0;
+
+    padding-right: 0;
+}
+
+
+/* Keep icons centered */
+
+.sidebar.collapsed .nav-item i {
+    margin: 0;
+}
+
+
+/* Divider */
+
+.sidebar.collapsed .sidebar-divider {
+    margin-left: 8px;
+
+    margin-right: 8px;
+}
+
+
+/* Footer */
+
+.sidebar.collapsed .sidebar-footer {
+    padding: 15px 0;
+
+    display: flex;
+
+    justify-content: center;
+}
+
+
+/* Hide system status text */
+
+.sidebar.collapsed .system-status {
+    font-size: 0;
+}
+
+
+/* Keep status dot */
+
+.sidebar.collapsed .status-dot {
+    margin: 0;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
 
 .main-content {
+    margin-left: var(--sidebar-width);
 
-    margin-left:
-        var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
 
-    width:
-        calc(100% - var(--sidebar-width));
-
-    padding:
-        30px;
+    padding: 30px;
 
     min-height:
         calc(100vh - var(--header-height));
 
     transition:
-        margin-left .2s ease;
-
+        margin-left 0.2s ease,
+        width 0.2s ease;
 }
 
+
+/* =========================================================
+   MAIN CONTENT WHEN SIDEBAR IS COLLAPSED
+========================================================= */
 
 .sidebar.collapsed + .main-content {
+    margin-left: 64px;
 
-    margin-left:
-        64px;
+    width: calc(100% - 64px);
+}
 
-    width:
-        calc(100% - 64px);
+
+/* =========================================================
+   GENERAL LINKS
+========================================================= */
+
+a {
+    color: inherit;
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .global-search {
+        width: 320px;
+    }
+
+    .header-left {
+        min-width: 200px;
+    }
+
+    .header-right {
+        min-width: 200px;
+    }
+
+    .user-details {
+        display: none;
+    }
 
 }
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .global-search {
+        width: 250px;
+    }
+
+    .brand span {
+        display: none;
+    }
+
+    .header-left {
+        min-width: auto;
+    }
+
+    .header-right {
+        min-width: auto;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .sidebar {
+        width: 64px;
+    }
+
+    .sidebar .nav-item span {
+        display: none;
+    }
+
+    .sidebar .nav-item {
+        justify-content: center;
+
+        gap: 0;
+
+        padding-left: 0;
+
+        padding-right: 0;
+    }
+
+    .sidebar .nav-item i {
+        margin: 0;
+    }
+
+    .sidebar .sidebar-footer {
+        padding: 15px 0;
+
+        display: flex;
+
+        justify-content: center;
+    }
+
+    .sidebar .system-status {
+        font-size: 0;
+    }
+
+    .sidebar .status-dot {
+        margin: 0;
+    }
+
+    .main-content {
+        margin-left: 64px;
+
+        width: calc(100% - 64px);
+
+        padding: 20px;
+    }
+
+    .header-center {
+        display: none;
+    }
+
+    .header-right {
+        gap: 5px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL SCREENS
+========================================================= */
+
+@media (max-width: 450px) {
+
+    .top-header {
+        padding: 0 10px;
+    }
+
+    .header-right .header-button {
+        display: none;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+}
+

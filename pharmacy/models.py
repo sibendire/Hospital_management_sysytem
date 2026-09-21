@@ -126,7 +126,7 @@ class Medicine(models.Model):
     )
 
     # SELLING PRICE
-    unit_price = models.DecimalField(
+    buying_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         validators=[
@@ -135,7 +135,7 @@ class Medicine(models.Model):
     )
 
     # PURCHASE / COST PRICE
-    cost_price = models.DecimalField(
+    selling_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal("0.00"),
@@ -387,12 +387,12 @@ class PharmacySaleItem(models.Model):
         ]
     )
 
-    unit_price = models.DecimalField(
+    buying_price = models.DecimalField(
         max_digits=12,
         decimal_places=2
     )
 
-    cost_price = models.DecimalField(
+    selling_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal("0.00")
@@ -410,14 +410,14 @@ class PharmacySaleItem(models.Model):
     def save(self, *args, **kwargs):
 
         self.total_price = (
-            self.unit_price * self.quantity
+            self.buying_price * self.quantity
         )
 
         super().save(*args, **kwargs)
 
     @property
     def total_cost(self):
-        return self.cost_price * self.quantity
+        return self.selling_price * self.quantity
 
     @property
     def profit(self):

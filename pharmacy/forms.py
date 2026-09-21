@@ -15,97 +15,96 @@ from .models import (
 class MedicineForm(forms.ModelForm):
 
     class Meta:
-
         model = Medicine
 
-    fields = [
-    "name",
-    "generic_name",
-    "brand_name",
-    "category",
-    "dosage_form",
-    "strength",
-    "unit",
-    "manufacturer",
-    "supplier",
-    "batch_number",
-    "expiry_date",
-    "quantity",
-    "reorder_level",
-    "unit_price",
-    "cost_price",
-    "prescription_required",
-    "controlled_substance",
-    "status",
-    "description",
-    ]
+        fields = [
+            "name",
+            "generic_name",
+            "brand_name",
+            "category",
+            "dosage_form",
+            "strength",
+            "unit",
+            "manufacturer",
+            "supplier",
+            "batch_number",
+            "expiry_date",
+            "quantity",
+            "reorder_level",
+            "buying_price",
+            "selling_price",
+            "prescription_required",
+            "controlled_substance",
+            "status",
+            "description",
+        ]
 
-    widgets = {
+        widgets = {
 
             "name": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. Amoxicillin"
+                    "placeholder": "e.g. Amoxicillin",
                 }
             ),
 
             "generic_name": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. Amoxicillin Trihydrate"
+                    "placeholder": "e.g. Amoxicillin Trihydrate",
                 }
             ),
 
             "brand_name": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. Amoxil"
+                    "placeholder": "e.g. Amoxil",
                 }
             ),
 
             "category": forms.Select(
                 attrs={
-                    "class": "form-select"
+                    "class": "form-select",
                 }
             ),
 
             "dosage_form": forms.Select(
                 attrs={
-                    "class": "form-select"
+                    "class": "form-select",
                 }
             ),
 
             "strength": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. 500 mg"
+                    "placeholder": "e.g. 500 mg",
                 }
             ),
 
             "unit": forms.Select(
                 attrs={
-                    "class": "form-select"
+                    "class": "form-select",
                 }
             ),
 
             "manufacturer": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Manufacturer"
+                    "placeholder": "Manufacturer",
                 }
             ),
 
             "supplier": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Supplier / Distributor"
+                    "placeholder": "Supplier / Distributor",
                 }
             ),
 
             "batch_number": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. AMX2026A01"
+                    "placeholder": "e.g. AMX2026A01",
                 }
             ),
 
@@ -113,55 +112,56 @@ class MedicineForm(forms.ModelForm):
                 format="%Y-%m-%d",
                 attrs={
                     "type": "date",
-                    "class": "form-control"
+                    "class": "form-control",
                 }
             ),
 
             "quantity": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "min": "0"
+                    "min": "0",
                 }
             ),
 
             "reorder_level": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "min": "0"
+                    "min": "0",
                 }
             ),
 
-            "unit_price": forms.NumberInput(
+            "buying_price": forms.NumberInput(
                 attrs={
                     "class": "form-control",
                     "min": "0",
-                    "step": "0.01"
+                    "step": "0.01",
                 }
             ),
 
-"cost_price": forms.NumberInput(
-    attrs={
-        "class": "form-control",
-        "min": "0",
-        "step": "0.01",
-        "placeholder": "Purchase / Cost Price"
-    }
-),
+            "selling_price": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "0",
+                    "step": "0.01",
+                    "placeholder": "Purchase / Cost Price",
+                }
+            ),
 
-"controlled_substance": forms.CheckboxInput(
-    attrs={
-        "class": "form-check-input"
-    }
-),
             "prescription_required": forms.Select(
                 attrs={
-                    "class": "form-select"
+                    "class": "form-select",
+                }
+            ),
+
+            "controlled_substance": forms.CheckboxInput(
+                attrs={
+                    "class": "form-check-input",
                 }
             ),
 
             "status": forms.Select(
                 attrs={
-                    "class": "form-select"
+                    "class": "form-select",
                 }
             ),
 
@@ -169,46 +169,25 @@ class MedicineForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "rows": 4,
-                    "placeholder": "Additional information..."
+                    "placeholder": "Additional information...",
                 }
             ),
         }
 
     def clean_expiry_date(self):
 
-        expiry_date = self.cleaned_data.get(
-            "expiry_date"
-        )
+        expiry_date = self.cleaned_data.get("expiry_date")
 
         if (
             expiry_date
             and expiry_date < timezone.now().date()
         ):
-
             raise forms.ValidationError(
                 "A new medicine cannot have an expiry date "
                 "in the past."
             )
 
         return expiry_date
-
-    def clean(self):
-
-        cleaned_data = super().clean()
-
-        quantity = cleaned_data.get("quantity")
-        reorder_level = cleaned_data.get("reorder_level")
-
-        if (
-            quantity is not None
-            and reorder_level is not None
-            and reorder_level > quantity
-        ):
-            # Allowed because reorder level can be
-            # higher than the current stock.
-            pass
-
-        return cleaned_data
 
 
 # =========================================================
@@ -218,7 +197,6 @@ class MedicineForm(forms.ModelForm):
 class PrescriptionForm(forms.ModelForm):
 
     class Meta:
-
         model = Prescription
 
         fields = [
@@ -231,7 +209,7 @@ class PrescriptionForm(forms.ModelForm):
 
             "patient": forms.Select(
                 attrs={
-                    "class": "form-select"
+                    "class": "form-select",
                 }
             ),
 
@@ -239,7 +217,7 @@ class PrescriptionForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "rows": 3,
-                    "placeholder": "Enter diagnosis..."
+                    "placeholder": "Enter diagnosis...",
                 }
             ),
 
@@ -247,7 +225,7 @@ class PrescriptionForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "rows": 3,
-                    "placeholder": "Additional notes..."
+                    "placeholder": "Additional notes...",
                 }
             ),
         }
@@ -260,7 +238,6 @@ class PrescriptionForm(forms.ModelForm):
 class PrescriptionItemForm(forms.ModelForm):
 
     class Meta:
-
         model = PrescriptionItem
 
         fields = [
@@ -276,35 +253,35 @@ class PrescriptionItemForm(forms.ModelForm):
 
             "medicine": forms.Select(
                 attrs={
-                    "class": "form-select"
+                    "class": "form-select",
                 }
             ),
 
             "dosage": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. 500mg"
+                    "placeholder": "e.g. 500mg",
                 }
             ),
 
             "frequency": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. 3 times daily"
+                    "placeholder": "e.g. 3 times daily",
                 }
             ),
 
             "duration": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "e.g. 5 days"
+                    "placeholder": "e.g. 5 days",
                 }
             ),
 
             "quantity": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "min": 1
+                    "min": 1,
                 }
             ),
 
@@ -312,7 +289,7 @@ class PrescriptionItemForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "rows": 2,
-                    "placeholder": "e.g. Take after meals"
+                    "placeholder": "e.g. Take after meals",
                 }
             ),
         }

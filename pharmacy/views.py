@@ -15,37 +15,27 @@ from .models import (
     PrescriptionItem,
 )
 
-# from .forms import (
-#     MedicineForm,
-#     PrescriptionForm,
-#     PrescriptionItemForm,
-# )
+from .forms import (
+    MedicineForm,
+    PrescriptionForm,
+    PrescriptionItemForm,
+)
+
 from laboratory.models import LabRequest, LabResult
+
 from django.db.models import (
-    F,
     Sum,
     Count,
     Q,
     DecimalField,
     ExpressionWrapper,
 )
+
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from django.utils.dateparse import parse_date
 
 from datetime import timedelta
-# from io import BytesIO
-# from openpyxl import Workbook
-# from reportlab.lib import colors
-# from reportlab.lib.pagesizes import A4, landscape
-# from reportlab.lib.styles import getSampleStyleSheet
-# from reportlab.platypus import (
-#     SimpleDocTemplate,
-#     Table,
-#     TableStyle,
-#     Paragraph,
-#     Spacer,
-# )
 
 
 # =========================================================
@@ -257,36 +247,255 @@ def delete_medicine(request, id):
 # =========================================================
 # DISPENSE MEDICINE
 # =========================================================
+
 @login_required
 @transaction.atomic
 def dispense_medicine(request):
 
     if request.method == "POST":
 
-        # ... validation ...
+        # -------------------------------------------------
+        # PATIENT INFORMATION
+        # -------------------------------------------------
+
+        patient_name = request.POST.get(
+            "patient_name",
+            ""
+        ).strip()
+
+        patient_number = request.POST.get(
+            "patient_number",
+            ""
+        ).strip()
+
+        if not patient_name:
+
+            messages.error(
+                request,
+                "Please enter the patient name."
+            )
+
+            return redirect("dispense_medicine")
+
+        # -------------------------------------------------
+        # MEDICINES FROM FORM
+        #
+        # IMPORTANT:
+        # HTML uses medicine_id[]
+        # -------------------------------------------------
+
+        medicine_ids = request.POST.getlist(
+            "medicine_id[]"
+        )
+
+        quantities = request.POST.getlist(
+            "quantity[]"
+        )
+
+        if not medicine_ids:
+
+            messages.error(
+                request,
+                "Please select at least one medicine."
+            )
+
+            return redirect("dispense_medicine")
+
+        # -------------------------------------------------
+        # BUILD SALE ITEMS
+        # -------------------------------------------------
+
+        sale_items = []
+
+        grand_total = Decimal("0.00")
+
+        for index, medicine_id in enumerate(
+            medicine_ids
+        ):
+
+            if not medicine_id:
+                continue
+
+            # -------------------------------------------------
+            # QUANTITY
+            # -------------------------------------------------
+
+            if index >= len(quantities):
+
+                messages.error(
+                    request,
+                    "A medicine quantity is missing."
+                )
+
+                return redirect(
+                    "dispense_medicine"
+                )
+
+            try:
+
+                quantity = int(
+                    quantities[index]
+                )
+
+            except (
+                TypeError,
+                ValueError
+            ):
+
+                messages.error(
+                    request,
+                    "Invalid medicine quantity."
+                )
+
+                return redirect(
+                    "dispense_medicine"
+                )
+
+            if quantity <= 0:
+
+                messages.error(
+                    request,
+                    "Medicine quantity must be greater than zero."
+                )
+
+                return redirect(
+                    "dispense_medicine"
+                )
+
+            # -------------------------------------------------
+            # GET MEDICINE
+            # -------------------------------------------------
+
+            medicine = get_object_or_404(
+                Medicine,
+                id=medicine_id,
+                status="ACTIVE"
+            )
+
+            # -------------------------------------------------
+            # CHECK STOCK
+            # -------------------------------------------------
+
+            if medicine.quantity < quantity:
+
+                messages.error(
+                    request,
+                    f"Insufficient stock for "
+                    f"{medicine.name}. "
+                    f"Available stock: "
+                    f"{medicine.quantity}."
+                )
+
+                return redirect(
+                    "dispense_medicine"
+                )
+
+            # -------------------------------------------------
+            # PRICES
+            # -------------------------------------------------
+
+            buying_price = (
+                medicine.buying_price
+            )
+
+            selling_price = (
+                medicine.selling_price
+            )
+
+            # -------------------------------------------------
+            # TOTAL FOR THIS MEDICINE
+            # -------------------------------------------------
+
+            total_price = (
+                selling_price * quantity
+            )
+
+            grand_total += total_price
+
+            # -------------------------------------------------
+            # STORE ITEM
+            # -------------------------------------------------
+
+            sale_items.append({
+
+                "medicine": medicine,
+
+                "quantity": quantity,
+
+                "buying_price": buying_price,
+
+                "selling_price": selling_price,
+
+                "total_price": total_price,
+
+            })
+
+        # -------------------------------------------------
+        # CHECK SALE ITEMS
+        # -------------------------------------------------
+
+        if not sale_items:
+
+            messages.error(
+                request,
+                "Please select at least one medicine."
+            )
+
+            return redirect(
+                "dispense_medicine"
+            )
+
+        # -------------------------------------------------
+        # CREATE SALE
+        # -------------------------------------------------
 
         sale = PharmacySale.objects.create(
+
             patient_name=patient_name,
+
             patient_number=patient_number,
+
             issued_by=request.user,
+
             total_amount=grand_total,
+
+            amount_paid=Decimal("0.00"),
+
             payment_status="PENDING"
+
         )
+
+        # -------------------------------------------------
+        # CREATE SALE ITEMS
+        # -------------------------------------------------
 
         for item in sale_items:
 
-            PharmacySaleItem.objects.create(
-                sale=sale,
-                medicine=item["medicine"],
-                quantity=item["quantity"],
-                unit_price=item["unit_price"],
-                cost_price=item["cost_price"],
-                total_price=item["total_price"]
-            )
-
             medicine = item["medicine"]
 
-            medicine.quantity -= item["quantity"]
+            PharmacySaleItem.objects.create(
+
+                sale=sale,
+
+                medicine=medicine,
+
+                quantity=item["quantity"],
+
+                buying_price=item["buying_price"],
+
+                selling_price=item["selling_price"],
+
+                total_price=item["total_price"]
+
+            )
+
+            # -------------------------------------------------
+            # REDUCE STOCK
+            # -------------------------------------------------
+
+            medicine.quantity -= (
+                item["quantity"]
+            )
 
             medicine.save(
                 update_fields=[
@@ -295,32 +504,57 @@ def dispense_medicine(request):
                 ]
             )
 
-        # =================================================
+        # -------------------------------------------------
         # AUDIT LOG
-        # =================================================
+        # -------------------------------------------------
 
         PharmacyAuditLog.objects.create(
+
             user=request.user,
+
             action="MEDICINE_DISPENSED",
+
             reference=sale.sale_number,
+
             description=(
-                f"Pharmacy sale {sale.sale_number} created for "
-                f"{patient_name}. Total amount: "
-                f"UGX {grand_total}"
+                f"Pharmacy sale "
+                f"{sale.sale_number} "
+                f"created for "
+                f"{patient_name}. "
+                f"Total amount: "
+                f"UGX {grand_total:,.2f}"
             ),
-            ip_address=request.META.get("REMOTE_ADDR")
+
+            ip_address=request.META.get(
+                "REMOTE_ADDR"
+            )
+
         )
 
+        # -------------------------------------------------
+        # SUCCESS
+        # -------------------------------------------------
+
         messages.success(
+
             request,
+
             f"Medicine issue completed successfully. "
             f"Bill {sale.sale_number} created."
+
         )
 
         return redirect(
+
             "pharmacy_receipt",
+
             sale_id=sale.id
+
         )
+
+    # =====================================================
+    # GET REQUEST
+    # =====================================================
 
     medicines = (
         Medicine.objects
@@ -332,13 +566,16 @@ def dispense_medicine(request):
     )
 
     return render(
+
         request,
+
         "pharmacy/dispense_medicine.html",
+
         {
             "medicines": medicines
         }
-    )
 
+    )
 
 # =========================================================
 # MEDICINE SALES HISTORY
