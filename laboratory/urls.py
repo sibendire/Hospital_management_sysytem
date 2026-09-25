@@ -3,6 +3,9 @@ from django.urls import path
 from . import views
 
 
+app_name = "laboratory"
+
+
 urlpatterns = [
 
     # =========================================================
@@ -10,9 +13,15 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "dashboard/",
+        "",
         views.laboratory_dashboard,
         name="laboratory_dashboard"
+    ),
+
+    path(
+        "dashboard/",
+        views.laboratory_dashboard,
+        name="dashboard"
     ),
 
 
@@ -33,13 +42,13 @@ urlpatterns = [
     ),
 
     path(
-        "tests/edit/<int:id>/",
+        "tests/<int:test_id>/edit/",
         views.edit_test,
         name="edit_test"
     ),
 
     path(
-        "tests/delete/<int:id>/",
+        "tests/<int:test_id>/delete/",
         views.delete_test,
         name="delete_test"
     ),
@@ -55,24 +64,10 @@ urlpatterns = [
         name="lab_requests"
     ),
 
-    # Backward-compatible name for existing templates
     path(
-        "requests/",
-        views.lab_requests,
-        name="lab_request_list"
-    ),
-
-    path(
-        "request/add/",
+        "requests/create/",
         views.create_lab_request,
         name="create_lab_request"
-    ),
-
-    # Backward-compatible name for existing templates
-    path(
-        "request/add/",
-        views.create_lab_request,
-        name="lab_request"
     ),
 
 
@@ -81,8 +76,15 @@ urlpatterns = [
     # =========================================================
 
     path(
-        "result/<int:id>/",
+        "requests/<int:request_id>/result/",
         views.enter_result,
         name="enter_result"
     ),
+
+    path(
+        "patient/<int:patient_id>/results/",
+        views.patient_lab_results,
+        name="patient_lab_results"
+    ),
+
 ]

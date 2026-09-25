@@ -1,11 +1,204 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment List</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Payment History{% endblock %}
+
+{% block content %}
+
+<style>
+    .billing-page {
+        padding: 24px;
+        background: #f4f4f4;
+        min-height: calc(100vh - 64px);
+    }
+
+    .page-header {
+        margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 26px;
+    }
+
+    .page-header p {
+        color: #6f6f6f;
+    }
+
+    .panel {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        background: #f4f4f4;
+        padding: 13px;
+        font-size: 12px;
+        color: #525252;
+    }
+
+    td {
+        padding: 13px;
+        border-top: 1px solid #e0e0e0;
+        font-size: 13px;
+    }
+
+    .link {
+        color: #0f62fe;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .amount {
+        font-weight: 600;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 4px 9px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .completed {
+        background: #defbe6;
+        color: #198038;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 40px;
+        color: #6f6f6f;
+    }
+</style>
+
+<div class="billing-page">
+
+    <div class="page-header">
+
+        <h1>Payment History</h1>
+
+        <p>
+            Review all recorded patient payments.
+        </p>
+
+    </div>
+
+    <div class="panel">
+
+        {% if payments %}
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Receipt</th>
+                        <th>Invoice</th>
+                        <th>Patient</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for payment in payments %}
+
+                    <tr>
+
+                        <td>
+                            <strong>{{ payment.receipt_number }}</strong>
+                        </td>
+
+                        <td>
+                            <a
+                                class="link"
+                                href="{% url 'invoice_detail' payment.invoice.id %}"
+                            >
+                                {{ payment.invoice.invoice_number }}
+                            </a>
+                        </td>
+
+                        <td>
+                            {{ payment.invoice.patient.first_name }}
+                            {{ payment.invoice.patient.last_name }}
+                        </td>
+
+                        <td class="amount">
+                            UGX {{ payment.amount|floatformat:0 }}
+                        </td>
+
+                        <td>
+                            {{ payment.get_payment_method_display }}
+                        </td>
+
+                        <td>
+                            {{ payment.transaction_reference|default:"—" }}
+                        </td>
+
+                        <td>
+                            {{ payment.payment_date|date:"d M Y H:i" }}
+                        </td>
+
+                        <td>
+
+                            {% if payment.status == "COMPLETED" %}
+                                <span class="status completed">
+                                    Completed
+                                </span>
+                            {% else %}
+                                {{ payment.get_status_display }}
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'receipt' payment.id %}"
+                                class="link"
+                            >
+                                Receipt
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+            No payments have been recorded.
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,11 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice item form</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Add Invoice Item{% endblock %}
+
+{% block content %}
+
+<style>
+    .billing-page {
+        padding: 24px;
+        background: #f4f4f4;
+        min-height: calc(100vh - 64px);
+    }
+
+    .form-container {
+        max-width: 700px;
+        margin: auto;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+    }
+
+    .header {
+        padding: 22px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 23px;
+    }
+
+    .header p {
+        color: #6f6f6f;
+    }
+
+    .body {
+        padding: 24px;
+    }
+
+    .field {
+        margin-bottom: 18px;
+    }
+
+    .field label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+
+    .field input,
+    .field select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px;
+        border: 1px solid #8d8d8d;
+        border-radius: 3px;
+    }
+
+    .errors {
+        color: #a2191f;
+        font-size: 13px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 15px;
+    }
+
+    .btn {
+        padding: 10px 17px;
+        border-radius: 4px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .primary {
+        background: #0f62fe;
+        color: white;
+    }
+
+    .secondary {
+        background: white;
+        border: 1px solid #c6c6c6;
+        color: #161616;
+    }
+</style>
+
+<div class="billing-page">
+
+    <div class="form-container">
+
+        <div class="header">
+            <h1>Add Invoice Item</h1>
+            <p>
+                Invoice:
+                <strong>{{ invoice.invoice_number }}</strong>
+            </p>
+        </div>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="body">
+
+                {{ form.non_field_errors }}
+
+                {% for field in form %}
+
+                <div class="field">
+
+                    {{ field.label_tag }}
+
+                    {{ field }}
+
+                    <div class="errors">
+                        {{ field.errors }}
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+                <div class="actions">
+
+                    <a
+                        href="{% url 'invoice_detail' invoice.id %}"
+                        class="btn secondary"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn primary"
+                    >
+                        Add Item
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,8 +1,12 @@
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
+from django.db import transaction
 from django.db.models.deletion import ProtectedError
+
+from billing.services import add_lab_charge
 
 from .forms import (
     LabRequestForm,
@@ -26,10 +30,13 @@ def laboratory_dashboard(request):
 
     context = {
         "tests": LabTest.objects.count(),
+
         "requests": LabRequest.objects.count(),
+
         "pending": LabRequest.objects.filter(
             status="Pending"
         ).count(),
+
         "completed": LabRequest.objects.filter(
             status="Completed"
         ).count(),
@@ -73,7 +80,12 @@ def add_test(request):
 
         if form.is_valid():
 
-            form.save()
+            test = form.save()
+
+            messages.success(
+                request,
+                f"Laboratory test '{test.name}' was added successfully."
+            )
 
             return redirect("test_list")
 
@@ -91,10 +103,105 @@ def add_test(request):
 
 
 # =========================================================
+# EDIT LAB TEST
+# =========================================================
+
+@login_required
+def edit_test(request, id):
+
+    test = get_object_or_404(
+        LabTest,
+        id=id
+    )
+
+    if request.method == "POST":
+
+        form = LabTestForm(
+            request.POST,
+            instance=test
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                (
+                    f"Laboratory test '{test.name}' "
+                    "was updated successfully."
+                )
+            )
+
+            return redirect("test_list")
+
+    else:
+
+        form = LabTestForm(
+            instance=test
+        )
+
+    return render(
+        request,
+        "laboratory/test_form.html",
+        {
+            "form": form,
+            "test": test,
+            "is_edit": True,
+        }
+    )
+
+
+# =========================================================
+# DELETE LAB TEST
+# =========================================================
+
+@login_required
+def delete_test(request, id):
+
+    test = get_object_or_404(
+        LabTest,
+        id=id
+    )
+
+    if request.method != "POST":
+
+        return redirect("test_list")
+
+    test_name = test.name
+
+    try:
+
+        test.delete()
+
+        messages.success(
+            request,
+            (
+                f"Laboratory test '{test_name}' "
+                "was deleted successfully."
+            )
+        )
+
+    except ProtectedError:
+
+        messages.error(
+            request,
+            (
+                f"'{test_name}' cannot be deleted because it has "
+                "already been used in one or more laboratory requests. "
+                "This protects the patient's laboratory history."
+            )
+        )
+
+    return redirect("test_list")
+
+
+# =========================================================
 # CREATE LAB REQUEST
 # =========================================================
 
 @login_required
+@transaction.atomic
 def create_lab_request(request):
 
     if request.method == "POST":
@@ -110,6 +217,37 @@ def create_lab_request(request):
             lab_request.requested_by = request.user
 
             lab_request.save()
+
+            try:
+
+                invoice, invoice_item = add_lab_charge(
+                    lab_request
+                )
+
+            except Exception as exc:
+
+                # Because this view is wrapped in transaction.atomic,
+                # the LabRequest will also be rolled back if billing fails.
+                messages.error(
+                    request,
+                    (
+                        "The laboratory request could not be billed. "
+                        f"Please correct the problem and try again. "
+                        f"Details: {exc}"
+                    )
+                )
+
+                raise
+
+            messages.success(
+                request,
+                (
+                    f"Laboratory request "
+                    f"{lab_request.sample_number} was created "
+                    f"successfully and added to invoice "
+                    f"{invoice.invoice_number}."
+                )
+            )
 
             return redirect("lab_requests")
 
@@ -139,6 +277,7 @@ def lab_requests(request):
             "patient",
             "test",
             "requested_by",
+            "encounter",
         )
         .all()
     )
@@ -147,27 +286,43 @@ def lab_requests(request):
     # SEARCH
     # -----------------------------------------------------
 
-    search = request.GET.get("q", "").strip()
+    search = request.GET.get(
+        "q",
+        ""
+    ).strip()
 
     if search:
 
-        requests = requests.filter(
-            patient__first_name__icontains=search
-        ) | requests.filter(
-            patient__last_name__icontains=search
-        ) | requests.filter(
-            patient__patient_number__icontains=search
-        ) | requests.filter(
-            sample_number__icontains=search
-        ) | requests.filter(
-            test__name__icontains=search
-        )
+        requests = (
+            requests.filter(
+                patient__first_name__icontains=search
+            )
+            |
+            requests.filter(
+                patient__last_name__icontains=search
+            )
+            |
+            requests.filter(
+                patient__patient_number__icontains=search
+            )
+            |
+            requests.filter(
+                sample_number__icontains=search
+            )
+            |
+            requests.filter(
+                test__name__icontains=search
+            )
+        ).distinct()
 
     # -----------------------------------------------------
     # STATUS FILTER
     # -----------------------------------------------------
 
-    status = request.GET.get("status", "").strip()
+    status = request.GET.get(
+        "status",
+        ""
+    ).strip()
 
     if status:
 
@@ -193,13 +348,17 @@ def lab_requests(request):
 
     context = {
         "lab_requests": requests,
+
         "total_requests": requests.count(),
+
         "pending_requests": requests.filter(
             status="Pending"
         ).count(),
+
         "processing_requests": requests.filter(
             status="Processing"
         ).count(),
+
         "completed_requests": requests.filter(
             status="Completed"
         ).count(),
@@ -217,21 +376,42 @@ def lab_requests(request):
 # =========================================================
 
 @login_required
+@transaction.atomic
 def enter_result(request, id):
 
     lab_request = get_object_or_404(
-        LabRequest,
+        LabRequest.objects.select_related(
+            "patient",
+            "test",
+            "encounter",
+        ),
         id=id
     )
+
+    # -----------------------------------------------------
+    # PREVENT DUPLICATE RESULT
+    # -----------------------------------------------------
 
     if hasattr(
         lab_request,
         "result_record"
     ):
 
+        messages.info(
+            request,
+            (
+                f"A result already exists for laboratory "
+                f"request {lab_request.sample_number}."
+            )
+        )
+
         return redirect(
             "lab_requests"
         )
+
+    # -----------------------------------------------------
+    # RESULT FORM
+    # -----------------------------------------------------
 
     if request.method == "POST":
 
@@ -246,6 +426,7 @@ def enter_result(request, id):
             )
 
             result.lab_request = lab_request
+
             result.technician = request.user
 
             result.save()
@@ -254,6 +435,15 @@ def enter_result(request, id):
 
             lab_request.save(
                 update_fields=["status"]
+            )
+
+            messages.success(
+                request,
+                (
+                    f"Laboratory result for "
+                    f"{lab_request.sample_number} "
+                    "was recorded successfully."
+                )
             )
 
             return redirect(
@@ -290,13 +480,16 @@ def patient_lab_results(
             "lab_request",
             "lab_request__test",
             "lab_request__patient",
+            "lab_request__encounter",
             "technician",
         )
         .filter(
             lab_request__patient_id=patient_id,
             lab_request__status="Completed",
         )
-        .order_by("-result_date")
+        .order_by(
+            "-result_date"
+        )
     )
 
     data = []
@@ -345,89 +538,3 @@ def patient_lab_results(
         data,
         safe=False
     )
-# =========================================================
-# EDIT LAB TEST
-# =========================================================
-
-@login_required
-def edit_test(request, id):
-
-    test = get_object_or_404(
-        LabTest,
-        id=id
-    )
-
-    if request.method == "POST":
-
-        form = LabTestForm(
-            request.POST,
-            instance=test
-        )
-
-        if form.is_valid():
-
-            form.save()
-
-            messages.success(
-                request,
-                f"Laboratory test '{test.name}' was updated successfully."
-            )
-
-            return redirect("test_list")
-
-    else:
-
-        form = LabTestForm(
-            instance=test
-        )
-
-    return render(
-        request,
-        "laboratory/test_form.html",
-        {
-            "form": form,
-            "test": test,
-            "is_edit": True,
-        }
-    )
-
-
-# =========================================================
-# DELETE LAB TEST
-# =========================================================
-
-@login_required
-def delete_test(request, id):
-
-    test = get_object_or_404(
-        LabTest,
-        id=id
-    )
-
-    if request.method != "POST":
-
-        return redirect("test_list")
-
-    test_name = test.name
-
-    try:
-
-        test.delete()
-
-        messages.success(
-            request,
-            f"Laboratory test '{test_name}' was deleted successfully."
-        )
-
-    except ProtectedError:
-
-        messages.error(
-            request,
-            (
-                f"'{test_name}' cannot be deleted because it has "
-                "already been used in one or more laboratory requests. "
-                "This protects the patient's laboratory history."
-            )
-        )
-
-    return redirect("test_list")

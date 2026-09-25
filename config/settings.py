@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'laboratory',
     'billing',
     'wards',
+    'consultations',
 ]
 
 MIDDLEWARE = [

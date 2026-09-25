@@ -69,6 +69,15 @@ class LabRequest(models.Model):
         related_name="lab_requests"
     )
 
+    # Links the laboratory request to the doctor's encounter.
+    encounter = models.ForeignKey(
+        "consultations.ClinicalEncounter",
+        on_delete=models.PROTECT,
+        related_name="lab_requests",
+        null=True,
+        blank=True
+    )
+
     test = models.ForeignKey(
         LabTest,
         on_delete=models.PROTECT,
@@ -114,6 +123,7 @@ class LabRequest(models.Model):
                 f"LAB-{year}-{self.pk:06d}"
             )
 
+            # Save the generated sample number.
             super().save(
                 update_fields=["sample_number"]
             )

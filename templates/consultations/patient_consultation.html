@@ -1,0 +1,562 @@
+{% extends "base.html" %}
+
+{% block title %}
+New Clinical Encounter
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+
+        <div>
+
+            <h2 class="mb-1">
+                New Clinical Encounter
+            </h2>
+
+            <p class="text-muted mb-0">
+                Create a clinical consultation for the selected patient.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'consultations:doctor_workspace' %}"
+            class="btn btn-outline-secondary"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Doctor Workspace
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         PATIENT INFORMATION
+         ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-person-vcard"></i>
+
+                Patient Information
+
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Patient
+                    </small>
+
+                    <h5 class="mb-0">
+
+                        {{ patient.first_name }}
+                        {{ patient.last_name }}
+
+                    </h5>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Patient Number
+                    </small>
+
+                    <h5 class="mb-0">
+
+                        {{ patient.patient_number }}
+
+                    </h5>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Gender
+                    </small>
+
+                    <h5 class="mb-0">
+
+                        {{ patient.gender|default:"Not recorded" }}
+
+                    </h5>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACTIVE ENCOUNTER CHECK
+         ===================================================== -->
+
+    {% if active_encounter %}
+
+        <div class="alert alert-warning shadow-sm">
+
+
+            <h5 class="alert-heading">
+
+                <i class="bi bi-exclamation-triangle"></i>
+
+                Active Encounter Already Exists
+
+            </h5>
+
+
+            <p>
+
+                This patient already has an active clinical encounter:
+
+                <strong>
+                    {{ active_encounter.encounter_number }}
+                </strong>
+
+            </p>
+
+
+            <p>
+
+                Continue the existing encounter instead of creating
+                another active encounter for this patient.
+
+            </p>
+
+
+            <a
+                href="{% url 'consultations:encounter_detail' active_encounter.id %}"
+                class="btn btn-warning"
+            >
+
+                <i class="bi bi-box-arrow-in-right"></i>
+
+                Open Existing Encounter
+
+            </a>
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             CLINICAL CONSULTATION FORM
+             ================================================= -->
+
+        <form
+            method="post"
+            action="{% url 'consultations:patient_consultation' patient.id %}"
+            novalidate
+        >
+
+            {% csrf_token %}
+
+
+            <div class="card border-0 shadow-sm">
+
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-clipboard2-pulse"></i>
+
+                        Clinical Consultation
+
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <!-- =================================================
+                         ENCOUNTER TYPE
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ encounter_form.encounter_type.id_for_label }}"
+                            class="form-label"
+                        >
+
+                            Encounter Type
+
+                        </label>
+
+
+                        {{ encounter_form.encounter_type }}
+
+
+                        {% for error in encounter_form.encounter_type.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         CHIEF COMPLAINT
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ encounter_form.chief_complaint.id_for_label }}"
+                            class="form-label"
+                        >
+
+                            Chief Complaint
+
+                        </label>
+
+
+                        {{ encounter_form.chief_complaint }}
+
+
+                        {% for error in encounter_form.chief_complaint.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         HISTORY
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ encounter_form.history_of_present_illness.id_for_label }}"
+                            class="form-label"
+                        >
+
+                            History of Present Illness
+
+                        </label>
+
+
+                        {{ encounter_form.history_of_present_illness }}
+
+
+                        {% for error in encounter_form.history_of_present_illness.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         CLINICAL EXAMINATION
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ encounter_form.clinical_examination.id_for_label }}"
+                            class="form-label"
+                        >
+
+                            Clinical Examination
+
+                        </label>
+
+
+                        {{ encounter_form.clinical_examination }}
+
+
+                        {% for error in encounter_form.clinical_examination.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         ASSESSMENT
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ encounter_form.assessment.id_for_label }}"
+                            class="form-label"
+                        >
+
+                            Assessment
+
+                        </label>
+
+
+                        {{ encounter_form.assessment }}
+
+
+                        {% for error in encounter_form.assessment.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         TREATMENT PLAN
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ encounter_form.treatment_plan.id_for_label }}"
+                            class="form-label"
+                        >
+
+                            Treatment Plan
+
+                        </label>
+
+
+                        {{ encounter_form.treatment_plan }}
+
+
+                        {% for error in encounter_form.treatment_plan.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         CLINICAL NOTES
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ encounter_form.clinical_notes.id_for_label }}"
+                            class="form-label"
+                        >
+
+                            Clinical Notes
+
+                        </label>
+
+
+                        {{ encounter_form.clinical_notes }}
+
+
+                        {% for error in encounter_form.clinical_notes.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- =================================================
+                         FOLLOW-UP
+                         ================================================= -->
+
+                    <h5 class="mb-3">
+
+                        <i class="bi bi-calendar-check"></i>
+
+                        Follow-up
+
+                    </h5>
+
+
+                    <div class="row g-4">
+
+
+                        <div class="col-md-6">
+
+                            <label
+                                for="{{ encounter_form.follow_up_date.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                Follow-up Date
+
+                            </label>
+
+
+                            {{ encounter_form.follow_up_date }}
+
+
+                            {% for error in encounter_form.follow_up_date.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label
+                                for="{{ encounter_form.follow_up_instructions.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                Follow-up Instructions
+
+                            </label>
+
+
+                            {{ encounter_form.follow_up_instructions }}
+
+
+                            {% for error in encounter_form.follow_up_instructions.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- =================================================
+                         FORM ERRORS
+                         ================================================= -->
+
+                    {% if encounter_form.non_field_errors %}
+
+                        <div class="alert alert-danger mt-4">
+
+                            {% for error in encounter_form.non_field_errors %}
+
+                                <div>
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================================
+                         FORM ACTIONS
+                         ================================================= -->
+
+                    <div
+                        class="d-flex justify-content-between align-items-center mt-5"
+                    >
+
+
+                        <a
+                            href="{% url 'consultations:doctor_workspace' %}"
+                            class="btn btn-outline-secondary"
+                        >
+
+                            <i class="bi bi-x-circle"></i>
+
+                            Cancel
+
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+
+                            <i class="bi bi-play-circle"></i>
+
+                            Start Consultation
+
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </form>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

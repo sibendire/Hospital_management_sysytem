@@ -1,11 +1,195 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Billing Reports{% endblock %}
+
+{% block content %}
+
+<style>
+    .billing-page {
+        padding: 24px;
+        background: #f4f4f4;
+        min-height: calc(100vh - 64px);
+    }
+
+    .page-header {
+        margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 26px;
+    }
+
+    .page-header p {
+        color: #6f6f6f;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .stat {
+        background: white;
+        border: 1px solid #e0e0e0;
+        padding: 22px;
+        border-radius: 4px;
+    }
+
+    .label {
+        color: #6f6f6f;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .value {
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .panel {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+    }
+
+    .panel-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .panel-header h2 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #f4f4f4;
+        padding: 13px;
+        text-align: left;
+        font-size: 12px;
+    }
+
+    td {
+        padding: 13px;
+        border-top: 1px solid #e0e0e0;
+        font-size: 13px;
+    }
+
+    @media(max-width:600px) {
+        .stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="billing-page">
+
+    <div class="page-header">
+
+        <h1>Billing Reports</h1>
+
+        <p>
+            Revenue and payment collection overview.
+        </p>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div class="label">
+                Today's Revenue
+            </div>
+
+            <div class="value">
+                UGX {{ today_revenue|floatformat:0 }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="label">
+                Total Revenue
+            </div>
+
+            <div class="value">
+                UGX {{ total_revenue|floatformat:0 }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <h2>Revenue by Payment Method</h2>
+
+        </div>
+
+        {% if payment_methods %}
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Payment Method</th>
+                        <th>Total Collected</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for method in payment_methods %}
+
+                    <tr>
+
+                        <td>
+                            {{ method.payment_method }}
+                        </td>
+
+                        <td>
+                            UGX {{ method.total|floatformat:0 }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div style="padding:35px;text-align:center;color:#6f6f6f;">
+            No payment data is available.
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Doctor Workspace
+{% endblock %}
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'css/doctor-workspace.css' %}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="doctor-workspace">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="doctor-page-header">
+
+        <div>
+
+            <h1 class="doctor-page-title">
+                Doctor Workspace
+            </h1>
+
+            <p class="doctor-page-subtitle">
+                Clinical encounters and patient consultations
+            </p>
+
+        </div>
+
+
+        <div class="doctor-page-actions">
+
+            <a
+                href="{% url 'patient_list' %}"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-person-plus"></i>
+
+                Start New Encounter
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
+
+    <div class="doctor-stat-grid">
+
+
+        <div class="doctor-stat-card">
+
+            <div class="doctor-stat-content">
+
+                <span class="doctor-stat-label">
+                    Total Encounters
+                </span>
+
+                <span class="doctor-stat-value">
+                    {{ total_encounters }}
+                </span>
+
+            </div>
+
+            <div class="doctor-stat-icon">
+
+                <i class="bi bi-clipboard2-pulse"></i>
+
+            </div>
+
+        </div>
+
+
+        <div class="doctor-stat-card">
+
+            <div class="doctor-stat-content">
+
+                <span class="doctor-stat-label">
+                    Active Encounters
+                </span>
+
+                <span class="doctor-stat-value">
+                    {{ open_encounters }}
+                </span>
+
+            </div>
+
+            <div class="doctor-stat-icon">
+
+                <i class="bi bi-person-check"></i>
+
+            </div>
+
+        </div>
+
+
+        <div class="doctor-stat-card">
+
+            <div class="doctor-stat-content">
+
+                <span class="doctor-stat-label">
+                    Completed
+                </span>
+
+                <span class="doctor-stat-value">
+                    {{ completed_encounters }}
+                </span>
+
+            </div>
+
+            <div class="doctor-stat-icon">
+
+                <i class="bi bi-check2-circle"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CLINICAL ENCOUNTERS
+         ===================================================== -->
+
+    <section class="encounter-panel">
+
+
+        <div class="encounter-panel-header">
+
+            <div>
+
+                <h2 class="encounter-panel-title">
+                    Clinical Encounters
+                </h2>
+
+                <p class="encounter-panel-description">
+                    Existing patient consultations assigned to you
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="encounter-table-wrapper">
+
+            <table class="encounter-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Encounter
+                        </th>
+
+                        <th>
+                            Patient
+                        </th>
+
+                        <th>
+                            Doctor
+                        </th>
+
+                        <th>
+                            Type
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                {% for encounter in encounters %}
+
+                    <tr>
+
+
+                        <!-- Encounter -->
+
+                        <td>
+
+                            <span class="encounter-number">
+                                {{ encounter.encounter_number }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- Patient -->
+
+                        <td>
+
+                            <span class="patient-name">
+
+                                {{ encounter.patient.first_name }}
+                                {{ encounter.patient.last_name }}
+
+                            </span>
+
+                            <span class="patient-number">
+
+                                {{ encounter.patient.patient_number }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- Doctor -->
+
+                        <td>
+
+                            <span class="encounter-doctor">
+
+                                {% if encounter.doctor.get_full_name %}
+
+                                    {{ encounter.doctor.get_full_name }}
+
+                                {% else %}
+
+                                    {{ encounter.doctor.username }}
+
+                                {% endif %}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- Encounter Type -->
+
+                        <td>
+
+                            <span class="encounter-type">
+
+                                {{ encounter.get_encounter_type_display }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- Date -->
+
+                        <td>
+
+                            <span class="encounter-date">
+
+                                {{ encounter.encounter_date|date:"d M Y H:i" }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- Status -->
+
+                        <td>
+
+                            {% if encounter.status == "COMPLETED" %}
+
+                                <span
+                                    class="encounter-status encounter-status-completed"
+                                >
+                                    Completed
+                                </span>
+
+                            {% elif encounter.status == "CANCELLED" %}
+
+                                <span
+                                    class="encounter-status encounter-status-cancelled"
+                                >
+                                    Cancelled
+                                </span>
+
+                            {% elif encounter.status == "IN_PROGRESS" %}
+
+                                <span
+                                    class="encounter-status encounter-status-active"
+                                >
+                                    In Progress
+                                </span>
+
+                            {% else %}
+
+                                <span
+                                    class="encounter-status encounter-status-active"
+                                >
+                                    Open
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Action -->
+
+                        <td>
+
+                            <a
+                                href="{% url 'consultations:encounter_detail' encounter.id %}"
+                                class="encounter-open-btn"
+                            >
+
+                                <i class="bi bi-box-arrow-in-right"></i>
+
+                                Open
+
+                            </a>
+
+                        </td>
+
+
+                    </tr>
+
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            class="encounter-empty"
+                        >
+
+                            <div class="encounter-empty-icon">
+
+                                <i class="bi bi-clipboard-x"></i>
+
+                            </div>
+
+                            <p class="encounter-empty-title">
+                                No clinical encounters
+                            </p>
+
+                            <p class="encounter-empty-text">
+                                There are currently no clinical encounters.
+                            </p>
+
+
+                            <a
+                                href="{% url 'patient_list' %}"
+                                class="btn btn-primary mt-3"
+                            >
+
+                                <i class="bi bi-person-plus"></i>
+
+                                Select Patient
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</div>
+
+{% endblock %}

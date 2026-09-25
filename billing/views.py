@@ -118,11 +118,27 @@ def invoice_list(request):
         "-invoice_date"
     )
 
+    query = request.GET.get("q", "").strip()
+    status = request.GET.get("status", "").strip()
+
+    if query:
+        invoices = invoices.filter(
+            Q(invoice_number__icontains=query)
+            | Q(patient__first_name__icontains=query)
+            | Q(patient__last_name__icontains=query)
+            | Q(patient__patient_number__icontains=query)
+        )
+
+    if status in ["UNPAID", "PARTIAL", "PAID"]:
+        invoices = invoices.filter(
+            payment_status=status
+        )
+
     return render(
         request,
         "billing/invoice_list.html",
         {
-            "invoices": invoices
+            "invoices": invoices,
         }
     )
 
@@ -278,28 +294,51 @@ def add_invoice_item(
 
 
 @login_required
-def delete_invoice_item(
-    request,
-    item_id
-):
+def delete_invoice_item(request, item_id):
 
     item = get_object_or_404(
         InvoiceItem,
         id=item_id
     )
 
-    invoice_id = item.invoice.id
+    invoice = item.invoice
+
+    if invoice.status == "PAID":
+
+        messages.error(
+            request,
+            "A fully paid invoice cannot be modified."
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
+
+    if invoice.status == "CANCELLED":
+
+        messages.error(
+            request,
+            "A cancelled invoice cannot be modified."
+        )
+
+        return redirect(
+            "invoice_detail",
+            invoice_id=invoice.id
+        )
 
     item.delete()
 
+    invoice.update_payment_status()
+
     messages.success(
         request,
-        "Invoice item removed."
+        "Invoice item removed successfully."
     )
 
     return redirect(
         "invoice_detail",
-        invoice_id=invoice_id
+        invoice_id=invoice.id
     )
 
 @login_required

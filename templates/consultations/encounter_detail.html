@@ -1,0 +1,1201 @@
+{% extends "base.html" %}
+
+{% block title %}
+Clinical Encounter
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+
+    <!-- =====================================================
+         PATIENT / ENCOUNTER HEADER
+         ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+
+                <!-- PATIENT -->
+
+                <div class="col-lg-8">
+
+                    <small class="text-muted">
+                        Patient
+                    </small>
+
+                    <h3 class="mb-1">
+
+                        {{ patient.first_name }}
+                        {{ patient.last_name }}
+
+                    </h3>
+
+
+                    <div class="text-muted">
+
+                        {{ patient.patient_number }}
+
+                        {% if patient.gender %}
+                            · {{ patient.gender }}
+                        {% endif %}
+
+                        {% if patient.phone %}
+                            · {{ patient.phone }}
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ENCOUNTER -->
+
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+
+                    <small class="text-muted">
+                        Encounter
+                    </small>
+
+                    <h5 class="mb-2">
+                        {{ encounter.encounter_number }}
+                    </h5>
+
+
+                    {% if encounter.status == "COMPLETED" %}
+
+                        <span class="badge bg-success">
+                            Completed
+                        </span>
+
+                    {% elif encounter.status == "CANCELLED" %}
+
+                        <span class="badge bg-danger">
+                            Cancelled
+                        </span>
+
+                    {% elif encounter.status == "IN_PROGRESS" %}
+
+                        <span class="badge bg-primary">
+                            In Progress
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            Open
+                        </span>
+
+                    {% endif %}
+
+
+                    <div class="small text-muted mt-2">
+
+                        {{ encounter.encounter_date|date:"d M Y H:i" }}
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CLINICAL WORKFLOW NAVIGATION
+         ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-2">
+
+
+                <div class="col-6 col-md">
+
+                    <a
+                        href="#clinical-assessment"
+                        class="btn btn-outline-primary w-100"
+                    >
+
+                        <i class="bi bi-clipboard2-pulse"></i>
+
+                        Assessment
+
+                    </a>
+
+                </div>
+
+
+                <div class="col-6 col-md">
+
+                    <a
+                        href="#vital-signs"
+                        class="btn btn-outline-primary w-100"
+                    >
+
+                        <i class="bi bi-heart-pulse"></i>
+
+                        Vitals
+
+                    </a>
+
+                </div>
+
+
+                <div class="col-6 col-md">
+
+                    <a
+                        href="#diagnoses"
+                        class="btn btn-outline-primary w-100"
+                    >
+
+                        <i class="bi bi-file-medical"></i>
+
+                        Diagnosis
+
+                    </a>
+
+                </div>
+
+
+                <div class="col-6 col-md">
+
+                    <a
+                        href="#laboratory"
+                        class="btn btn-outline-primary w-100"
+                    >
+
+                        <i class="bi bi-eyedropper"></i>
+
+                        Laboratory
+
+                    </a>
+
+                </div>
+
+
+                <div class="col-6 col-md">
+
+                    <a
+                        href="#billing"
+                        class="btn btn-outline-dark w-100"
+                    >
+
+                        <i class="bi bi-receipt"></i>
+
+                        Billing
+
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+
+        <!-- =================================================
+             MAIN CLINICAL AREA
+             ================================================= -->
+
+        <div class="col-lg-8">
+
+
+            <!-- =================================================
+                 CLINICAL ASSESSMENT
+                 ================================================= -->
+
+            <section
+                id="clinical-assessment"
+                class="card border-0 shadow-sm mb-4"
+            >
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-clipboard2-pulse"></i>
+
+                        Clinical Assessment
+
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <div class="mb-4">
+
+                        <h6>
+                            Chief Complaint
+                        </h6>
+
+                        <p class="mb-0">
+                            {{ encounter.chief_complaint|default:"Not recorded." }}
+                        </p>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div class="mb-4">
+
+                        <h6>
+                            History of Present Illness
+                        </h6>
+
+                        <p class="mb-0">
+                            {{ encounter.history_of_present_illness|default:"Not recorded." }}
+                        </p>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div class="mb-4">
+
+                        <h6>
+                            Clinical Examination
+                        </h6>
+
+                        <p class="mb-0">
+                            {{ encounter.clinical_examination|default:"Not recorded." }}
+                        </p>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div class="mb-4">
+
+                        <h6>
+                            Assessment
+                        </h6>
+
+                        <p class="mb-0">
+                            {{ encounter.assessment|default:"Not recorded." }}
+                        </p>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div class="mb-4">
+
+                        <h6>
+                            Treatment Plan
+                        </h6>
+
+                        <p class="mb-0">
+                            {{ encounter.treatment_plan|default:"Not recorded." }}
+                        </p>
+
+                    </div>
+
+
+                    {% if encounter.clinical_notes %}
+
+                        <hr>
+
+                        <div>
+
+                            <h6>
+                                Clinical Notes
+                            </h6>
+
+                            <p class="mb-0">
+                                {{ encounter.clinical_notes }}
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    {% if encounter.follow_up_date %}
+
+                        <hr>
+
+                        <div>
+
+                            <h6>
+                                Follow-up
+                            </h6>
+
+                            <p class="mb-1">
+
+                                <strong>
+                                    Date:
+                                </strong>
+
+                                {{ encounter.follow_up_date|date:"d M Y" }}
+
+                            </p>
+
+
+                            {% if encounter.follow_up_instructions %}
+
+                                <p class="mb-0">
+
+                                    <strong>
+                                        Instructions:
+                                    </strong>
+
+                                    {{ encounter.follow_up_instructions }}
+
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endif %}
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 DIAGNOSES
+                 ================================================= -->
+
+            <section
+                id="diagnoses"
+                class="card border-0 shadow-sm mb-4"
+            >
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-file-medical"></i>
+
+                        Diagnoses
+
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    {% for diagnosis in diagnoses %}
+
+                        <div class="border-bottom pb-3 mb-3">
+
+
+                            <div>
+
+                                <strong>
+                                    {{ diagnosis.diagnosis_name }}
+                                </strong>
+
+
+                                {% if diagnosis.is_primary %}
+
+                                    <span class="badge bg-primary ms-2">
+                                        Primary
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if diagnosis.diagnosis_code %}
+
+                                <div class="text-muted small mt-1">
+
+                                    Code:
+                                    {{ diagnosis.diagnosis_code }}
+
+                                </div>
+
+                            {% endif %}
+
+
+                            {% if diagnosis.notes %}
+
+                                <div class="text-muted small mt-2">
+
+                                    {{ diagnosis.notes }}
+
+                                </div>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    {% empty %}
+
+                        <div class="text-center py-3">
+
+                            <i class="bi bi-file-medical fs-2 text-muted"></i>
+
+                            <p class="text-muted mb-0 mt-2">
+
+                                No diagnosis recorded yet.
+
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                    {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+                        <hr>
+
+
+                        <h6 class="mb-3">
+                            Add Diagnosis
+                        </h6>
+
+
+                        <form
+                            method="post"
+                            action="{% url 'consultations:add_diagnosis' encounter.id %}"
+                        >
+
+                            {% csrf_token %}
+
+                            {{ diagnosis_form.as_p }}
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-primary"
+                            >
+
+                                <i class="bi bi-plus-circle"></i>
+
+                                Add Diagnosis
+
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 LABORATORY
+                 ================================================= -->
+
+            <section
+                id="laboratory"
+                class="card border-0 shadow-sm mb-4"
+            >
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-eyedropper"></i>
+
+                        Laboratory Investigations
+
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+                        <form
+                            method="post"
+                            action="{% url 'consultations:request_lab_test' encounter.id %}"
+                            class="mb-4"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <div class="row g-3 align-items-end">
+
+
+                                <div class="col-md-9">
+
+                                    <label class="form-label">
+                                        Laboratory Test
+                                    </label>
+
+                                    {{ lab_request_form.test }}
+
+
+                                    {% for error in lab_request_form.test.errors %}
+
+                                        <div class="text-danger small mt-1">
+
+                                            {{ error }}
+
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+
+                                <div class="col-md-3">
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary w-100"
+                                    >
+
+                                        <i class="bi bi-plus-circle"></i>
+
+                                        Request Test
+
+                                    </button>
+
+                                </div>
+
+
+                            </div>
+
+                        </form>
+
+                    {% endif %}
+
+
+                    <h6 class="mb-3">
+                        Requested Tests
+                    </h6>
+
+
+                    {% for lab_request in lab_requests %}
+
+                        <div class="border rounded p-3 mb-3">
+
+
+                            <div class="row align-items-center">
+
+
+                                <div class="col-md-5">
+
+                                    <strong>
+                                        {{ lab_request.test.name }}
+                                    </strong>
+
+
+                                    <div class="text-muted small">
+
+                                        {{ lab_request.test.category }}
+
+                                    </div>
+
+
+                                    <div class="text-muted small">
+
+                                        Sample:
+                                        {{ lab_request.sample_number }}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-md-3">
+
+                                    <small class="text-muted d-block">
+                                        Requested
+                                    </small>
+
+                                    {{ lab_request.requested_date|date:"d M Y H:i" }}
+
+                                </div>
+
+
+                                <div class="col-md-4 text-md-end">
+
+
+                                    {% if lab_request.status == "Completed" %}
+
+                                        <span class="badge bg-success">
+                                            Completed
+                                        </span>
+
+                                    {% elif lab_request.status == "Processing" %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            Processing
+                                        </span>
+
+                                    {% elif lab_request.status == "Sample Collected" %}
+
+                                        <span class="badge bg-info text-dark">
+                                            Sample Collected
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+                                            Pending
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                            </div>
+
+
+                            {% if lab_request.result_record %}
+
+                                <hr>
+
+
+                                <div class="bg-light rounded p-3">
+
+
+                                    <strong>
+                                        Laboratory Result
+                                    </strong>
+
+
+                                    <p class="mt-2 mb-2">
+
+                                        {{ lab_request.result_record.result }}
+
+                                    </p>
+
+
+                                    {% if lab_request.result_record.interpretation %}
+
+                                        <div class="small text-muted">
+
+                                            <strong>
+                                                Interpretation:
+                                            </strong>
+
+                                            {{ lab_request.result_record.interpretation }}
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    {% if lab_request.result_record.technician %}
+
+                                        <div class="small text-muted mt-2">
+
+                                            Technician:
+
+                                            {{ lab_request.result_record.technician.get_full_name|default:lab_request.result_record.technician.username }}
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    <div class="small text-muted mt-1">
+
+                                        Result date:
+
+                                        {{ lab_request.result_record.result_date|date:"d M Y H:i" }}
+
+                                    </div>
+
+
+                                </div>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    {% empty %}
+
+                        <div class="text-center py-4">
+
+                            <i class="bi bi-eyedropper fs-2 text-muted"></i>
+
+                            <p class="text-muted mt-2 mb-0">
+
+                                No laboratory investigations have been
+                                requested for this encounter.
+
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 BILLING
+                 ================================================= -->
+
+            <section
+                id="billing"
+                class="card border-0 shadow-sm mb-4"
+            >
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-receipt"></i>
+
+                        Encounter Billing
+
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    {% if invoice %}
+
+                        <div class="row g-3">
+
+
+                            <div class="col-md-4">
+
+                                <small class="text-muted d-block">
+                                    Invoice
+                                </small>
+
+                                <strong>
+                                    {{ invoice.invoice_number }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <small class="text-muted d-block">
+                                    Total
+                                </small>
+
+                                <strong>
+
+                                    UGX
+                                    {{ invoice.total_amount|floatformat:2 }}
+
+                                </strong>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <small class="text-muted d-block">
+                                    Balance
+                                </small>
+
+                                <strong>
+
+                                    UGX
+                                    {{ invoice.balance|floatformat:2 }}
+
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <hr>
+
+
+                        <div class="d-flex gap-2 flex-wrap">
+
+
+                            <a
+                                href="{% url 'invoice_detail' invoice.id %}"
+                                class="btn btn-outline-primary"
+                            >
+
+                                <i class="bi bi-receipt"></i>
+
+                                View Invoice
+
+                            </a>
+
+
+                            {% if invoice.balance > 0 %}
+
+                                <a
+                                    href="{% url 'record_payment' invoice.id %}"
+                                    class="btn btn-success"
+                                >
+
+                                    <i class="bi bi-cash-stack"></i>
+
+                                    Receive Payment
+
+                                </a>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    {% else %}
+
+                        <div class="text-center py-4">
+
+                            <i class="bi bi-receipt fs-2 text-muted"></i>
+
+                            <p class="text-muted mt-2 mb-0">
+
+                                No invoice has been created for this
+                                encounter yet.
+
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <!-- =================================================
+             RIGHT SIDEBAR
+             ================================================= -->
+
+        <div class="col-lg-4">
+
+
+            <!-- =================================================
+                 VITAL SIGNS
+                 ================================================= -->
+
+            <section
+                id="vital-signs"
+                class="card border-0 shadow-sm mb-4"
+            >
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-heart-pulse"></i>
+
+                        Vital Signs
+
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <form
+                        method="post"
+                        action="{% url 'consultations:save_vital_signs' encounter.id %}"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <div class="row g-3">
+
+
+                            {% for field in vital_form %}
+
+                                <div class="col-md-6">
+
+
+                                    <label class="form-label">
+
+                                        {{ field.label }}
+
+                                    </label>
+
+
+                                    {{ field }}
+
+
+                                    {% for error in field.errors %}
+
+                                        <small class="text-danger d-block">
+
+                                            {{ error }}
+
+                                        </small>
+
+                                    {% endfor %}
+
+
+                                </div>
+
+                            {% endfor %}
+
+
+                        </div>
+
+
+                        {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary mt-4 w-100"
+                            >
+
+                                <i class="bi bi-save"></i>
+
+                                Save Vital Signs
+
+                            </button>
+
+                        {% endif %}
+
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 ENCOUNTER SUMMARY
+                 ================================================= -->
+
+            <section class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+                        Encounter Summary
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Encounter Type
+                        </small>
+
+                        <strong>
+                            {{ encounter.get_encounter_type_display }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Doctor
+                        </small>
+
+                        <strong>
+
+                            {% if encounter.doctor.get_full_name %}
+
+                                {{ encounter.doctor.get_full_name }}
+
+                            {% else %}
+
+                                {{ encounter.doctor.username }}
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Encounter Date
+                        </small>
+
+                        <strong>
+
+                            {{ encounter.encounter_date|date:"d M Y H:i" }}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <small class="text-muted d-block">
+                            Status
+                        </small>
+
+
+                        {% if encounter.status == "COMPLETED" %}
+
+                            <span class="badge bg-success">
+                                Completed
+                            </span>
+
+                        {% elif encounter.status == "CANCELLED" %}
+
+                            <span class="badge bg-danger">
+                                Cancelled
+                            </span>
+
+                        {% elif encounter.status == "IN_PROGRESS" %}
+
+                            <span class="badge bg-primary">
+                                In Progress
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                Open
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 ENCOUNTER ACTIONS
+                 ================================================= -->
+
+            <section class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+
+                    <h5 class="mb-3">
+                        Encounter Actions
+                    </h5>
+
+
+                    {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+
+                        <form
+                            method="post"
+                            action="{% url 'consultations:complete_encounter' encounter.id %}"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-success w-100"
+                            >
+
+                                <i class="bi bi-check-circle"></i>
+
+                                Complete Encounter
+
+                            </button>
+
+                        </form>
+
+
+                    {% elif encounter.status == "COMPLETED" %}
+
+
+                        <div class="alert alert-success mb-0">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            This encounter has been completed.
+
+                        </div>
+
+
+                    {% else %}
+
+
+                        <div class="alert alert-danger mb-0">
+
+                            This encounter has been cancelled.
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

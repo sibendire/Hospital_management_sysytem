@@ -5,660 +5,804 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Patient Management | Hospital System</title>
+    <title>
+        Patient Management | Hospital System
+    </title>
 
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet">
+    <!-- =====================================================
+         BOOTSTRAP
+         ===================================================== -->
 
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-      rel="stylesheet">
 
+    <!-- =====================================================
+         BOOTSTRAP ICONS
+         ===================================================== -->
 
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
 
-<style>
 
+    <!-- =====================================================
+         PAGE STYLES
+         ===================================================== -->
 
-body{
+    <style>
 
-    background:#f4f7fb;
+        body {
 
-    font-family:"Segoe UI",sans-serif;
+            background: #f4f7fb;
 
-}
+            font-family: "Segoe UI", sans-serif;
 
+        }
 
 
+        /* =================================================
+           HEADER
+           ================================================= */
 
-.header{
+        .header {
 
-    background:linear-gradient(
-        135deg,
-        #0d6efd,
-        #084298
-    );
+            background: linear-gradient(
+                135deg,
+                #0d6efd,
+                #084298
+            );
 
-    color:white;
+            color: white;
 
-    padding:25px;
+            padding: 25px;
 
-    box-shadow:0 4px 15px rgba(0,0,0,.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .15);
 
-}
+        }
 
 
+        .header h2 {
 
-.header h2{
+            margin: 0;
 
-    margin:0;
+            font-weight: 600;
 
-    font-weight:600;
+        }
 
-}
 
+        /* =================================================
+           DASHBOARD CARD
+           ================================================= */
 
+        .dashboard-card {
 
+            border: none;
 
+            border-radius: 15px;
 
-.dashboard-card{
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
 
-    border:none;
+        }
 
-    border-radius:15px;
 
-    box-shadow:0 5px 20px rgba(0,0,0,.08);
+        /* =================================================
+           PATIENT TABLE
+           ================================================= */
 
-}
+        .patient-table {
 
+            background: white;
 
+            border-radius: 15px;
 
-.patient-table{
+            overflow: hidden;
 
-    background:white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
 
-    border-radius:15px;
+        }
 
-    overflow:hidden;
 
-    box-shadow:0 5px 20px rgba(0,0,0,.08);
+        .table thead {
 
-}
+            background: #084298;
 
+            color: white;
 
+        }
 
-.table thead{
 
-    background:#084298;
+        .table tbody tr:hover {
 
-    color:white;
+            background: #f1f7ff;
 
-}
+        }
 
 
+        /* =================================================
+           PATIENT IMAGE
+           ================================================= */
 
-.table tbody tr:hover{
+        .patient-img {
 
-    background:#f1f7ff;
+            width: 55px;
 
-}
+            height: 55px;
 
+            object-fit: cover;
 
+        }
 
-.patient-img{
 
-    width:55px;
+        /* =================================================
+           SEARCH
+           ================================================= */
 
-    height:55px;
+        .search-box {
 
-    object-fit:cover;
+            max-width: 350px;
 
-}
+        }
 
 
+        /* =================================================
+           BADGES
+           ================================================= */
 
-.search-box{
+        .badge {
 
-    max-width:350px;
+            font-size: 13px;
 
-}
+        }
 
 
+        /* =================================================
+           ACTION BUTTON
+           ================================================= */
 
+        .action-btn {
 
-.badge{
+            width: 35px;
 
-    font-size:13px;
+            height: 35px;
 
-}
+            display: inline-flex;
 
+            align-items: center;
 
+            justify-content: center;
 
+            border-radius: 50%;
 
-.action-btn{
+        }
 
-    width:35px;
 
-    height:35px;
+        /* =================================================
+           NEW ENCOUNTER BUTTON
+           ================================================= */
 
-    display:inline-flex;
+        .encounter-btn {
 
-    align-items:center;
+            display: inline-flex;
 
-    justify-content:center;
+            align-items: center;
 
-    border-radius:50%;
+            gap: 5px;
 
-}
+            white-space: nowrap;
 
+        }
 
 
-</style>
+        /* =================================================
+           EMPTY STATE
+           ================================================= */
 
+        .empty-state-icon {
+
+            font-size: 60px;
+
+        }
+
+
+    </style>
 
 </head>
-
 
 
 <body>
 
 
-
-<!-- Header -->
-
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
 
 <div class="header">
 
+    <div class="container">
 
-<div class="container">
+        <div class="d-flex justify-content-between align-items-center">
 
+            <div>
 
-<div class="d-flex justify-content-between align-items-center">
+                <h2>
 
+                    <i class="bi bi-hospital"></i>
 
-<div>
+                    MediCare Hospital
 
-<h2>
-
-<i class="bi bi-hospital"></i>
-
-MediCare Hospital
-
-</h2>
+                </h2>
 
 
-<p class="mb-0">
+                <p class="mb-0">
 
-Patient Management System
+                    Patient Management System
 
-</p>
+                </p>
 
-
-</div>
-
+            </div>
 
 
-<a href="{% url 'add_patient' %}"
-class="btn btn-light">
+            <a
+                href="{% url 'add_patient' %}"
+                class="btn btn-light"
+            >
 
+                <i class="bi bi-person-plus"></i>
 
-<i class="bi bi-person-plus"></i>
+                Register Patient
 
-Register Patient
+            </a>
 
+        </div>
 
-</a>
-
-
+    </div>
 
 </div>
 
 
-</div>
-
-
-</div>
-
-
-
-
-
+<!-- =====================================================
+     MAIN CONTENT
+     ===================================================== -->
 
 <div class="container mt-5">
 
 
+    <!-- =================================================
+         STATISTICS
+         ================================================= -->
+
+    <div class="row mb-4">
 
 
+        <div class="col-md-4">
 
-<!-- Statistics -->
+            <div class="card dashboard-card p-3">
 
-
-<div class="row mb-4">
-
-
-<div class="col-md-4">
+                <div class="d-flex align-items-center">
 
 
-<div class="card dashboard-card p-3">
+                    <div class="fs-1 text-primary me-3">
+
+                        <i class="bi bi-people"></i>
+
+                    </div>
 
 
-<div class="d-flex align-items-center">
+                    <div>
+
+                        <h5 class="mb-0">
+
+                            Total Patients
+
+                        </h5>
 
 
-<div class="fs-1 text-primary me-3">
+                        <h3>
 
-<i class="bi bi-people"></i>
+                            {{ patients.count }}
+
+                        </h3>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =================================================
+         PATIENT LIST
+         ================================================= -->
+
+    <div class="card patient-table">
+
+
+        <!-- =================================================
+             TABLE HEADER
+             ================================================= -->
+
+        <div class="card-header bg-white p-4">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+
+                <div>
+
+                    <h3 class="mb-0">
+
+                        <i class="bi bi-file-medical"></i>
+
+                        Patient Records
+
+                    </h3>
+
+
+                    <small class="text-muted">
+
+                        Select a patient to begin a clinical encounter.
+
+                    </small>
+
+                </div>
+
+
+                <!-- SEARCH -->
+
+                <div class="input-group search-box">
+
+                    <input
+                        type="text"
+                        id="patientSearch"
+                        class="form-control"
+                        placeholder="Search patient..."
+                    >
+
+
+                    <span class="input-group-text">
+
+                        <i class="bi bi-search"></i>
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TABLE
+             ================================================= -->
+
+        <div class="table-responsive">
+
+
+            <table
+                class="table table-hover align-middle mb-0"
+                id="patientTable"
+            >
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Photo
+                        </th>
+
+                        <th>
+                            Patient Number
+                        </th>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Gender
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Blood Group
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                {% for patient in patients %}
+
+
+                    <tr>
+
+
+                        <!-- =================================
+                             PHOTO
+                             ================================= -->
+
+                        <td>
+
+
+                            {% if patient.photo %}
+
+                                <img
+                                    src="{{ patient.photo.url }}"
+                                    class="rounded-circle patient-img"
+                                    alt="Patient photo"
+                                >
+
+                            {% else %}
+
+                                <div
+                                    class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center patient-img"
+                                >
+
+                                    <i class="bi bi-person"></i>
+
+                                </div>
+
+                            {% endif %}
+
+
+                        </td>
+
+
+                        <!-- =================================
+                             PATIENT NUMBER
+                             ================================= -->
+
+                        <td>
+
+                            <span class="badge bg-primary">
+
+                                {{ patient.patient_number }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- =================================
+                             NAME
+                             ================================= -->
+
+                        <td>
+
+                            <strong>
+
+                                {{ patient.first_name }}
+                                {{ patient.last_name }}
+
+                            </strong>
+
+                        </td>
+
+
+                        <!-- =================================
+                             GENDER
+                             ================================= -->
+
+                        <td>
+
+                            {{ patient.gender|default:"Not recorded" }}
+
+                        </td>
+
+
+                        <!-- =================================
+                             PHONE
+                             ================================= -->
+
+                        <td>
+
+                            {% if patient.phone %}
+
+                                <i class="bi bi-telephone text-success"></i>
+
+                                {{ patient.phone }}
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Not recorded
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- =================================
+                             BLOOD GROUP
+                             ================================= -->
+
+                        <td>
+
+
+                            {% if patient.blood_group %}
+
+                                <span class="badge bg-danger">
+
+                                    {{ patient.blood_group }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    N/A
+                                </span>
+
+                            {% endif %}
+
+
+                        </td>
+
+
+                        <!-- =================================
+                             EMAIL
+                             ================================= -->
+
+                        <td>
+
+                            {% if patient.email %}
+
+                                {{ patient.email }}
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Not recorded
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- =================================
+                             ACTIONS
+                             ================================= -->
+
+                        <td>
+
+
+                            <div class="d-flex align-items-center gap-1">
+
+
+                                <!-- =================================
+                                     VIEW PATIENT
+                                     ================================= -->
+
+                                <a
+                                    href="#"
+                                    class="btn btn-sm btn-outline-primary action-btn"
+                                    title="View Patient"
+                                >
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+
+                                <!-- =================================
+                                     EDIT PATIENT
+                                     ================================= -->
+
+                                <a
+                                    href="#"
+                                    class="btn btn-sm btn-outline-warning action-btn"
+                                    title="Edit Patient"
+                                >
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+
+                                <!-- =================================
+                                     NEW CLINICAL ENCOUNTER
+                                     ================================= -->
+
+                                <a
+                                    href="{% url 'consultations:patient_consultation' patient.id %}"
+                                    class="btn btn-sm btn-primary encounter-btn"
+                                    title="Start New Clinical Encounter"
+                                >
+
+                                    <i class="bi bi-stethoscope"></i>
+
+                                    <span>
+                                        Encounter
+                                    </span>
+
+                                </a>
+
+
+                                <!-- =================================
+                                     DELETE PATIENT
+                                     ================================= -->
+
+                                <a
+                                    href="#"
+                                    class="btn btn-sm btn-outline-danger action-btn"
+                                    title="Delete Patient"
+                                >
+
+                                    <i class="bi bi-trash"></i>
+
+                                </a>
+
+
+                            </div>
+
+
+                        </td>
+
+
+                    </tr>
+
+
+                {% empty %}
+
+
+                    <!-- =================================
+                         EMPTY STATE
+                         ================================= -->
+
+                    <tr>
+
+
+                        <td
+                            colspan="8"
+                            class="text-center py-5"
+                        >
+
+
+                            <i
+                                class="bi bi-folder-x text-muted empty-state-icon"
+                            ></i>
+
+
+                            <h5 class="mt-3">
+
+                                No patients registered yet
+
+                            </h5>
+
+
+                            <p class="text-muted">
+
+                                Register a patient before starting
+                                a clinical encounter.
+
+                            </p>
+
+
+                            <a
+                                href="{% url 'add_patient' %}"
+                                class="btn btn-primary mt-2"
+                            >
+
+                                <i class="bi bi-person-plus"></i>
+
+                                Add First Patient
+
+                            </a>
+
+
+                        </td>
+
+
+                    </tr>
+
+
+                {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    </div>
+
 
 </div>
 
 
-<div>
+<!-- =====================================================
+     BOOTSTRAP JAVASCRIPT
+     ===================================================== -->
 
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
 
-<h5 class="mb-0">
 
-Total Patients
+<!-- =====================================================
+     PATIENT SEARCH
+     ===================================================== -->
 
-</h5>
+<script>
 
+    document
+        .getElementById("patientSearch")
+        .addEventListener("keyup", function () {
 
-<h3>
+            const searchValue =
+                this.value.toLowerCase();
 
-{{ patients.count }}
+            const rows =
+                document.querySelectorAll(
+                    "#patientTable tbody tr"
+                );
 
-</h3>
 
+            rows.forEach(function (row) {
 
-</div>
+                const text =
+                    row.textContent.toLowerCase();
 
 
-</div>
+                if (text.includes(searchValue)) {
 
+                    row.style.display = "";
 
-</div>
+                } else {
 
+                    row.style.display = "none";
 
-</div>
+                }
 
+            });
 
+        });
 
-</div>
-
-
-
-
-
-
-
-<!-- Patient List -->
-
-<div class="card patient-table">
-
-
-
-<div class="card-header bg-white p-4">
-
-
-<div class="d-flex justify-content-between align-items-center">
-
-
-<h3 class="mb-0">
-
-
-<i class="bi bi-file-medical"></i>
-
-Patient Records
-
-
-</h3>
-
-
-
-<div class="input-group search-box">
-
-
-<input type="text"
-class="form-control"
-placeholder="Search patient...">
-
-
-<span class="input-group-text">
-
-<i class="bi bi-search"></i>
-
-</span>
-
-
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="table-responsive">
-
-
-
-<table class="table table-hover align-middle mb-0">
-
-
-
-<thead>
-
-
-<tr>
-
-<th>Photo</th>
-
-<th>Patient Number</th>
-
-<th>Name</th>
-
-<th>Gender</th>
-
-<th>Phone</th>
-
-<th>Blood Group</th>
-
-<th>Email</th>
-
-<th>Actions</th>
-
-
-</tr>
-
-
-</thead>
-
-
-
-
-
-
-<tbody>
-
-
-
-{% for patient in patients %}
-
-
-
-<tr>
-
-
-<td>
-
-
-{% if patient.photo %}
-
-<img src="{{ patient.photo.url }}"
-class="rounded-circle patient-img">
-
-
-{% else %}
-
-
-<div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center patient-img">
-
-<i class="bi bi-person"></i>
-
-</div>
-
-
-{% endif %}
-
-
-
-</td>
-
-
-
-
-
-
-<td>
-
-
-<span class="badge bg-primary">
-
-{{ patient.patient_number }}
-
-</span>
-
-
-</td>
-
-
-
-
-
-
-
-<td>
-
-
-<strong>
-
-{{ patient.first_name }}
-{{ patient.last_name }}
-
-</strong>
-
-
-</td>
-
-
-
-
-
-
-
-<td>
-
-{{ patient.gender }}
-
-</td>
-
-
-
-
-
-
-<td>
-
-<i class="bi bi-telephone text-success"></i>
-
-{{ patient.phone }}
-
-</td>
-
-
-
-
-
-
-
-<td>
-
-
-{% if patient.blood_group %}
-
-
-<span class="badge bg-danger">
-
-{{ patient.blood_group }}
-
-</span>
-
-
-{% else %}
-
-N/A
-
-{% endif %}
-
-
-
-</td>
-
-
-
-
-
-
-
-
-<td>
-
-{{ patient.email }}
-
-</td>
-
-
-
-
-
-
-
-
-<td>
-
-
-<a href="#"
-class="btn btn-sm btn-outline-primary action-btn"
-title="View">
-
-
-<i class="bi bi-eye"></i>
-
-
-</a>
-
-
-
-<a href="#"
-class="btn btn-sm btn-outline-warning action-btn"
-title="Edit">
-
-
-<i class="bi bi-pencil"></i>
-
-
-</a>
-
-
-
-
-<a href="#"
-class="btn btn-sm btn-outline-danger action-btn"
-title="Delete">
-
-
-<i class="bi bi-trash"></i>
-
-
-</a>
-
-
-
-</td>
-
-
-
-
-
-
-</tr>
-
-
-
-
-{% empty %}
-
-
-
-<tr>
-
-
-<td colspan="8"
-class="text-center py-5">
-
-
-<i class="bi bi-folder-x fs-1 text-muted"></i>
-
-
-<h5 class="mt-3">
-
-No patients registered yet
-
-</h5>
-
-
-<a href="{% url 'add_patient' %}"
-class="btn btn-primary mt-2">
-
-
-Add First Patient
-
-
-</a>
-
-
-
-</td>
-
-
-</tr>
-
-
-
-{% endfor %}
-
-
-
-
-</tbody>
-
-
-
-</table>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</script>
 
 
 </body>
-
 
 </html>

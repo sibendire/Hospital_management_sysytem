@@ -1,9 +1,9 @@
-from django.db import models
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
-from decimal import Decimal
+from django.db import models
 from django.utils import timezone
-
 
 
 # =========================================================
@@ -64,7 +64,13 @@ class Medicine(models.Model):
         ("NO", "Prescription Not Required"),
     ]
 
-    name = models.CharField(max_length=200)
+    # =====================================================
+    # BASIC MEDICINE INFORMATION
+    # =====================================================
+
+    name = models.CharField(
+        max_length=200
+    )
 
     generic_name = models.CharField(
         max_length=200,
@@ -111,6 +117,10 @@ class Medicine(models.Model):
         null=True
     )
 
+    # =====================================================
+    # STOCK INFORMATION
+    # =====================================================
+
     batch_number = models.CharField(
         max_length=100
     )
@@ -125,7 +135,13 @@ class Medicine(models.Model):
         default=20
     )
 
-    # SELLING PRICE
+    # =====================================================
+    # PRICING
+    #
+    # buying_price  = hospital purchase/cost price
+    # selling_price = price charged to patient
+    # =====================================================
+
     buying_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -134,7 +150,6 @@ class Medicine(models.Model):
         ]
     )
 
-    # PURCHASE / COST PRICE
     selling_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -144,16 +159,23 @@ class Medicine(models.Model):
         ]
     )
 
+    # =====================================================
+    # PRESCRIPTION / CONTROL
+    # =====================================================
+
     prescription_required = models.CharField(
         max_length=3,
         choices=PRESCRIPTION_CHOICES,
         default="NO"
     )
 
-    # CONTROLLED MEDICINE
     controlled_substance = models.BooleanField(
         default=False
     )
+
+    # =====================================================
+    # STATUS
+    # =====================================================
 
     status = models.CharField(
         max_length=20,
@@ -166,6 +188,10 @@ class Medicine(models.Model):
         null=True
     )
 
+    # =====================================================
+    # TIMESTAMPS
+    # =====================================================
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
@@ -173,6 +199,10 @@ class Medicine(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
+
+    # =====================================================
+    # STOCK HELPERS
+    # =====================================================
 
     def is_expired(self):
         return self.expiry_date < timezone.now().date()
@@ -186,11 +216,14 @@ class Medicine(models.Model):
     def is_out_of_stock(self):
         return self.quantity <= 0
 
+    # Total amount invested in the current stock
     def stock_value(self):
-        return self.quantity * self.cost_price
+        return self.quantity * self.buying_price
 
+    # Total amount the current stock would generate
+    # if sold to patients
     def selling_value(self):
-        return self.quantity * self.unit_price
+        return self.quantity * self.selling_price
 
     def __str__(self):
         return f"{self.name} - {self.batch_number}"
@@ -209,10 +242,16 @@ class Medicine(models.Model):
 
 
 # =========================================================
-# PHARMACY SALE / DISPENSING BILL
-# =========================================================
-# =========================================================
 # PHARMACY SALE
+# =========================================================
+#
+# This represents the actual dispensing transaction.
+#
+# Long term:
+# Billing.Invoice will become the central financial record.
+#
+# For now, the existing payment fields are retained so
+# existing pharmacy functionality is not broken.
 # =========================================================
 
 class PharmacySale(models.Model):
@@ -233,11 +272,30 @@ class PharmacySale(models.Model):
         ("OTHER", "Other"),
     ]
 
+    # =====================================================
+    # SALE IDENTIFICATION
+    # =====================================================
+
     sale_number = models.CharField(
         max_length=30,
         unique=True,
         editable=False
     )
+
+    # =====================================================
+    # PATIENT
+    # =====================================================
+
+    patient = models.ForeignKey(
+        "patients.Patient",
+        on_delete=models.PROTECT,
+        related_name="pharmacy_sales",
+        null=True,
+        blank=True
+    )
+
+    # Keep legacy patient information for compatibility
+    # with existing pharmacy records and views.
 
     patient_name = models.CharField(
         max_length=200
@@ -249,6 +307,22 @@ class PharmacySale(models.Model):
         null=True
     )
 
+    # =====================================================
+    # CLINICAL ENCOUNTER
+    # =====================================================
+
+    encounter = models.ForeignKey(
+        "consultations.ClinicalEncounter",
+        on_delete=models.PROTECT,
+        related_name="pharmacy_sales",
+        null=True,
+        blank=True
+    )
+
+    # =====================================================
+    # STAFF
+    # =====================================================
+
     issued_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -257,9 +331,17 @@ class PharmacySale(models.Model):
         related_name="pharmacy_sales"
     )
 
+    # =====================================================
+    # SALE DATE
+    # =====================================================
+
     sale_date = models.DateTimeField(
         auto_now_add=True
     )
+
+    # =====================================================
+    # FINANCIAL INFORMATION
+    # =====================================================
 
     total_amount = models.DecimalField(
         max_digits=12,
@@ -286,6 +368,10 @@ class PharmacySale(models.Model):
         null=True
     )
 
+    # =====================================================
+    # PAYMENT STAFF
+    # =====================================================
+
     paid_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -299,10 +385,18 @@ class PharmacySale(models.Model):
         blank=True
     )
 
+    # =====================================================
+    # NOTES
+    # =====================================================
+
     notes = models.TextField(
         blank=True,
         null=True
     )
+
+    # =====================================================
+    # AUDIT TIMESTAMPS
+    # =====================================================
 
     created_at = models.DateTimeField(
         auto_now_add=True
@@ -311,6 +405,10 @@ class PharmacySale(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
+
+    # =====================================================
+    # SAVE
+    # =====================================================
 
     def save(self, *args, **kwargs):
 
@@ -333,6 +431,7 @@ class PharmacySale(models.Model):
                     last_number = int(
                         last_sale.sale_number.split("-")[-1]
                     )
+
                 except (ValueError, IndexError):
                     last_number = 0
 
@@ -345,9 +444,20 @@ class PharmacySale(models.Model):
 
         super().save(*args, **kwargs)
 
+    # =====================================================
+    # BALANCE
+    # =====================================================
+
     @property
     def balance(self):
-        return self.total_amount - self.amount_paid
+        return max(
+            self.total_amount - self.amount_paid,
+            Decimal("0.00")
+        )
+
+    # =====================================================
+    # STRING REPRESENTATION
+    # =====================================================
 
     def __str__(self):
         return self.sale_number
@@ -363,8 +473,19 @@ class PharmacySale(models.Model):
             models.Index(fields=["payment_method"]),
         ]
 
+
 # =========================================================
 # PHARMACY SALE ITEM
+# =========================================================
+#
+# Each item records both:
+#
+# buying_price  = hospital cost
+# selling_price = patient charge
+#
+# total_price   = amount charged to patient
+# total_cost    = hospital cost
+# profit        = selling total - cost total
 # =========================================================
 
 class PharmacySaleItem(models.Model):
@@ -387,17 +508,20 @@ class PharmacySaleItem(models.Model):
         ]
     )
 
+    # Hospital purchase price at the time of sale
     buying_price = models.DecimalField(
         max_digits=12,
         decimal_places=2
     )
 
+    # Patient selling price at the time of sale
     selling_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal("0.00")
     )
 
+    # Amount charged to patient
     total_price = models.DecimalField(
         max_digits=12,
         decimal_places=2
@@ -407,21 +531,38 @@ class PharmacySaleItem(models.Model):
         auto_now_add=True
     )
 
+    # =====================================================
+    # SAVE
+    # =====================================================
+
     def save(self, *args, **kwargs):
 
+        # Patient charge
         self.total_price = (
-            self.buying_price * self.quantity
+            self.selling_price * self.quantity
         )
 
         super().save(*args, **kwargs)
 
+    # =====================================================
+    # COST
+    # =====================================================
+
     @property
     def total_cost(self):
-        return self.selling_price * self.quantity
+        return (
+            self.buying_price * self.quantity
+        )
+
+    # =====================================================
+    # PROFIT
+    # =====================================================
 
     @property
     def profit(self):
-        return self.total_price - self.total_cost
+        return (
+            self.total_price - self.total_cost
+        )
 
     def __str__(self):
         return f"{self.medicine.name} x {self.quantity}"
@@ -429,7 +570,8 @@ class PharmacySaleItem(models.Model):
     class Meta:
         ordering = ["id"]
 
-        # =========================================================
+
+# =========================================================
 # PHARMACY AUDIT LOG
 # =========================================================
 
@@ -487,6 +629,7 @@ class PharmacyAuditLog(models.Model):
     def __str__(self):
         return f"{self.action} - {self.reference}"
 
+
 # =========================================================
 # PRESCRIPTION
 # =========================================================
@@ -500,11 +643,31 @@ class Prescription(models.Model):
         ("CANCELLED", "Cancelled"),
     ]
 
+    # =====================================================
+    # PATIENT
+    # =====================================================
+
     patient = models.ForeignKey(
         "patients.Patient",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="prescriptions"
     )
+
+    # =====================================================
+    # CLINICAL ENCOUNTER
+    # =====================================================
+
+    encounter = models.ForeignKey(
+        "consultations.ClinicalEncounter",
+        on_delete=models.PROTECT,
+        related_name="prescriptions",
+        null=True,
+        blank=True
+    )
+
+    # =====================================================
+    # PRESCRIBER
+    # =====================================================
 
     prescribed_by = models.ForeignKey(
         User,
@@ -514,6 +677,10 @@ class Prescription(models.Model):
         related_name="prescriptions_created"
     )
 
+    # =====================================================
+    # CLINICAL INFORMATION
+    # =====================================================
+
     diagnosis = models.TextField()
 
     notes = models.TextField(
@@ -521,18 +688,29 @@ class Prescription(models.Model):
         null=True
     )
 
+    # =====================================================
+    # STATUS
+    # =====================================================
+
     status = models.CharField(
         max_length=30,
         choices=STATUS_CHOICES,
         default="PENDING"
     )
 
+    # =====================================================
+    # DATE
+    # =====================================================
+
     prescribed_at = models.DateTimeField(
         auto_now_add=True
     )
 
     def __str__(self):
-        return f"Prescription #{self.id} - {self.patient}"
+        return (
+            f"Prescription #{self.id} - "
+            f"{self.patient}"
+        )
 
     class Meta:
         ordering = ["-prescribed_at"]
@@ -580,10 +758,10 @@ class PrescriptionItem(models.Model):
     )
 
     def __str__(self):
-        return f"{self.medicine.name} - {self.quantity}"
+        return (
+            f"{self.medicine.name} - "
+            f"{self.quantity}"
+        )
 
     class Meta:
         ordering = ["id"]
-
-
- 
