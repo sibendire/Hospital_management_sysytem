@@ -7,12 +7,18 @@ from django.shortcuts import (
     redirect,
     render,
 )
+from django.utils import timezone
 
 from patients.models import Patient
 
 from laboratory.models import (
     LabRequest,
     LabResult,
+)
+
+from pharmacy.models import (
+    Prescription,
+    PharmacySale,
 )
 
 from billing.services import add_lab_charge
@@ -32,7 +38,7 @@ from .models import (
 
 
 # =========================================================
-# DOCTOR WORKSPACE
+# DOCTOR WORKSPACE / CONSULTATION DASHBOARD
 # =========================================================
 
 @login_required
@@ -47,8 +53,12 @@ def consultation_dashboard(request):
         .order_by("-encounter_date")
     )
 
-    if not request.user.is_staff:
+    # -----------------------------------------------------
+    # DOCTORS SEE THEIR OWN ENCOUNTERS
+    # STAFF CAN SEE ALL ENCOUNTERS
+    # -----------------------------------------------------
 
+    if not request.user.is_staff:
         encounters = encounters.filter(
             doctor=request.user
         )
@@ -81,7 +91,7 @@ def consultation_dashboard(request):
 
 
 # =========================================================
-# CREATE PATIENT CONSULTATION
+# CREATE PATIENT CONSULTATION / ENCOUNTER
 # =========================================================
 
 @login_required
@@ -92,6 +102,10 @@ def patient_consultation(request, patient_id):
         Patient,
         id=patient_id,
     )
+
+    # -----------------------------------------------------
+    # CHECK FOR EXISTING ACTIVE ENCOUNTER
+    # -----------------------------------------------------
 
     active_encounter = (
         ClinicalEncounter.objects
@@ -106,6 +120,10 @@ def patient_consultation(request, patient_id):
         .first()
     )
 
+    # -----------------------------------------------------
+    # CREATE NEW ENCOUNTER
+    # -----------------------------------------------------
+
     if request.method == "POST":
 
         encounter_form = ClinicalEncounterForm(
@@ -114,8 +132,11 @@ def patient_consultation(request, patient_id):
 
         if encounter_form.is_valid():
 
+            # Re-check inside the transaction in case another
+            # active encounter was created before this request.
             existing_encounter = (
                 ClinicalEncounter.objects
+                .select_for_update()
                 .filter(
                     patient=patient,
                     status__in=[
@@ -257,6 +278,82 @@ def encounter_detail(request, encounter_id):
         .order_by("-requested_date")
     )
 
+    # =====================================================
+    # LABORATORY REVIEW STATUS
+    # =====================================================
+
+    completed_lab_requests = lab_requests.filter(
+        status="Completed"
+    )
+
+    # A completed request is still pending if:
+    #
+    # 1. It has no result yet, OR
+    # 2. Its result has not been reviewed by the doctor.
+    #
+    # This prevents one reviewed result from unlocking
+    # prescription while another completed result is still
+    # awaiting review.
+
+    lab_results_pending_review = (
+        completed_lab_requests.filter(
+            result_record__isnull=True
+        ).exists()
+        or completed_lab_requests.filter(
+            result_record__reviewed_at__isnull=True
+        ).exists()
+    )
+
+    # Prescription becomes available only when:
+    #
+    # - At least one laboratory request has been completed
+    # - None of the completed requests is waiting for review
+    #
+    lab_results_reviewed = (
+        completed_lab_requests.exists()
+        and not lab_results_pending_review
+    )
+
+    # -----------------------------------------------------
+    # PRESCRIPTIONS
+    # -----------------------------------------------------
+
+    prescriptions = (
+        Prescription.objects
+        .filter(
+            encounter=encounter
+        )
+        .select_related(
+            "patient",
+            "prescribed_by",
+        )
+        .prefetch_related(
+            "items__medicine",
+        )
+        .order_by("-prescribed_at")
+    )
+
+    # -----------------------------------------------------
+    # PHARMACY SALES / DISPENSING
+    # -----------------------------------------------------
+
+    pharmacy_sales = (
+        PharmacySale.objects
+        .filter(
+            encounter=encounter
+        )
+        .select_related(
+            "patient",
+            "prescription",
+            "issued_by",
+        )
+        .prefetch_related(
+            "items__medicine",
+            "items__prescription_item",
+        )
+        .order_by("-sale_date")
+    )
+
     # -----------------------------------------------------
     # BILLING
     # -----------------------------------------------------
@@ -276,6 +373,9 @@ def encounter_detail(request, encounter_id):
             .exclude(
                 status="CANCELLED"
             )
+            .prefetch_related(
+                "items",
+            )
             .order_by("-invoice_date")
             .first()
         )
@@ -283,20 +383,57 @@ def encounter_detail(request, encounter_id):
     except Exception:
         invoice = None
 
+    # -----------------------------------------------------
+    # CONTEXT
+    # -----------------------------------------------------
+
     context = {
         "encounter": encounter,
         "patient": encounter.patient,
 
+        # -------------------------------------------------
+        # VITAL SIGNS
+        # -------------------------------------------------
+
         "vital_signs": vital_signs,
+
         "vital_form": VitalSignsForm(
             instance=vital_signs
         ),
 
+        # -------------------------------------------------
+        # DIAGNOSES
+        # -------------------------------------------------
+
         "diagnoses": diagnoses,
+
         "diagnosis_form": DiagnosisForm(),
 
+        # -------------------------------------------------
+        # LABORATORY
+        # -------------------------------------------------
+
         "lab_requests": lab_requests,
+
         "lab_request_form": LabRequestForm(),
+
+        "lab_results_reviewed": lab_results_reviewed,
+
+        "lab_results_pending_review": (
+            lab_results_pending_review
+        ),
+
+        # -------------------------------------------------
+        # PHARMACY
+        # -------------------------------------------------
+
+        "prescriptions": prescriptions,
+
+        "pharmacy_sales": pharmacy_sales,
+
+        # -------------------------------------------------
+        # BILLING
+        # -------------------------------------------------
 
         "invoice": invoice,
     }
@@ -321,6 +458,10 @@ def save_vital_signs(request, encounter_id):
         id=encounter_id,
     )
 
+    # -----------------------------------------------------
+    # SECURITY
+    # -----------------------------------------------------
+
     if (
         not request.user.is_staff
         and encounter.doctor_id != request.user.id
@@ -334,6 +475,10 @@ def save_vital_signs(request, encounter_id):
         return redirect(
             "consultations:consultation_dashboard"
         )
+
+    # -----------------------------------------------------
+    # CLOSED ENCOUNTER CHECK
+    # -----------------------------------------------------
 
     if encounter.status in [
         ClinicalEncounter.Status.COMPLETED,
@@ -349,6 +494,10 @@ def save_vital_signs(request, encounter_id):
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
+
+    # -----------------------------------------------------
+    # POST ONLY
+    # -----------------------------------------------------
 
     if request.method != "POST":
 
@@ -410,6 +559,10 @@ def add_diagnosis(request, encounter_id):
         id=encounter_id,
     )
 
+    # -----------------------------------------------------
+    # SECURITY
+    # -----------------------------------------------------
+
     if (
         not request.user.is_staff
         and encounter.doctor_id != request.user.id
@@ -423,6 +576,10 @@ def add_diagnosis(request, encounter_id):
         return redirect(
             "consultations:consultation_dashboard"
         )
+
+    # -----------------------------------------------------
+    # CLOSED ENCOUNTER CHECK
+    # -----------------------------------------------------
 
     if encounter.status in [
         ClinicalEncounter.Status.COMPLETED,
@@ -438,6 +595,10 @@ def add_diagnosis(request, encounter_id):
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
+
+    # -----------------------------------------------------
+    # POST ONLY
+    # -----------------------------------------------------
 
     if request.method == "POST":
 
@@ -489,6 +650,10 @@ def request_lab_test(request, encounter_id):
         id=encounter_id,
     )
 
+    # -----------------------------------------------------
+    # SECURITY
+    # -----------------------------------------------------
+
     if (
         not request.user.is_staff
         and encounter.doctor_id != request.user.id
@@ -502,6 +667,10 @@ def request_lab_test(request, encounter_id):
         return redirect(
             "consultations:consultation_dashboard"
         )
+
+    # -----------------------------------------------------
+    # CLOSED ENCOUNTER CHECK
+    # -----------------------------------------------------
 
     if encounter.status in [
         ClinicalEncounter.Status.COMPLETED,
@@ -517,6 +686,10 @@ def request_lab_test(request, encounter_id):
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
+
+    # -----------------------------------------------------
+    # POST ONLY
+    # -----------------------------------------------------
 
     if request.method != "POST":
 
@@ -655,6 +828,10 @@ def complete_encounter(request, encounter_id):
         id=encounter_id,
     )
 
+    # -----------------------------------------------------
+    # SECURITY
+    # -----------------------------------------------------
+
     if (
         not request.user.is_staff
         and encounter.doctor_id != request.user.id
@@ -669,6 +846,10 @@ def complete_encounter(request, encounter_id):
             "consultations:consultation_dashboard"
         )
 
+    # -----------------------------------------------------
+    # ALREADY COMPLETED
+    # -----------------------------------------------------
+
     if encounter.status == ClinicalEncounter.Status.COMPLETED:
 
         messages.info(
@@ -680,6 +861,10 @@ def complete_encounter(request, encounter_id):
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
+
+    # -----------------------------------------------------
+    # CANCELLED
+    # -----------------------------------------------------
 
     if encounter.status == ClinicalEncounter.Status.CANCELLED:
 
@@ -693,6 +878,10 @@ def complete_encounter(request, encounter_id):
             encounter_id=encounter.id,
         )
 
+    # -----------------------------------------------------
+    # POST ONLY
+    # -----------------------------------------------------
+
     if request.method != "POST":
 
         return redirect(
@@ -701,7 +890,7 @@ def complete_encounter(request, encounter_id):
         )
 
     # -----------------------------------------------------
-    # WARN IF THERE ARE STILL ACTIVE LAB REQUESTS
+    # CHECK ACTIVE LAB REQUESTS
     # -----------------------------------------------------
 
     pending_lab_count = (
@@ -729,6 +918,10 @@ def complete_encounter(request, encounter_id):
             ),
         )
 
+    # -----------------------------------------------------
+    # COMPLETE ENCOUNTER
+    # -----------------------------------------------------
+
     encounter.status = (
         ClinicalEncounter.Status.COMPLETED
     )
@@ -749,24 +942,37 @@ def complete_encounter(request, encounter_id):
         "consultations:consultation_dashboard"
     )
 
+
+# =========================================================
+# DOCTOR WORKSPACE
+# =========================================================
+
 @login_required
 def doctor_workspace(request):
 
     encounters = (
         ClinicalEncounter.objects
-        .select_related("patient", "doctor")
-        .filter(doctor=request.user)
+        .select_related(
+            "patient",
+            "doctor",
+        )
+        .filter(
+            doctor=request.user
+        )
         .order_by("-encounter_date")
     )
 
     total_encounters = encounters.count()
 
     open_encounters = encounters.filter(
-        status__in=["OPEN", "IN_PROGRESS"]
+        status__in=[
+            ClinicalEncounter.Status.OPEN,
+            ClinicalEncounter.Status.IN_PROGRESS,
+        ]
     ).count()
 
     completed_encounters = encounters.filter(
-        status="COMPLETED"
+        status=ClinicalEncounter.Status.COMPLETED
     ).count()
 
     context = {
@@ -779,5 +985,162 @@ def doctor_workspace(request):
     return render(
         request,
         "consultations/doctor_workspace.html",
-        context
+        context,
+    )
+
+
+# =========================================================
+# REVIEW LABORATORY RESULT
+# =========================================================
+
+@login_required
+@transaction.atomic
+def review_lab_result(
+    request,
+    encounter_id,
+    result_id,
+):
+
+    # -----------------------------------------------------
+    # POST ONLY
+    # -----------------------------------------------------
+
+    if request.method != "POST":
+
+        return redirect(
+            "consultations:consultation_dashboard"
+        )
+
+    # -----------------------------------------------------
+    # GET LAB RESULT
+    # -----------------------------------------------------
+
+    lab_result = get_object_or_404(
+        LabResult.objects.select_related(
+            "lab_request",
+            "lab_request__patient",
+            "lab_request__encounter",
+            "lab_request__test",
+        ),
+        id=result_id,
+    )
+
+    lab_request = lab_result.lab_request
+    encounter = lab_request.encounter
+
+    # -----------------------------------------------------
+    # ENCOUNTER MUST EXIST
+    # -----------------------------------------------------
+
+    if encounter is None:
+
+        messages.error(
+            request,
+            (
+                "This laboratory result is not linked "
+                "to a clinical encounter."
+            ),
+        )
+
+        return redirect(
+            "laboratory:lab_requests"
+        )
+
+    # -----------------------------------------------------
+    # VERIFY URL ENCOUNTER MATCHES RESULT ENCOUNTER
+    # -----------------------------------------------------
+
+    if encounter.id != encounter_id:
+
+        messages.error(
+            request,
+            (
+                "This laboratory result does not belong "
+                "to the selected encounter."
+            ),
+        )
+
+        return redirect(
+            "consultations:consultation_dashboard"
+        )
+
+    # -----------------------------------------------------
+    # SECURITY
+    # -----------------------------------------------------
+
+    if (
+        not request.user.is_staff
+        and encounter.doctor_id != request.user.id
+    ):
+
+        messages.error(
+            request,
+            (
+                "You are not authorized to review "
+                "this laboratory result."
+            ),
+        )
+
+        return redirect(
+            "consultations:consultation_dashboard"
+        )
+
+    # -----------------------------------------------------
+    # LABORATORY MUST BE COMPLETED
+    # -----------------------------------------------------
+
+    if lab_request.status != "Completed":
+
+        messages.error(
+            request,
+            "This laboratory result is not yet completed.",
+        )
+
+        return redirect(
+            "consultations:encounter_detail",
+            encounter_id=encounter.id,
+        )
+
+    # -----------------------------------------------------
+    # PREVENT DUPLICATE REVIEW
+    # -----------------------------------------------------
+
+    if lab_result.reviewed_at:
+
+        messages.info(
+            request,
+            "This laboratory result has already been reviewed.",
+        )
+
+        return redirect(
+            "consultations:encounter_detail",
+            encounter_id=encounter.id,
+        )
+
+    # -----------------------------------------------------
+    # RECORD DOCTOR REVIEW
+    # -----------------------------------------------------
+
+    lab_result.reviewed_by = request.user
+    lab_result.reviewed_at = timezone.now()
+
+    lab_result.save(
+        update_fields=[
+            "reviewed_by",
+            "reviewed_at",
+        ]
+    )
+
+    messages.success(
+        request,
+        (
+            f"Laboratory result for "
+            f"{lab_request.sample_number} "
+            "has been reviewed successfully."
+        ),
+    )
+
+    return redirect(
+        "consultations:encounter_detail",
+        encounter_id=encounter.id,
     )

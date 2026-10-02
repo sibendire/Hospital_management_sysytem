@@ -1,0 +1,1259 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Enter Laboratory Result | MediCare HMS
+    </title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #263238;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #123c69;
+            color: white;
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            margin-bottom: 7px;
+        }
+
+        .logo h2 {
+            font-size: 20px;
+        }
+
+        .logo p {
+            font-size: 11px;
+            color: #c9d8e8;
+            margin-top: 5px;
+        }
+
+        .menu-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #9fb8d0;
+            margin: 20px 12px 8px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 13px;
+            margin-bottom: 5px;
+            color: #eaf2f8;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #1e5a91;
+            color: white;
+        }
+
+        .icon {
+            width: 24px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            padding: 25px 30px;
+            max-width: 1500px;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            background: white;
+            min-height: 72px;
+            border-radius: 12px;
+            padding: 15px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 22px;
+        }
+
+        .page-title h1 {
+            font-size: 23px;
+            color: #123c69;
+        }
+
+        .page-title p {
+            color: #7a8793;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .notification {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eef4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info strong {
+            display: block;
+        }
+
+        .user-info small {
+            color: #8996a3;
+        }
+
+        /* ================= BREADCRUMB ================= */
+
+        .breadcrumb {
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: #8996a3;
+        }
+
+        .breadcrumb a {
+            color: #1769aa;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .breadcrumb span {
+            margin: 0 7px;
+        }
+
+        /* ================= PATIENT HEADER ================= */
+
+        .patient-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 20px;
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .patient-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .patient-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 12px;
+            background: #e8f1fb;
+            color: #1769aa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 25px;
+        }
+
+        .patient-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #123c69;
+        }
+
+        .patient-meta {
+            margin-top: 5px;
+            color: #7a8793;
+            font-size: 13px;
+        }
+
+        .patient-meta span {
+            margin-right: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 20px;
+            background: #fff3df;
+            color: #c87900;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* ================= CONTENT GRID ================= */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* ================= CARDS ================= */
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            color: #263238;
+        }
+
+        .card-header p {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #8996a3;
+        }
+
+        .card-body {
+            padding: 22px;
+        }
+
+        /* ================= REQUEST DETAILS ================= */
+
+        .request-number {
+            color: #1769aa;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #8996a3;
+            font-size: 12px;
+        }
+
+        .detail-value {
+            color: #263238;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .test-box {
+            background: #f7f9fb;
+            border: 1px solid #e4eaf0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .test-box strong {
+            display: block;
+            color: #123c69;
+            font-size: 16px;
+        }
+
+        .test-box span {
+            display: block;
+            color: #8996a3;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* ================= WORKFLOW ================= */
+
+        .workflow {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .workflow-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 60%;
+            width: 80%;
+            height: 2px;
+            background: #dce3e9;
+        }
+
+        .workflow-circle {
+            width: 30px;
+            height: 30px;
+            margin: auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef1f4;
+            color: #65727d;
+            font-size: 12px;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+        }
+
+        .workflow-step.active .workflow-circle {
+            background: #1769aa;
+            color: white;
+        }
+
+        .workflow-step.active .workflow-label {
+            color: #1769aa;
+        }
+
+        .workflow-label {
+            display: block;
+            margin-top: 7px;
+            font-size: 10px;
+            color: #8996a3;
+            font-weight: 600;
+        }
+
+        /* ================= ALERT ================= */
+
+        .info-alert {
+            background: #eef6fc;
+            border: 1px solid #cfe4f5;
+            border-radius: 9px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-alert-icon {
+            font-size: 18px;
+        }
+
+        .info-alert strong {
+            display: block;
+            color: #1769aa;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .info-alert p {
+            color: #65727d;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* ================= FORM ================= */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #394750;
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: #d93025;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 13px 14px;
+            border: 1px solid #dce3e9;
+            border-radius: 8px;
+            outline: none;
+            resize: vertical;
+            font-size: 13px;
+            color: #263238;
+            line-height: 1.6;
+            transition: .2s;
+        }
+
+        textarea:focus {
+            border-color: #1769aa;
+            box-shadow: 0 0 0 3px rgba(23,105,170,.08);
+        }
+
+        .interpretation {
+            min-height: 120px;
+        }
+
+        .field-help {
+            color: #8996a3;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        /* Django form errors */
+
+        .errorlist {
+            list-style: none;
+            margin-bottom: 7px;
+            color: #c62828;
+            font-size: 12px;
+        }
+
+        /* ================= FORM ACTIONS ================= */
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid #edf0f3;
+            padding-top: 20px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .btn-primary {
+            background: #1769aa;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #12588f;
+        }
+
+        .btn-light {
+            background: #eef4f9;
+            color: #1769aa;
+        }
+
+        .btn-light:hover {
+            background: #e1ebf3;
+        }
+
+        /* ================= COMPLETION NOTICE ================= */
+
+        .completion-notice {
+            background: #fff9ed;
+            border: 1px solid #f2dfb3;
+            border-radius: 9px;
+            padding: 14px 16px;
+            margin-top: 15px;
+        }
+
+        .completion-notice strong {
+            color: #9a6700;
+            font-size: 12px;
+        }
+
+        .completion-notice p {
+            margin-top: 4px;
+            color: #6f6250;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #8996a3;
+            font-size: 12px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar span:not(.icon),
+            .logo h2,
+            .logo p,
+            .menu-title {
+                display: none;
+            }
+
+            .main {
+                margin-left: 70px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .main {
+                padding: 15px;
+            }
+
+            .topbar {
+                padding: 15px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .patient-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .workflow-label {
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ========================================================= -->
+<!-- SIDEBAR -->
+<!-- ========================================================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        <div class="logo-icon">
+            🏥
+        </div>
+
+        <h2>MediCare HMS</h2>
+
+        <p>
+            Hospital Management System
+        </p>
+    </div>
+
+    <div class="menu-title">
+        Main
+    </div>
+
+    <a href="{% url 'dashboard' %}">
+        <span class="icon">🏠</span>
+        <span>Dashboard</span>
+    </a>
+
+    <a href="{% url 'patient_list' %}">
+        <span class="icon">👥</span>
+        <span>Patients</span>
+    </a>
+
+    <div class="menu-title">
+        Departments
+    </div>
+
+    <a href="{% url 'laboratory:laboratory_dashboard' %}">
+        <span class="icon">🧪</span>
+        <span>Laboratory Dashboard</span>
+    </a>
+
+    <a
+        href="{% url 'laboratory:lab_requests' %}"
+        class="active"
+    >
+        <span class="icon">📋</span>
+        <span>Lab Requests</span>
+    </a>
+
+    <a href="{% url 'laboratory:test_list' %}">
+        <span class="icon">🧬</span>
+        <span>Test Catalog</span>
+    </a>
+
+    <a href="{% url 'billing_dashboard' %}">
+        <span class="icon">💰</span>
+        <span>Billing</span>
+    </a>
+
+    <a href="{% url 'logout' %}">
+        <span class="icon">🚪</span>
+        <span>Logout</span>
+    </a>
+
+</aside>
+
+
+<!-- ========================================================= -->
+<!-- MAIN -->
+<!-- ========================================================= -->
+
+<main class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="page-title">
+
+            <h1>
+                Enter Laboratory Result
+            </h1>
+
+            <p>
+                Record and complete the laboratory investigation
+            </p>
+
+        </div>
+
+        <div class="user-area">
+
+            <div class="notification">
+                🔔
+            </div>
+
+            <div class="user-info">
+
+                <strong>
+                    {{ request.user.username }}
+                </strong>
+
+                <small>
+                    Laboratory Staff
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- BREADCRUMB -->
+    <!-- ===================================================== -->
+
+    <div class="breadcrumb">
+
+        <a href="{% url 'laboratory:lab_requests' %}">
+            Laboratory Requests
+        </a>
+
+        <span>›</span>
+
+        Enter Result
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- PATIENT -->
+    <!-- ===================================================== -->
+
+    <section class="patient-card">
+
+        <div class="patient-header">
+
+            <div class="patient-info">
+
+                <div class="patient-avatar">
+                    👤
+                </div>
+
+                <div>
+
+                    <div class="patient-name">
+
+                        {{ lab_request.patient.first_name }}
+                        {{ lab_request.patient.last_name }}
+
+                    </div>
+
+                    <div class="patient-meta">
+
+                        <span>
+                            Patient No:
+                            <strong>
+                                {{ lab_request.patient.patient_number }}
+                            </strong>
+                        </span>
+
+                        {% if lab_request.patient.gender %}
+                            <span>
+                                {{ lab_request.patient.gender }}
+                            </span>
+                        {% endif %}
+
+                        {% if lab_request.patient.phone %}
+                            <span>
+                                {{ lab_request.patient.phone }}
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                {% if lab_request.status == "Pending" %}
+
+                    <span class="status-badge">
+                        Pending
+                    </span>
+
+                {% elif lab_request.status == "Sample Collected" %}
+
+                    <span class="status-badge">
+                        Sample Collected
+                    </span>
+
+                {% elif lab_request.status == "Processing" %}
+
+                    <span class="status-badge">
+                        Processing
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge">
+                        {{ lab_request.status }}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- CONTENT -->
+    <!-- ===================================================== -->
+
+    <div class="content-grid">
+
+
+        <!-- ================================================= -->
+        <!-- LEFT COLUMN -->
+        <!-- ================================================= -->
+
+        <div>
+
+
+            <!-- REQUEST DETAILS -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Laboratory Request
+                    </h2>
+
+                    <p>
+                        Investigation details
+                    </p>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="request-number">
+
+                        {{ lab_request.sample_number }}
+
+                    </div>
+
+
+                    <div class="test-box">
+
+                        <strong>
+                            {{ lab_request.test.name }}
+                        </strong>
+
+                        <span>
+                            {{ lab_request.test.category }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Patient
+                        </span>
+
+                        <span class="detail-value">
+
+                            {{ lab_request.patient.first_name }}
+                            {{ lab_request.patient.last_name }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Patient Number
+                        </span>
+
+                        <span class="detail-value">
+
+                            {{ lab_request.patient.patient_number }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Requested By
+                        </span>
+
+                        <span class="detail-value">
+
+                            {% if lab_request.requested_by %}
+
+                                {% if lab_request.requested_by.get_full_name %}
+
+                                    {{ lab_request.requested_by.get_full_name }}
+
+                                {% else %}
+
+                                    {{ lab_request.requested_by.username }}
+
+                                {% endif %}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Request Date
+                        </span>
+
+                        <span class="detail-value">
+
+                            {{ lab_request.requested_date|date:"d M Y" }}
+
+                            <br>
+
+                            {{ lab_request.requested_date|time:"H:i" }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Test Price
+                        </span>
+
+                        <span class="detail-value">
+
+                            UGX {{ lab_request.test.price|floatformat:2 }}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- WORKFLOW -->
+
+                    <div class="workflow">
+
+                        <div class="workflow-step active">
+
+                            <div class="workflow-circle">
+                                ✓
+                            </div>
+
+                            <span class="workflow-label">
+                                Requested
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="workflow-step
+                            {% if lab_request.status == 'Sample Collected' or lab_request.status == 'Processing' %}
+                                active
+                            {% endif %}"
+                        >
+
+                            <div class="workflow-circle">
+                                2
+                            </div>
+
+                            <span class="workflow-label">
+                                Sample
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="workflow-step
+                            {% if lab_request.status == 'Processing' %}
+                                active
+                            {% endif %}"
+                        >
+
+                            <div class="workflow-circle">
+                                3
+                            </div>
+
+                            <span class="workflow-label">
+                                Processing
+                            </span>
+
+                        </div>
+
+
+                        <div class="workflow-step">
+
+                            <div class="workflow-circle">
+                                4
+                            </div>
+
+                            <span class="workflow-label">
+                                Result
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- INFORMATION -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Laboratory Workflow
+                    </h2>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="info-alert">
+
+                        <div class="info-alert-icon">
+                            ℹ️
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Result completion
+                            </strong>
+
+                            <p>
+                                Enter the laboratory findings exactly as obtained
+                                from the investigation. Saving the result will mark
+                                this laboratory request as completed.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="completion-notice">
+
+                        <strong>
+                            Important
+                        </strong>
+
+                        <p>
+                            Once this result is submitted, it will become available
+                            to the requesting doctor for clinical review.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- RIGHT COLUMN -->
+        <!-- ================================================= -->
+
+        <div>
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Laboratory Result
+                    </h2>
+
+                    <p>
+                        Record the findings from the investigation
+                    </p>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <form
+                        method="POST"
+                        action=""
+                    >
+
+                        {% csrf_token %}
+
+
+                        <!-- RESULT -->
+
+                        <div class="form-group">
+
+                            <label for="{{ form.result.id_for_label }}">
+
+                                Laboratory Result
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            {{ form.result.errors }}
+
+
+                            {{ form.result }}
+
+
+                            <div class="field-help">
+
+                                Enter the actual laboratory finding,
+                                measurement, observation, or result.
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- INTERPRETATION -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="{{ form.interpretation.id_for_label }}"
+                            >
+
+                                Interpretation
+
+                            </label>
+
+
+                            {{ form.interpretation.errors }}
+
+
+                            {{ form.interpretation }}
+
+
+                            <div class="field-help">
+
+                                Provide the laboratory interpretation or
+                                relevant comments for the requesting clinician.
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- COMPLETION -->
+
+                        <div class="completion-notice">
+
+                            <strong>
+                                Completing this request
+                            </strong>
+
+                            <p>
+                                When you submit this form, the laboratory
+                                request will change from
+                                <strong>{{ lab_request.status }}</strong>
+                                to
+                                <strong>Completed</strong>.
+                                The result will then be available to the
+                                attending doctor for review.
+                            </p>
+
+                        </div>
+
+
+                        <!-- ACTIONS -->
+
+                        <div class="form-actions">
+
+                            <a
+                                href="{% url 'laboratory:lab_requests' %}"
+                                class="btn btn-light"
+                            >
+                                ← Back to Requests
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                ✓ Complete Laboratory Result
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- FOOTER -->
+    <!-- ===================================================== -->
+
+    <footer>
+
+        © 2026 MediCare Hospital Management System
+        • Laboratory Department
+
+    </footer>
+
+</main>
+
+</body>
+</html>

@@ -12,7 +12,6 @@ from .models import (
 # =========================================================
 # GET OR CREATE OPEN INVOICE
 # =========================================================
-
 @transaction.atomic
 def get_or_create_invoice(
     patient,
@@ -20,19 +19,52 @@ def get_or_create_invoice(
 ):
 
     if not patient:
-
         raise ValidationError(
             "A patient is required to create an invoice."
         )
 
     # -----------------------------------------------------
-    # Reuse ONLY an open invoice
+    # ENCOUNTER BILLING
+    # -----------------------------------------------------
+    #
+    # One clinical encounter should have one central invoice.
+    #
+    if encounter:
+
+        invoice = (
+            Invoice.objects
+            .select_for_update()
+            .filter(
+                patient=patient,
+                encounter=encounter,
+            )
+            .exclude(
+                status="CANCELLED"
+            )
+            .order_by("-invoice_date")
+            .first()
+        )
+
+        if invoice:
+            return invoice
+
+        return Invoice.objects.create(
+            patient=patient,
+            encounter=encounter,
+            status="UNPAID",
+            payment_status="UNPAID",
+        )
+
+    # -----------------------------------------------------
+    # PATIENT-LEVEL BILLING WITHOUT ENCOUNTER
     # -----------------------------------------------------
 
-    invoice_query = (
+    invoice = (
         Invoice.objects
+        .select_for_update()
         .filter(
             patient=patient,
+            encounter__isnull=True,
             payment_status__in=[
                 "UNPAID",
                 "PARTIAL",
@@ -41,45 +73,19 @@ def get_or_create_invoice(
         .exclude(
             status="CANCELLED"
         )
+        .order_by("-invoice_date")
+        .first()
     )
 
-    if encounter:
-
-        invoice = (
-            invoice_query
-            .filter(
-                encounter=encounter
-            )
-            .order_by("-invoice_date")
-            .first()
-        )
-
-    else:
-
-        invoice = (
-            invoice_query
-            .filter(
-                encounter__isnull=True
-            )
-            .order_by("-invoice_date")
-            .first()
-        )
-
     if invoice:
-
         return invoice
-
-    # -----------------------------------------------------
-    # Create new invoice
-    # -----------------------------------------------------
 
     return Invoice.objects.create(
         patient=patient,
-        encounter=encounter,
+        encounter=None,
         status="UNPAID",
         payment_status="UNPAID",
     )
-
 
 # =========================================================
 # ADD INVOICE ITEM
@@ -95,6 +101,14 @@ def add_invoice_item(
     source_type=None,
     source_id=None,
 ):
+
+    invoice = (
+        Invoice.objects
+        .select_for_update()
+        .get(
+            pk=invoice.pk
+        )
+    )
 
     if invoice.status in [
         "PAID",
@@ -142,10 +156,6 @@ def add_invoice_item(
             "Unit price cannot be negative."
         )
 
-    # -----------------------------------------------------
-    # Prevent duplicate source charges
-    # -----------------------------------------------------
-
     if source_type and source_id:
 
         existing_item = (
@@ -161,10 +171,6 @@ def add_invoice_item(
         if existing_item:
 
             return existing_item
-
-    # -----------------------------------------------------
-    # Create item
-    # -----------------------------------------------------
 
     item = InvoiceItem.objects.create(
         invoice=invoice,
@@ -228,41 +234,94 @@ def add_lab_charge(
 # =========================================================
 
 @transaction.atomic
-def add_pharmacy_charge(
-    pharmacy_sale,
-):
+def add_pharmacy_charge(pharmacy_sale):
 
     if not pharmacy_sale.patient:
-
         raise ValidationError(
-            "A patient is required for a pharmacy charge."
+            "A patient is required for pharmacy billing."
         )
+
+    if not pharmacy_sale.encounter:
+        raise ValidationError(
+            "A clinical encounter is required for pharmacy billing."
+        )
+
+    # =====================================================
+    # GET CENTRAL ENCOUNTER INVOICE
+    # =====================================================
 
     invoice = get_or_create_invoice(
         patient=pharmacy_sale.patient,
         encounter=pharmacy_sale.encounter,
     )
 
+    # =====================================================
+    # GET DISPENSED MEDICINES
+    # =====================================================
+
+    sale_items = list(
+        pharmacy_sale.items
+        .select_related("medicine")
+        .all()
+    )
+
+    if not sale_items:
+
+        raise ValidationError(
+            "The pharmacy sale has no items to bill."
+        )
+
     created_items = []
 
-    for sale_item in pharmacy_sale.items.select_related(
-        "medicine"
-    ):
+    # =====================================================
+    # ADD EACH MEDICINE TO CENTRAL INVOICE
+    # =====================================================
+
+    for sale_item in sale_items:
+
+        medicine_name = sale_item.medicine.name
+
+        if getattr(
+            sale_item.medicine,
+            "strength",
+            None
+        ):
+
+            medicine_name = (
+                f"{medicine_name} "
+                f"{sale_item.medicine.strength}"
+            )
 
         item = add_invoice_item(
+
             invoice=invoice,
+
             service_type="PHARMACY",
+
             description=(
-                f"{sale_item.medicine.name} "
+                f"Pharmacy: "
+                f"{medicine_name} "
                 f"x {sale_item.quantity}"
             ),
+
             quantity=sale_item.quantity,
+
             unit_price=sale_item.selling_price,
+
             source_type="PHARMACY_SALE_ITEM",
+
             source_id=sale_item.id,
         )
 
         created_items.append(item)
+
+    # =====================================================
+    # REFRESH INVOICE
+    # =====================================================
+
+    invoice.update_payment_status()
+
+    invoice.refresh_from_db()
 
     return invoice, created_items
 

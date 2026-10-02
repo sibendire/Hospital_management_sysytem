@@ -638,7 +638,7 @@
     </div>
 
 
-    <a href="{% url 'pharmacy_dashboard' %}"
+    <a href="{% url 'pharmacy:pharmacy_dashboard' %}"
        class="active">
 
         <span>📊</span>
@@ -647,7 +647,7 @@
     </a>
 
 
-    <a href="{% url 'medicine_list' %}">
+    <a href="{% url 'pharmacy:medicine_list' %}">
 
         <span>💊</span>
         <span>Medicine Inventory</span>
@@ -655,7 +655,7 @@
     </a>
 
 
-    <a href="{% url 'add_medicine' %}">
+    <a href="{% url 'pharmacy:add_medicine' %}">
 
         <span>➕</span>
         <span>Add Medicine</span>
@@ -681,7 +681,7 @@
          instead of old sell_medicine
     -->
 
-    <a href="{% url 'dispense_medicine' %}">
+    <a href="{% url 'pharmacy:dispense_medicine' %}">
 
         <span>💉</span>
         <span>Dispensing</span>
@@ -689,7 +689,7 @@
     </a>
 
 
-    <a href="{% url 'medicine_sales' %}">
+    <a href="{% url 'pharmacy:medicine_sales' %}">
 
         <span>💰</span>
         <span>Sales History</span>
@@ -718,7 +718,7 @@
     </div>
 
 
-    <a href="{% url 'pharmacy_reports' %}">
+    <a href="{% url 'pharmacy:pharmacy_reports' %}">
 
         <span>📈</span>
         <span>Pharmacy Reports</span>
@@ -726,7 +726,7 @@
     </a>
 
 
-    <a href="{% url 'medicine_list' %}">
+    <a href="{% url 'pharmacy:medicine_list' %}">
 
         <span>⚠️</span>
         <span>Stock Alerts</span>
@@ -1017,7 +1017,7 @@
 
         <!-- ADD -->
 
-        <a href="{% url 'add_medicine' %}"
+        <a href="{% url 'pharmacy:add_medicine' %}"
            class="action">
 
             <div class="action-icon">
@@ -1037,7 +1037,7 @@
 
         <!-- INVENTORY -->
 
-        <a href="{% url 'medicine_list' %}"
+        <a href="{% url 'pharmacy:medicine_list' %}"
            class="action">
 
             <div class="action-icon">
@@ -1057,7 +1057,7 @@
 
         <!-- DISPENSE -->
 
-        <a href="{% url 'dispense_medicine' %}"
+        <a href="{% url 'pharmacy:dispense_medicine' %}"
            class="action">
 
             <div class="action-icon">
@@ -1077,7 +1077,7 @@
 
         <!-- SALES -->
 
-        <a href="{% url 'medicine_sales' %}"
+        <a href="{% url 'pharmacy:medicine_sales' %}"
            class="action">
 
             <div class="action-icon">
@@ -1116,7 +1116,7 @@
                     ⚠️ Inventory Alerts
                 </h3>
 
-                <a href="{% url 'medicine_list' %}">
+                <a href="{% url 'pharmacy:medicine_list' %}">
                     View Inventory
                 </a>
 
@@ -1365,7 +1365,7 @@
                     </div>
 
 
-                    <a href="{% url 'dispense_medicine' %}"
+                    <a href="{% url 'pharmacy:dispense_medicine' %}"
                        class="badge badge-success">
 
                         Open
@@ -1400,7 +1400,7 @@
                     </div>
 
 
-                    <a href="{% url 'medicine_sales' %}"
+                    <a href="{% url 'pharmacy:medicine_sales' %}"
                        class="badge badge-info">
 
                         View

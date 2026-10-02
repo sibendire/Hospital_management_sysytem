@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.db import transaction
 from django.db.models.deletion import ProtectedError
+from django.views.decorators.http import require_POST
 
 from billing.services import add_lab_charge
 
@@ -87,7 +88,7 @@ def add_test(request):
                 f"Laboratory test '{test.name}' was added successfully."
             )
 
-            return redirect("test_list")
+            return redirect("laboratory:test_list")
 
     else:
 
@@ -133,7 +134,7 @@ def edit_test(request, id):
                 )
             )
 
-            return redirect("test_list")
+            return redirect("laboratory:test_list")
 
     else:
 
@@ -166,7 +167,7 @@ def delete_test(request, id):
 
     if request.method != "POST":
 
-        return redirect("test_list")
+        return redirect("laboratory:test_list")
 
     test_name = test.name
 
@@ -193,7 +194,7 @@ def delete_test(request, id):
             )
         )
 
-    return redirect("test_list")
+    return redirect("laboratory:test_list")
 
 
 # =========================================================
@@ -249,7 +250,7 @@ def create_lab_request(request):
                 )
             )
 
-            return redirect("lab_requests")
+            return redirect("laboratory:lab_requests")
 
     else:
 
@@ -377,92 +378,56 @@ def lab_requests(request):
 
 @login_required
 @transaction.atomic
-def enter_result(request, id):
-
+def enter_result(request, request_id):
     lab_request = get_object_or_404(
         LabRequest.objects.select_related(
             "patient",
             "test",
+            "requested_by",
             "encounter",
         ),
-        id=id
+        id=request_id,
     )
 
-    # -----------------------------------------------------
-    # PREVENT DUPLICATE RESULT
-    # -----------------------------------------------------
-
-    if hasattr(
-        lab_request,
-        "result_record"
-    ):
-
+    # Do not allow another result to be entered
+    if hasattr(lab_request, "result_record"):
         messages.info(
             request,
-            (
-                f"A result already exists for laboratory "
-                f"request {lab_request.sample_number}."
-            )
+            "A laboratory result has already been recorded for this request."
         )
-
-        return redirect(
-            "lab_requests"
-        )
-
-    # -----------------------------------------------------
-    # RESULT FORM
-    # -----------------------------------------------------
+        return redirect("laboratory:lab_requests")
 
     if request.method == "POST":
-
-        form = LabResultForm(
-            request.POST
-        )
+        form = LabResultForm(request.POST)
 
         if form.is_valid():
+            lab_result = form.save(commit=False)
+            lab_result.lab_request = lab_request
+            lab_result.technician = request.user
+            lab_result.save()
 
-            result = form.save(
-                commit=False
-            )
-
-            result.lab_request = lab_request
-
-            result.technician = request.user
-
-            result.save()
-
+            # Completing the result completes the laboratory request
             lab_request.status = "Completed"
-
-            lab_request.save(
-                update_fields=["status"]
-            )
+            lab_request.save(update_fields=["status"])
 
             messages.success(
                 request,
-                (
-                    f"Laboratory result for "
-                    f"{lab_request.sample_number} "
-                    "was recorded successfully."
-                )
+                f"Result for {lab_request.sample_number} has been completed."
             )
 
-            return redirect(
-                "lab_requests"
-            )
+            return redirect("laboratory:lab_requests")
 
     else:
-
         form = LabResultForm()
 
     return render(
         request,
-        "laboratory/result_form.html",
+        "laboratory/enter_result.html",
         {
             "form": form,
-            "request": lab_request,
-        }
+            "lab_request": lab_request,
+        },
     )
-
 
 # =========================================================
 # PATIENT LAB RESULTS API
@@ -538,3 +503,38 @@ def patient_lab_results(
         data,
         safe=False
     )
+@login_required
+@require_POST
+def update_lab_status(request, request_id, status):
+    lab_request = get_object_or_404(
+        LabRequest,
+        id=request_id
+    )
+
+    allowed_transitions = {
+        "Pending": "Sample Collected",
+        "Sample Collected": "Processing",
+    }
+
+    current_status = lab_request.status
+
+    if status not in allowed_transitions.values():
+        messages.error(request, "Invalid laboratory status.")
+        return redirect("laboratory:lab_requests")
+
+    if allowed_transitions.get(current_status) != status:
+        messages.error(
+            request,
+            f"Cannot change status from {current_status} to {status}."
+        )
+        return redirect("laboratory:lab_requests")
+
+    lab_request.status = status
+    lab_request.save(update_fields=["status"])
+
+    messages.success(
+        request,
+        f"{lab_request.sample_number} marked as {status}."
+    )
+
+    return redirect("laboratory:lab_requests")

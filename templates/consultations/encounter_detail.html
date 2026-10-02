@@ -1,7 +1,8 @@
+
 {% extends "base.html" %}
 
 {% block title %}
-Clinical Encounter
+    Clinical Encounter - {{ patient.first_name }} {{ patient.last_name }}
 {% endblock %}
 
 
@@ -9,10 +10,9 @@ Clinical Encounter
 
 <div class="container-fluid py-4">
 
-
-    <!-- =====================================================
+    <!-- =========================================================
          PATIENT / ENCOUNTER HEADER
-         ===================================================== -->
+         ========================================================= -->
 
     <div class="card border-0 shadow-sm mb-4">
 
@@ -20,46 +20,60 @@ Clinical Encounter
 
             <div class="row align-items-center">
 
-
-                <!-- PATIENT -->
+                <!-- PATIENT INFORMATION -->
 
                 <div class="col-lg-8">
 
-                    <small class="text-muted">
-                        Patient
-                    </small>
+                    <div class="d-flex align-items-center gap-3">
 
-                    <h3 class="mb-1">
+                        <div
+                            class="rounded-circle bg-primary bg-opacity-10
+                                   d-flex align-items-center justify-content-center"
+                            style="width:56px;height:56px;"
+                        >
+                            <i class="bi bi-person-vcard fs-3 text-primary"></i>
+                        </div>
 
-                        {{ patient.first_name }}
-                        {{ patient.last_name }}
+                        <div>
 
-                    </h3>
+                            <small class="text-muted">
+                                Patient
+                            </small>
 
+                            <h3 class="mb-1">
 
-                    <div class="text-muted">
+                                {{ patient.first_name }}
+                                {{ patient.last_name }}
 
-                        {{ patient.patient_number }}
+                            </h3>
 
-                        {% if patient.gender %}
-                            · {{ patient.gender }}
-                        {% endif %}
+                            <div class="text-muted">
 
-                        {% if patient.phone %}
-                            · {{ patient.phone }}
-                        {% endif %}
+                                {{ patient.patient_number }}
+
+                                {% if patient.gender %}
+                                    · {{ patient.gender }}
+                                {% endif %}
+
+                                {% if patient.phone %}
+                                    · {{ patient.phone }}
+                                {% endif %}
+
+                            </div>
+
+                        </div>
 
                     </div>
 
                 </div>
 
 
-                <!-- ENCOUNTER -->
+                <!-- ENCOUNTER INFORMATION -->
 
-                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
 
                     <small class="text-muted">
-                        Encounter
+                        Clinical Encounter
                     </small>
 
                     <h5 class="mb-2">
@@ -70,18 +84,21 @@ Clinical Encounter
                     {% if encounter.status == "COMPLETED" %}
 
                         <span class="badge bg-success">
+                            <i class="bi bi-check-circle"></i>
                             Completed
                         </span>
 
                     {% elif encounter.status == "CANCELLED" %}
 
                         <span class="badge bg-danger">
+                            <i class="bi bi-x-circle"></i>
                             Cancelled
                         </span>
 
                     {% elif encounter.status == "IN_PROGRESS" %}
 
                         <span class="badge bg-primary">
+                            <i class="bi bi-clock"></i>
                             In Progress
                         </span>
 
@@ -102,7 +119,6 @@ Clinical Encounter
 
                 </div>
 
-
             </div>
 
         </div>
@@ -110,16 +126,15 @@ Clinical Encounter
     </div>
 
 
-    <!-- =====================================================
+    <!-- =========================================================
          CLINICAL WORKFLOW NAVIGATION
-         ===================================================== -->
+         ========================================================= -->
 
     <div class="card border-0 shadow-sm mb-4">
 
         <div class="card-body">
 
             <div class="row g-2">
-
 
                 <div class="col-6 col-md">
 
@@ -188,6 +203,22 @@ Clinical Encounter
                 <div class="col-6 col-md">
 
                     <a
+                        href="#pharmacy"
+                        class="btn btn-outline-primary w-100"
+                    >
+
+                        <i class="bi bi-capsule-pill"></i>
+
+                        Prescription
+
+                    </a>
+
+                </div>
+
+
+                <div class="col-6 col-md">
+
+                    <a
                         href="#billing"
                         class="btn btn-outline-dark w-100"
                     >
@@ -200,6 +231,191 @@ Clinical Encounter
 
                 </div>
 
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         CLINICAL WORKFLOW STATUS
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h6 class="text-uppercase text-muted mb-3">
+
+                <i class="bi bi-diagram-3"></i>
+
+                Clinical Workflow
+
+            </h6>
+
+
+            <div class="row g-2">
+
+                <!-- ASSESSMENT -->
+
+                <div class="col-md">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-clipboard2-pulse text-primary"></i>
+
+                            <strong>Assessment</strong>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Doctor assessment
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VITALS -->
+
+                <div class="col-md">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-heart-pulse text-primary"></i>
+
+                            <strong>Vitals</strong>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Patient measurements
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DIAGNOSIS -->
+
+                <div class="col-md">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-file-medical text-primary"></i>
+
+                            <strong>Diagnosis</strong>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Clinical diagnosis
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LAB -->
+
+                <div class="col-md">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-eyedropper text-primary"></i>
+
+                            <strong>Laboratory</strong>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Investigations & results
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRESCRIPTION -->
+
+                <div class="col-md">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-capsule-pill text-primary"></i>
+
+                            <strong>Prescription</strong>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Treatment decision
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PHARMACY -->
+
+                <div class="col-md">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-bag-check text-primary"></i>
+
+                            <strong>Dispensing</strong>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Pharmacy dispensing
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BILLING -->
+
+                <div class="col-md">
+
+                    <div class="border rounded p-3 h-100">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <i class="bi bi-receipt text-primary"></i>
+
+                            <strong>Billing</strong>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Invoice & payment
+                        </small>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -211,9 +427,9 @@ Clinical Encounter
     <div class="row g-4">
 
 
-        <!-- =================================================
+        <!-- =====================================================
              MAIN CLINICAL AREA
-             ================================================= -->
+             ===================================================== -->
 
         <div class="col-lg-8">
 
@@ -231,7 +447,7 @@ Clinical Encounter
 
                     <h5 class="mb-0">
 
-                        <i class="bi bi-clipboard2-pulse"></i>
+                        <i class="bi bi-clipboard2-pulse text-primary"></i>
 
                         Clinical Assessment
 
@@ -242,15 +458,14 @@ Clinical Encounter
 
                 <div class="card-body">
 
-
                     <div class="mb-4">
 
-                        <h6>
-                            Chief Complaint
-                        </h6>
+                        <h6>Chief Complaint</h6>
 
                         <p class="mb-0">
+
                             {{ encounter.chief_complaint|default:"Not recorded." }}
+
                         </p>
 
                     </div>
@@ -261,12 +476,12 @@ Clinical Encounter
 
                     <div class="mb-4">
 
-                        <h6>
-                            History of Present Illness
-                        </h6>
+                        <h6>History of Present Illness</h6>
 
                         <p class="mb-0">
+
                             {{ encounter.history_of_present_illness|default:"Not recorded." }}
+
                         </p>
 
                     </div>
@@ -277,12 +492,12 @@ Clinical Encounter
 
                     <div class="mb-4">
 
-                        <h6>
-                            Clinical Examination
-                        </h6>
+                        <h6>Clinical Examination</h6>
 
                         <p class="mb-0">
+
                             {{ encounter.clinical_examination|default:"Not recorded." }}
+
                         </p>
 
                     </div>
@@ -293,12 +508,12 @@ Clinical Encounter
 
                     <div class="mb-4">
 
-                        <h6>
-                            Assessment
-                        </h6>
+                        <h6>Assessment</h6>
 
                         <p class="mb-0">
+
                             {{ encounter.assessment|default:"Not recorded." }}
+
                         </p>
 
                     </div>
@@ -309,12 +524,12 @@ Clinical Encounter
 
                     <div class="mb-4">
 
-                        <h6>
-                            Treatment Plan
-                        </h6>
+                        <h6>Treatment Plan</h6>
 
                         <p class="mb-0">
+
                             {{ encounter.treatment_plan|default:"Not recorded." }}
+
                         </p>
 
                     </div>
@@ -326,12 +541,12 @@ Clinical Encounter
 
                         <div>
 
-                            <h6>
-                                Clinical Notes
-                            </h6>
+                            <h6>Clinical Notes</h6>
 
                             <p class="mb-0">
+
                                 {{ encounter.clinical_notes }}
+
                             </p>
 
                         </div>
@@ -345,15 +560,11 @@ Clinical Encounter
 
                         <div>
 
-                            <h6>
-                                Follow-up
-                            </h6>
+                            <h6>Follow-up</h6>
 
                             <p class="mb-1">
 
-                                <strong>
-                                    Date:
-                                </strong>
+                                <strong>Date:</strong>
 
                                 {{ encounter.follow_up_date|date:"d M Y" }}
 
@@ -364,9 +575,7 @@ Clinical Encounter
 
                                 <p class="mb-0">
 
-                                    <strong>
-                                        Instructions:
-                                    </strong>
+                                    <strong>Instructions:</strong>
 
                                     {{ encounter.follow_up_instructions }}
 
@@ -377,7 +586,6 @@ Clinical Encounter
                         </div>
 
                     {% endif %}
-
 
                 </div>
 
@@ -397,7 +605,7 @@ Clinical Encounter
 
                     <h5 class="mb-0">
 
-                        <i class="bi bi-file-medical"></i>
+                        <i class="bi bi-file-medical text-primary"></i>
 
                         Diagnoses
 
@@ -408,11 +616,9 @@ Clinical Encounter
 
                 <div class="card-body">
 
-
                     {% for diagnosis in diagnoses %}
 
                         <div class="border-bottom pb-3 mb-3">
-
 
                             <div>
 
@@ -454,7 +660,6 @@ Clinical Encounter
 
                             {% endif %}
 
-
                         </div>
 
 
@@ -478,7 +683,6 @@ Clinical Encounter
                     {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
 
                         <hr>
-
 
                         <h6 class="mb-3">
                             Add Diagnosis
@@ -510,7 +714,6 @@ Clinical Encounter
 
                     {% endif %}
 
-
                 </div>
 
             </section>
@@ -527,19 +730,36 @@ Clinical Encounter
 
                 <div class="card-header bg-white">
 
-                    <h5 class="mb-0">
+                    <div class="d-flex justify-content-between align-items-center">
 
-                        <i class="bi bi-eyedropper"></i>
+                        <div>
 
-                        Laboratory Investigations
+                            <h5 class="mb-1">
 
-                    </h5>
+                                <i class="bi bi-eyedropper text-primary"></i>
+
+                                Laboratory Investigations
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Laboratory results must be reviewed by the
+                                attending doctor before medication is prescribed.
+
+                            </small>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
 
                 <div class="card-body">
 
+
+                    <!-- REQUEST LAB TEST -->
 
                     {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
 
@@ -553,7 +773,6 @@ Clinical Encounter
 
 
                             <div class="row g-3 align-items-end">
-
 
                                 <div class="col-md-9">
 
@@ -592,7 +811,6 @@ Clinical Encounter
 
                                 </div>
 
-
                             </div>
 
                         </form>
@@ -607,16 +825,19 @@ Clinical Encounter
 
                     {% for lab_request in lab_requests %}
 
-                        <div class="border rounded p-3 mb-3">
+                        <div class="border rounded p-3 mb-4">
 
 
-                            <div class="row align-items-center">
+                            <!-- LAB REQUEST HEADER -->
 
+                            <div class="row align-items-start">
 
-                                <div class="col-md-5">
+                                <div class="col-md-6">
 
                                     <strong>
+
                                         {{ lab_request.test.name }}
+
                                     </strong>
 
 
@@ -627,7 +848,7 @@ Clinical Encounter
                                     </div>
 
 
-                                    <div class="text-muted small">
+                                    <div class="text-muted small mt-1">
 
                                         Sample:
                                         {{ lab_request.sample_number }}
@@ -637,10 +858,12 @@ Clinical Encounter
                                 </div>
 
 
-                                <div class="col-md-3">
+                                <div class="col-md-3 mt-2 mt-md-0">
 
                                     <small class="text-muted d-block">
+
                                         Requested
+
                                     </small>
 
                                     {{ lab_request.requested_date|date:"d M Y H:i" }}
@@ -648,40 +871,58 @@ Clinical Encounter
                                 </div>
 
 
-                                <div class="col-md-4 text-md-end">
-
+                                <div class="col-md-3 text-md-end mt-2 mt-md-0">
 
                                     {% if lab_request.status == "Completed" %}
 
                                         <span class="badge bg-success">
+
+                                            <i class="bi bi-check-circle"></i>
+
                                             Completed
+
                                         </span>
 
                                     {% elif lab_request.status == "Processing" %}
 
                                         <span class="badge bg-warning text-dark">
+
+                                            <i class="bi bi-hourglass-split"></i>
+
                                             Processing
+
                                         </span>
 
                                     {% elif lab_request.status == "Sample Collected" %}
 
                                         <span class="badge bg-info text-dark">
+
+                                            <i class="bi bi-droplet"></i>
+
                                             Sample Collected
+
                                         </span>
 
                                     {% else %}
 
                                         <span class="badge bg-secondary">
+
+                                            <i class="bi bi-clock"></i>
+
                                             Pending
+
                                         </span>
 
                                     {% endif %}
 
                                 </div>
 
-
                             </div>
 
+
+                            <!-- =================================================
+                                 LAB RESULT
+                                 ================================================= -->
 
                             {% if lab_request.result_record %}
 
@@ -691,38 +932,106 @@ Clinical Encounter
                                 <div class="bg-light rounded p-3">
 
 
-                                    <strong>
-                                        Laboratory Result
-                                    </strong>
+                                    <div class="d-flex justify-content-between
+                                                align-items-start flex-wrap gap-2">
+
+                                        <div>
+
+                                            <h6 class="mb-1">
+
+                                                <i class="bi bi-file-earmark-medical"></i>
+
+                                                Laboratory Result
+
+                                            </h6>
+
+                                            <small class="text-muted">
+
+                                                {{ lab_request.test.name }}
+
+                                            </small>
+
+                                        </div>
 
 
-                                    <p class="mt-2 mb-2">
+                                        <!-- RESULT REVIEW STATUS -->
 
-                                        {{ lab_request.result_record.result }}
+                                        {% if lab_request.result_record.reviewed_at %}
 
-                                    </p>
+                                            <span class="badge bg-success">
 
+                                                <i class="bi bi-check-circle"></i>
+
+                                                Reviewed by Doctor
+
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                <i class="bi bi-exclamation-circle"></i>
+
+                                                Awaiting Doctor Review
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <!-- RESULT -->
+
+                                    <div class="mt-3">
+
+                                        <small class="text-muted d-block mb-1">
+
+                                            Result
+
+                                        </small>
+
+                                        <div class="border rounded bg-white p-3">
+
+                                            {{ lab_request.result_record.result }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- INTERPRETATION -->
 
                                     {% if lab_request.result_record.interpretation %}
 
-                                        <div class="small text-muted">
+                                        <div class="mt-3">
 
-                                            <strong>
-                                                Interpretation:
-                                            </strong>
+                                            <small class="text-muted d-block mb-1">
 
-                                            {{ lab_request.result_record.interpretation }}
+                                                Laboratory Interpretation
+
+                                            </small>
+
+                                            <div class="border rounded bg-white p-3">
+
+                                                {{ lab_request.result_record.interpretation }}
+
+                                            </div>
 
                                         </div>
 
                                     {% endif %}
 
 
+                                    <!-- TECHNICIAN -->
+
                                     {% if lab_request.result_record.technician %}
 
-                                        <div class="small text-muted mt-2">
+                                        <div class="small text-muted mt-3">
 
-                                            Technician:
+                                            <strong>
+                                                Performed by:
+                                            </strong>
 
                                             {{ lab_request.result_record.technician.get_full_name|default:lab_request.result_record.technician.username }}
 
@@ -731,19 +1040,143 @@ Clinical Encounter
                                     {% endif %}
 
 
+                                    <!-- RESULT DATE -->
+
                                     <div class="small text-muted mt-1">
 
-                                        Result date:
+                                        <strong>
+                                            Result date:
+                                        </strong>
 
                                         {{ lab_request.result_record.result_date|date:"d M Y H:i" }}
 
                                     </div>
 
 
+                                    <!-- =================================================
+                                         DOCTOR REVIEW
+                                         ================================================= -->
+
+                                    {% if lab_request.result_record.reviewed_at %}
+
+                                        <div class="alert alert-success mt-3 mb-0">
+
+                                            <div class="d-flex gap-2">
+
+                                                <i class="bi bi-check-circle-fill"></i>
+
+                                                <div>
+
+                                                    <strong>
+                                                        Laboratory result reviewed
+                                                    </strong>
+
+                                                    <div class="small mt-1">
+
+                                                        {% if lab_request.result_record.reviewed_by %}
+
+                                                            Reviewed by:
+
+                                                            {{ lab_request.result_record.reviewed_by.get_full_name|default:lab_request.result_record.reviewed_by.username }}
+
+                                                        {% endif %}
+
+                                                        {% if lab_request.result_record.reviewed_at %}
+
+                                                            ·
+
+                                                            {{ lab_request.result_record.reviewed_at|date:"d M Y H:i" }}
+
+                                                        {% endif %}
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                    {% elif lab_request.status == "Completed" %}
+
+                                        {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+                                            <div class="alert alert-warning mt-3 mb-0">
+
+                                                <div class="d-flex
+                                                            justify-content-between
+                                                            align-items-center
+                                                            flex-wrap gap-3">
+
+                                                    <div class="d-flex gap-2">
+
+                                                        <i class="bi bi-exclamation-triangle-fill"></i>
+
+                                                        <div>
+
+                                                            <strong>
+                                                                Doctor review required
+                                                            </strong>
+
+                                                            <div class="small mt-1">
+
+                                                                Review this laboratory
+                                                                result before prescribing
+                                                                medication.
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <form
+                                                        method="post"
+                                                        action="{% url 'consultations:review_lab_result' encounter.id lab_request.result_record.id %}"
+                                                    >
+
+                                                        {% csrf_token %}
+
+                                                        <button
+                                                            type="submit"
+                                                            class="btn btn-warning"
+                                                        >
+
+                                                            <i class="bi bi-check2-circle"></i>
+
+                                                            Review Result
+
+                                                        </button>
+
+                                                    </form>
+
+                                                </div>
+
+                                            </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                </div>
+
+
+                            {% elif lab_request.status == "Completed" %}
+
+                                <hr>
+
+                                <div class="alert alert-warning mb-0">
+
+                                    <i class="bi bi-exclamation-triangle"></i>
+
+                                    Laboratory test is marked as completed,
+                                    but no result record is available yet.
+
                                 </div>
 
                             {% endif %}
-
 
                         </div>
 
@@ -765,6 +1198,762 @@ Clinical Encounter
 
                     {% endfor %}
 
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PHARMACY / PRESCRIPTIONS
+                 ================================================= -->
+
+            <section
+                id="pharmacy"
+                class="card border-0 shadow-sm mb-4"
+            >
+
+                <div class="card-header bg-white">
+
+                    <div class="d-flex justify-content-between
+                                align-items-center flex-wrap gap-2">
+
+                        <div>
+
+                            <h5 class="mb-1">
+
+                                <i class="bi bi-capsule-pill text-primary"></i>
+
+                                Pharmacy & Prescriptions
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Prescription follows doctor review of
+                                available laboratory results.
+
+                            </small>
+
+                        </div>
+
+
+                        {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+                            {% if lab_results_reviewed %}
+
+                                <a
+                                    href="{% url 'pharmacy:create_prescription' %}?patient={{ patient.id }}&encounter={{ encounter.id }}"
+                                    class="btn btn-primary"
+                                >
+
+                                    <i class="bi bi-prescription2"></i>
+
+                                    Prescribe Medicine
+
+                                </a>
+
+                            {% endif %}
+
+                        {% endif %}
+
+
+                        <span class="badge bg-light text-dark border">
+
+                            {{ prescriptions|length }}
+
+                            Prescription{{ prescriptions|length|pluralize }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <!-- =================================================
+                         PRESCRIPTION WORKFLOW STATUS
+                         ================================================= -->
+
+                    {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+                        {% if lab_results_reviewed %}
+
+                            <div class="alert alert-success">
+
+                                <div class="d-flex gap-2">
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    <div>
+
+                                        <strong>
+                                            Laboratory review completed
+                                        </strong>
+
+                                        <div class="small mt-1">
+
+                                            The doctor may now prescribe
+                                            medication based on the clinical
+                                            assessment and reviewed laboratory
+                                            findings.
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% elif lab_results_pending_review %}
+
+                            <div class="alert alert-warning">
+
+                                <div class="d-flex gap-2">
+
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                                    <div>
+
+                                        <strong>
+                                            Prescription is awaiting laboratory
+                                            review
+                                        </strong>
+
+                                        <div class="small mt-1">
+
+                                            The doctor must review the completed
+                                            laboratory result before prescribing
+                                            medication.
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="alert alert-light border">
+
+                                <div class="d-flex gap-2">
+
+                                    <i class="bi bi-info-circle"></i>
+
+                                    <div>
+
+                                        <strong>
+                                            No reviewed laboratory result
+                                        </strong>
+
+                                        <div class="small mt-1">
+
+                                            Request and complete the necessary
+                                            laboratory investigation before
+                                            prescribing when laboratory
+                                            investigation is clinically required.
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    {% endif %}
+
+
+                    <!-- =================================================
+                         PRESCRIPTIONS
+                         ================================================= -->
+
+                    <h6 class="mb-3">
+
+                        <i class="bi bi-prescription2"></i>
+
+                        Prescriptions
+
+                    </h6>
+
+
+                    {% for prescription in prescriptions %}
+
+                        <div class="border rounded p-3 mb-3">
+
+
+                            <!-- PRESCRIPTION HEADER -->
+
+                            <div class="d-flex justify-content-between
+                                        align-items-start mb-3">
+
+                                <div>
+
+                                    <strong>
+
+                                        Prescription #{{ prescription.id }}
+
+                                    </strong>
+
+
+                                    <div class="small text-muted">
+
+                                        {{ prescription.prescribed_at|date:"d M Y H:i" }}
+
+                                    </div>
+
+
+                                    {% if prescription.prescribed_by %}
+
+                                        <div class="small text-muted">
+
+                                            Prescribed by:
+
+                                            {{ prescription.prescribed_by.get_full_name|default:prescription.prescribed_by.username }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div>
+
+                                    {% if prescription.status == "PENDING" %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+
+                                    {% elif prescription.status == "PARTIALLY_DISPENSED" %}
+
+                                        <span class="badge bg-info text-dark">
+                                            Partially Dispensed
+                                        </span>
+
+                                    {% elif prescription.status == "DISPENSED" %}
+
+                                        <span class="badge bg-success">
+                                            Dispensed
+                                        </span>
+
+                                    {% elif prescription.status == "CANCELLED" %}
+
+                                        <span class="badge bg-danger">
+                                            Cancelled
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DIAGNOSIS -->
+
+                            {% if prescription.diagnosis %}
+
+                                <div class="mb-3">
+
+                                    <small class="text-muted d-block">
+                                        Diagnosis
+                                    </small>
+
+                                    <span>
+                                        {{ prescription.diagnosis }}
+                                    </span>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- PRESCRIPTION ITEMS -->
+
+                            <div class="table-responsive">
+
+                                <table class="table table-sm align-middle mb-0">
+
+                                    <thead class="table-light">
+
+                                        <tr>
+
+                                            <th>Medicine</th>
+
+                                            <th>Dosage</th>
+
+                                            <th>Frequency</th>
+
+                                            <th>Duration</th>
+
+                                            <th class="text-center">
+                                                Prescribed
+                                            </th>
+
+                                            <th class="text-center">
+                                                Dispensed
+                                            </th>
+
+                                            <th class="text-center">
+                                                Remaining
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {% for item in prescription.items.all %}
+
+                                            <tr>
+
+                                                <td>
+
+                                                    <strong>
+                                                        {{ item.medicine.name }}
+                                                    </strong>
+
+
+                                                    {% if item.medicine.strength %}
+
+                                                        <div class="small text-muted">
+
+                                                            {{ item.medicine.strength }}
+
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                </td>
+
+
+                                                <td>
+                                                    {{ item.dosage }}
+                                                </td>
+
+
+                                                <td>
+                                                    {{ item.frequency }}
+                                                </td>
+
+
+                                                <td>
+                                                    {{ item.duration }}
+                                                </td>
+
+
+                                                <td class="text-center">
+                                                    {{ item.quantity }}
+                                                </td>
+
+
+                                                <td class="text-center">
+                                                    {{ item.dispensed_quantity }}
+                                                </td>
+
+
+                                                <td class="text-center">
+
+                                                    {% if item.remaining_quantity > 0 %}
+
+                                                        <span class="badge bg-warning text-dark">
+
+                                                            {{ item.remaining_quantity }}
+
+                                                        </span>
+
+                                                    {% else %}
+
+                                                        <span class="badge bg-success">
+                                                            0
+                                                        </span>
+
+                                                    {% endif %}
+
+                                                </td>
+
+                                            </tr>
+
+
+                                        {% empty %}
+
+                                            <tr>
+
+                                                <td
+                                                    colspan="7"
+                                                    class="text-center text-muted py-3"
+                                                >
+
+                                                    No medicines have been
+                                                    added to this prescription.
+
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+
+                            {% if prescription.notes %}
+
+                                <div class="alert alert-light border mt-3 mb-0">
+
+                                    <strong>
+                                        Instructions:
+                                    </strong>
+
+                                    {{ prescription.notes }}
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- DISPENSING -->
+
+                            {% if prescription.status == "PENDING" or prescription.status == "PARTIALLY_DISPENSED" %}
+
+                                <div class="mt-3 pt-3 border-top">
+
+                                    <div class="alert alert-info mb-3">
+
+                                        <i class="bi bi-info-circle"></i>
+
+                                        This prescription has medicine
+                                        remaining to be dispensed.
+
+                                    </div>
+
+
+                                    <a
+                                        href="{% url 'pharmacy:dispense_medicine' %}?prescription_id={{ prescription.id }}"
+                                        class="btn btn-primary"
+                                    >
+
+                                        <i class="bi bi-capsule"></i>
+
+                                        Dispense Prescription
+
+                                    </a>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                    {% empty %}
+
+                        <div class="text-center py-4">
+
+                            <i class="bi bi-capsule-pill fs-2 text-muted"></i>
+
+                            <p class="text-muted mt-2 mb-3">
+
+                                No prescription has been created for this
+                                encounter.
+
+                            </p>
+
+
+                            {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
+
+                                {% if lab_results_reviewed %}
+
+                                    <a
+                                        href="{% url 'pharmacy:create_prescription' %}?patient={{ patient.id }}&encounter={{ encounter.id }}"
+                                        class="btn btn-primary"
+                                    >
+
+                                        <i class="bi bi-prescription2"></i>
+
+                                        Prescribe Medicine
+
+                                    </a>
+
+                                {% else %}
+
+                                    <div class="alert alert-warning mb-0">
+
+                                        <i class="bi bi-lock"></i>
+
+                                        Prescription is not yet available.
+                                        The doctor must review the completed
+                                        laboratory result first.
+
+                                    </div>
+
+                                {% endif %}
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+
+                    <!-- =================================================
+                         PHARMACY DISPENSING HISTORY
+                         ================================================= -->
+
+                    <hr class="my-4">
+
+
+                    <h6 class="mb-3">
+
+                        <i class="bi bi-bag-check"></i>
+
+                        Pharmacy Dispensing History
+
+                    </h6>
+
+
+                    {% for sale in pharmacy_sales %}
+
+                        <div class="border rounded p-3 mb-3">
+
+                            <div class="d-flex justify-content-between
+                                        align-items-start">
+
+                                <div>
+
+                                    <strong>
+                                        {{ sale.sale_number }}
+                                    </strong>
+
+
+                                    <div class="small text-muted">
+
+                                        {{ sale.sale_date|date:"d M Y H:i" }}
+
+                                    </div>
+
+
+                                    {% if sale.prescription %}
+
+                                        <div class="small text-muted">
+
+                                            Prescription #{{ sale.prescription.id }}
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    {% if sale.issued_by %}
+
+                                        <div class="small text-muted">
+
+                                            Dispensed by:
+
+                                            {{ sale.issued_by.get_full_name|default:sale.issued_by.username }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="text-end">
+
+                                    <strong class="d-block">
+
+                                        UGX
+                                        {{ sale.total_amount|floatformat:2 }}
+
+                                    </strong>
+
+
+                                    {% if sale.payment_status == "PAID" %}
+
+                                        <span class="badge bg-success">
+                                            Paid
+                                        </span>
+
+                                    {% elif sale.payment_status == "PARTIAL" %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            Partial
+                                        </span>
+
+                                    {% elif sale.payment_status == "CANCELLED" %}
+
+                                        <span class="badge bg-danger">
+                                            Cancelled
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+                                            Added to Bill
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="table-responsive mt-3">
+
+                                <table class="table table-sm mb-0">
+
+                                    <thead class="table-light">
+
+                                        <tr>
+
+                                            <th>
+                                                Medicine
+                                            </th>
+
+                                            <th class="text-center">
+                                                Quantity
+                                            </th>
+
+                                            <th class="text-end">
+                                                Unit Price
+                                            </th>
+
+                                            <th class="text-end">
+                                                Total
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {% for item in sale.items.all %}
+
+                                            <tr>
+
+                                                <td>
+
+                                                    {{ item.medicine.name }}
+
+                                                    {% if item.medicine.strength %}
+
+                                                        <span class="text-muted">
+
+                                                            {{ item.medicine.strength }}
+
+                                                        </span>
+
+                                                    {% endif %}
+
+                                                </td>
+
+
+                                                <td class="text-center">
+
+                                                    {{ item.quantity }}
+
+                                                </td>
+
+
+                                                <td class="text-end">
+
+                                                    UGX
+                                                    {{ item.selling_price|floatformat:2 }}
+
+                                                </td>
+
+
+                                                <td class="text-end">
+
+                                                    UGX
+                                                    {{ item.total_price|floatformat:2 }}
+
+                                                </td>
+
+                                            </tr>
+
+
+                                        {% empty %}
+
+                                            <tr>
+
+                                                <td
+                                                    colspan="4"
+                                                    class="text-center text-muted py-3"
+                                                >
+
+                                                    No dispensing items found.
+
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+
+                            <!-- BILLING NOTICE -->
+
+                            <div class="alert alert-light border mt-3 mb-0">
+
+                                <i class="bi bi-receipt"></i>
+
+                                Pharmacy charges are included in the
+                                patient's central encounter invoice.
+
+                                {% if invoice %}
+
+                                    <a
+                                        href="{% url 'invoice_detail' invoice.id %}"
+                                        class="ms-1"
+                                    >
+
+                                        View invoice
+
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                    {% empty %}
+
+                        <div class="alert alert-light border mb-0">
+
+                            <i class="bi bi-info-circle"></i>
+
+                            No medicines have been dispensed for this
+                            encounter yet.
+
+                        </div>
+
+                    {% endfor %}
 
                 </div>
 
@@ -784,7 +1973,7 @@ Clinical Encounter
 
                     <h5 class="mb-0">
 
-                        <i class="bi bi-receipt"></i>
+                        <i class="bi bi-receipt text-primary"></i>
 
                         Encounter Billing
 
@@ -795,11 +1984,9 @@ Clinical Encounter
 
                 <div class="card-body">
 
-
                     {% if invoice %}
 
                         <div class="row g-3">
-
 
                             <div class="col-md-4">
 
@@ -821,10 +2008,7 @@ Clinical Encounter
                                 </small>
 
                                 <strong>
-
-                                    UGX
-                                    {{ invoice.total_amount|floatformat:2 }}
-
+                                    UGX {{ invoice.total_amount|floatformat:2 }}
                                 </strong>
 
                             </div>
@@ -837,14 +2021,119 @@ Clinical Encounter
                                 </small>
 
                                 <strong>
-
-                                    UGX
-                                    {{ invoice.balance|floatformat:2 }}
-
+                                    UGX {{ invoice.balance|floatformat:2 }}
                                 </strong>
 
                             </div>
 
+                        </div>
+
+
+                        <hr>
+
+
+                        <h6 class="mb-3">
+                            Invoice Items
+                        </h6>
+
+
+                        <div class="table-responsive">
+
+                            <table class="table table-sm align-middle">
+
+                                <thead class="table-light">
+
+                                    <tr>
+
+                                        <th>Description</th>
+
+                                        <th>Type</th>
+
+                                        <th class="text-center">
+                                            Qty
+                                        </th>
+
+                                        <th class="text-end">
+                                            Unit Price
+                                        </th>
+
+                                        <th class="text-end">
+                                            Total
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+                                    {% for item in invoice.items.all %}
+
+                                        <tr>
+
+                                            <td>
+                                                {{ item.description }}
+                                            </td>
+
+
+                                            <td>
+
+                                                <span
+                                                    class="badge bg-light text-dark border"
+                                                >
+
+                                                    {{ item.get_service_type_display }}
+
+                                                </span>
+
+                                            </td>
+
+
+                                            <td class="text-center">
+                                                {{ item.quantity }}
+                                            </td>
+
+
+                                            <td class="text-end">
+
+                                                UGX
+                                                {{ item.unit_price|floatformat:2 }}
+
+                                            </td>
+
+
+                                            <td class="text-end">
+
+                                                UGX
+                                                {{ item.total|floatformat:2 }}
+
+                                            </td>
+
+                                        </tr>
+
+
+                                    {% empty %}
+
+                                        <tr>
+
+                                            <td
+                                                colspan="5"
+                                                class="text-center text-muted py-3"
+                                            >
+
+                                                No invoice items have been
+                                                added yet.
+
+                                            </td>
+
+                                        </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
 
                         </div>
 
@@ -853,7 +2142,6 @@ Clinical Encounter
 
 
                         <div class="d-flex gap-2 flex-wrap">
-
 
                             <a
                                 href="{% url 'invoice_detail' invoice.id %}"
@@ -882,7 +2170,6 @@ Clinical Encounter
 
                             {% endif %}
 
-
                         </div>
 
 
@@ -903,18 +2190,16 @@ Clinical Encounter
 
                     {% endif %}
 
-
                 </div>
 
             </section>
 
-
         </div>
 
 
-        <!-- =================================================
+        <!-- =====================================================
              RIGHT SIDEBAR
-             ================================================= -->
+             ===================================================== -->
 
         <div class="col-lg-4">
 
@@ -932,7 +2217,7 @@ Clinical Encounter
 
                     <h5 class="mb-0">
 
-                        <i class="bi bi-heart-pulse"></i>
+                        <i class="bi bi-heart-pulse text-primary"></i>
 
                         Vital Signs
 
@@ -942,7 +2227,6 @@ Clinical Encounter
 
 
                 <div class="card-body">
-
 
                     <form
                         method="post"
@@ -954,11 +2238,9 @@ Clinical Encounter
 
                         <div class="row g-3">
 
-
                             {% for field in vital_form %}
 
                                 <div class="col-md-6">
-
 
                                     <label class="form-label">
 
@@ -980,11 +2262,9 @@ Clinical Encounter
 
                                     {% endfor %}
 
-
                                 </div>
 
                             {% endfor %}
-
 
                         </div>
 
@@ -1003,7 +2283,6 @@ Clinical Encounter
                             </button>
 
                         {% endif %}
-
 
                     </form>
 
@@ -1029,7 +2308,6 @@ Clinical Encounter
 
                 <div class="card-body">
 
-
                     <div class="mb-3">
 
                         <small class="text-muted d-block">
@@ -1051,15 +2329,7 @@ Clinical Encounter
 
                         <strong>
 
-                            {% if encounter.doctor.get_full_name %}
-
-                                {{ encounter.doctor.get_full_name }}
-
-                            {% else %}
-
-                                {{ encounter.doctor.username }}
-
-                            {% endif %}
+                            {{ encounter.doctor.get_full_name|default:encounter.doctor.username }}
 
                         </strong>
 
@@ -1116,6 +2386,116 @@ Clinical Encounter
 
                     </div>
 
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 CLINICAL WORKFLOW RULE
+                 ================================================= -->
+
+            <section class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        <i class="bi bi-shield-check text-primary"></i>
+
+                        Prescription Safety
+
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    {% if lab_results_reviewed %}
+
+                        <div class="alert alert-success mb-0">
+
+                            <div class="d-flex gap-2">
+
+                                <i class="bi bi-check-circle-fill"></i>
+
+                                <div>
+
+                                    <strong>
+                                        Laboratory review completed
+                                    </strong>
+
+                                    <div class="small mt-1">
+
+                                        Reviewed laboratory findings are
+                                        available to the doctor for treatment
+                                        decision-making.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% elif lab_results_pending_review %}
+
+                        <div class="alert alert-warning mb-0">
+
+                            <div class="d-flex gap-2">
+
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+
+                                <div>
+
+                                    <strong>
+                                        Laboratory review required
+                                    </strong>
+
+                                    <div class="small mt-1">
+
+                                        Medication prescribing is waiting for
+                                        the doctor to review the completed
+                                        laboratory result.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="alert alert-light border mb-0">
+
+                            <div class="d-flex gap-2">
+
+                                <i class="bi bi-info-circle"></i>
+
+                                <div>
+
+                                    <strong>
+                                        No laboratory review recorded
+                                    </strong>
+
+                                    <div class="small mt-1">
+
+                                        No laboratory result has been reviewed
+                                        for this encounter.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
 
                 </div>
 
@@ -1130,14 +2510,14 @@ Clinical Encounter
 
                 <div class="card-body">
 
-
                     <h5 class="mb-3">
+
                         Encounter Actions
+
                     </h5>
 
 
                     {% if encounter.status != "COMPLETED" and encounter.status != "CANCELLED" %}
-
 
                         <form
                             method="post"
@@ -1163,7 +2543,6 @@ Clinical Encounter
 
                     {% elif encounter.status == "COMPLETED" %}
 
-
                         <div class="alert alert-success mb-0">
 
                             <i class="bi bi-check-circle"></i>
@@ -1175,27 +2554,25 @@ Clinical Encounter
 
                     {% else %}
 
-
                         <div class="alert alert-danger mb-0">
+
+                            <i class="bi bi-x-circle"></i>
 
                             This encounter has been cancelled.
 
                         </div>
 
-
                     {% endif %}
-
 
                 </div>
 
             </section>
 
-
         </div>
 
     </div>
 
-
 </div>
 
 {% endblock %}
+

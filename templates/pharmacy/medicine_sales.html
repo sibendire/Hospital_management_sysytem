@@ -237,7 +237,7 @@
 
 
             <a
-                href="{% url 'dispense_medicine' %}"
+                href="{% url 'pharmacy:dispense_medicine' %}"
                 class="btn btn-light"
             >
 
@@ -600,7 +600,7 @@
                                 <td>
 
                                     <a
-                                        href="{% url 'pharmacy_receipt' sale_id=sale.id %}"
+                                        href="{% url 'pharmacy:pharmacy_receipt' sale_id=sale.id %}"
                                         class="btn btn-sm btn-outline-primary"
                                     >
 
@@ -648,7 +648,7 @@
 
 
                     <a
-                        href="{% url 'dispense_medicine' %}"
+                        href="{% url 'pharmacy:dispense_medicine' %}"
                         class="btn btn-primary"
                     >
 

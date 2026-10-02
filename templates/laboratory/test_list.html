@@ -414,7 +414,7 @@
                     <div>
 
                         <a
-                            href="{% url 'add_test' %}"
+                            href="{% url 'laboratory:add_test' %}"
                             class="btn-add"
                         >
 
@@ -571,7 +571,7 @@
                                             <!-- EDIT -->
 
                                             <a
-                                                href="{% url 'edit_test' test.id %}"
+                                                href="{% url 'laboratory:edit_test' test.id %}"
                                                 class="btn-edit"
                                             >
 
@@ -584,7 +584,7 @@
 
                                             <form
                                                 method="POST"
-                                                action="{% url 'delete_test' test.id %}"
+                                                action="{% url 'laboratory:delete_test' test.id %}"
                                                 style="display: inline;"
                                                 onsubmit="return confirmDelete('{{ test.name|escapejs }}');"
                                             >

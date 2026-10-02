@@ -89,4 +89,9 @@ urlpatterns = [
         views.complete_encounter,
         name="complete_encounter",
     ),
+    path(
+    "encounter/<int:encounter_id>/lab-result/<int:result_id>/review/",
+    views.review_lab_result,
+    name="review_lab_result",
+),
 ]

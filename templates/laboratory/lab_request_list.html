@@ -519,17 +519,17 @@
         Departments
     </div>
 
-    <a href="{% url 'laboratory_dashboard' %}">
+    <a href="{% url 'laboratory:laboratory_dashboard' %}">
         <span class="icon">🧪</span>
         <span>Laboratory Dashboard</span>
     </a>
 
-    <a href="{% url 'lab_requests' %}" class="active">
+    <a href="{% url 'laboratory:lab_requests' %}" class="active">
         <span class="icon">📋</span>
         <span>Lab Requests</span>
     </a>
 
-    <a href="{% url 'test_list' %}">
+    <a href="{% url 'laboratory:test_list' %}">
         <span class="icon">🧬</span>
         <span>Test Catalog</span>
     </a>
@@ -743,7 +743,7 @@
 
 
                 <a
-                    href="{% url 'lab_requests' %}"
+                    href="{% url 'laboratory:lab_requests' %}"
                     class="btn btn-light"
                 >
                     ↻ Reset
@@ -777,7 +777,7 @@
             </div>
 
             <a
-                href="{% url 'create_lab_request' %}"
+                href="{% url 'laboratory:create_lab_request' %}"
                 class="btn btn-primary"
             >
                 + New Lab Request
@@ -962,27 +962,61 @@
 
                             <div class="actions">
 
-                                {% if request_item.status == "Completed" %}
+                               {% if request_item.status == "Pending" %}
 
-                                    <a
-                                        href="#"
-                                        class="action-btn result"
-                                        title="Result available"
-                                    >
-                                        📄
-                                    </a>
+    <form
+        method="post"
+        action="{% url 'laboratory:update_lab_status' request_item.id 'Sample Collected' %}"
+        style="display:inline;"
+    >
+        {% csrf_token %}
+        <button
+            type="submit"
+            class="action-btn"
+            title="Mark Sample Collected"
+        >
+            🧴
+        </button>
+    </form>
 
-                                {% else %}
+{% elif request_item.status == "Sample Collected" %}
 
-                                    <a
-                                        href="{% url 'enter_result' request_item.id %}"
-                                        class="action-btn"
-                                        title="Enter Result"
-                                    >
-                                        🧪
-                                    </a>
+    <form
+        method="post"
+        action="{% url 'laboratory:update_lab_status' request_item.id 'Processing' %}"
+        style="display:inline;"
+    >
+        {% csrf_token %}
+        <button
+            type="submit"
+            class="action-btn"
+            title="Start Processing"
+        >
+            ⚙️
+        </button>
+    </form>
 
-                                {% endif %}
+{% elif request_item.status == "Processing" %}
+
+    <a
+        href="{% url 'laboratory:enter_result' request_item.id %}"
+        class="action-btn result"
+        title="Enter Laboratory Result"
+    >
+        🧪
+    </a>
+
+{% elif request_item.status == "Completed" %}
+
+    <a
+        href="{% url 'laboratory:enter_result' request_item.id %}"
+        class="action-btn result"
+        title="View Laboratory Result"
+    >
+        📄
+    </a>
+
+{% endif %}
 
                             </div>
 

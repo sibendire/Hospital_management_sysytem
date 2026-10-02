@@ -86,5 +86,11 @@ urlpatterns = [
         views.patient_lab_results,
         name="patient_lab_results"
     ),
+    
+    path(
+    "requests/<int:request_id>/status/<str:status>/",
+    views.update_lab_status,
+    name="update_lab_status",
+),
 
 ]

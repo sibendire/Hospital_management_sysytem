@@ -2,6 +2,9 @@ from django.urls import path
 from . import views
 
 
+app_name = "pharmacy"
+
+
 urlpatterns = [
 
     # =====================================================
@@ -52,7 +55,7 @@ urlpatterns = [
         name="dispense_medicine"
     ),
 
-    # Keep this alias if your existing dashboard/templates
+    # Keep this alias if existing dashboard/templates
     # already use {% url 'sell_medicine' %}
 
     path(
@@ -80,33 +83,43 @@ urlpatterns = [
         views.pharmacy_receipt,
         name="pharmacy_receipt"
     ),
-      path(
+
+    path(
         "medicine/payment/<int:sale_id>/",
         views.confirm_pharmacy_payment,
         name="confirm_pharmacy_payment"
     ),
 
- path(
-    "prescriptions/",
-    views.prescription_list,
-    name="prescription_list"
-),
+    # =====================================================
+    # PRESCRIPTIONS
+    # =====================================================
 
-path(
-    "prescriptions/create/",
-    views.create_prescription,
-    name="create_prescription"
-),
+    path(
+        "prescriptions/",
+        views.prescription_list,
+        name="prescription_list"
+    ),
 
-path(
-    "prescriptions/<int:pk>/",
-    views.prescription_details,
-    name="prescription_details"
-),
+    path(
+        "prescriptions/create/",
+        views.create_prescription,
+        name="create_prescription"
+    ),
 
-path(
-    "reports/",
-    views.pharmacy_reports,
-    name="pharmacy_reports"
-),
+    path(
+        "prescriptions/<int:pk>/",
+        views.prescription_details,
+        name="prescription_details"
+    ),
+
+    # =====================================================
+    # REPORTS
+    # =====================================================
+
+    path(
+        "reports/",
+        views.pharmacy_reports,
+        name="pharmacy_reports"
+    ),
+    
 ]

@@ -142,6 +142,9 @@ class LabRequest(models.Model):
 # =========================================================
 # LABORATORY RESULT
 # =========================================================
+# =========================================================
+# LABORATORY RESULT
+# =========================================================
 
 class LabResult(models.Model):
 
@@ -168,6 +171,27 @@ class LabResult(models.Model):
     result_date = models.DateTimeField(
         auto_now_add=True
     )
+
+    # =====================================================
+    # DOCTOR REVIEW
+    # =====================================================
+
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reviewed_lab_results"
+    )
+
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    @property
+    def is_reviewed(self):
+        return self.reviewed_at is not None
 
     def __str__(self):
         return self.lab_request.sample_number
