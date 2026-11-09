@@ -9,14 +9,13 @@ from .models import (
 )
 
 
+
 # =========================================================
 # GET OR CREATE OPEN INVOICE
 # =========================================================
+
 @transaction.atomic
-def get_or_create_invoice(
-    patient,
-    encounter=None,
-):
+def get_or_create_invoice(patient, encounter=None):
 
     if not patient:
         raise ValidationError(
@@ -26,9 +25,7 @@ def get_or_create_invoice(
     # -----------------------------------------------------
     # ENCOUNTER BILLING
     # -----------------------------------------------------
-    #
-    # One clinical encounter should have one central invoice.
-    #
+
     if encounter:
 
         invoice = (
@@ -37,16 +34,30 @@ def get_or_create_invoice(
             .filter(
                 patient=patient,
                 encounter=encounter,
+                payment_status__in=[
+                    "UNPAID",
+                    "PARTIAL",
+                ],
             )
             .exclude(
-                status="CANCELLED"
+                status__in=[
+                    "PAID",
+                    "CANCELLED",
+                ]
             )
-            .order_by("-invoice_date")
+            .exclude(
+                payment_status="CANCELLED"
+            )
+            .order_by("-invoice_date", "-id")
             .first()
         )
 
         if invoice:
             return invoice
+
+        # No open invoice exists.
+        # Create a new invoice instead of reopening
+        # a paid or cancelled invoice.
 
         return Invoice.objects.create(
             patient=patient,
@@ -71,9 +82,15 @@ def get_or_create_invoice(
             ],
         )
         .exclude(
-            status="CANCELLED"
+            status__in=[
+                "PAID",
+                "CANCELLED",
+            ]
         )
-        .order_by("-invoice_date")
+        .exclude(
+            payment_status="CANCELLED"
+        )
+        .order_by("-invoice_date", "-id")
         .first()
     )
 
@@ -229,6 +246,7 @@ def add_lab_charge(
     return invoice, item
 
 
+
 # =========================================================
 # PHARMACY CHARGE
 # =========================================================
@@ -246,19 +264,6 @@ def add_pharmacy_charge(pharmacy_sale):
             "A clinical encounter is required for pharmacy billing."
         )
 
-    # =====================================================
-    # GET CENTRAL ENCOUNTER INVOICE
-    # =====================================================
-
-    invoice = get_or_create_invoice(
-        patient=pharmacy_sale.patient,
-        encounter=pharmacy_sale.encounter,
-    )
-
-    # =====================================================
-    # GET DISPENSED MEDICINES
-    # =====================================================
-
     sale_items = list(
         pharmacy_sale.items
         .select_related("medicine")
@@ -266,18 +271,67 @@ def add_pharmacy_charge(pharmacy_sale):
     )
 
     if not sale_items:
-
         raise ValidationError(
             "The pharmacy sale has no items to bill."
         )
 
+    # -----------------------------------------------------
+    # CHECK WHETHER ALL SALE ITEMS WERE ALREADY BILLED
+    # -----------------------------------------------------
+
+    existing_items = {
+        item.source_id: item
+        for item in InvoiceItem.objects
+        .select_related("invoice")
+        .filter(
+            source_type="PHARMACY_SALE_ITEM",
+            source_id__in=[
+                sale_item.id for sale_item in sale_items
+            ],
+        )
+    }
+
+    # If every item is already billed, return its
+    # original invoice without creating another invoice.
+
+    if len(existing_items) == len(sale_items):
+
+        existing_invoices = {
+            item.invoice_id: item.invoice
+            for item in existing_items.values()
+        }
+
+        if len(existing_invoices) != 1:
+            raise ValidationError(
+                "The pharmacy sale items are linked to "
+                "multiple invoices. Please review the billing records."
+            )
+
+        invoice = next(
+            iter(existing_invoices.values())
+        )
+
+        return invoice, list(existing_items.values())
+
+    # -----------------------------------------------------
+    # GET AN OPEN INVOICE
+    # -----------------------------------------------------
+
+    invoice = get_or_create_invoice(
+        patient=pharmacy_sale.patient,
+        encounter=pharmacy_sale.encounter,
+    )
+
     created_items = []
 
-    # =====================================================
-    # ADD EACH MEDICINE TO CENTRAL INVOICE
-    # =====================================================
+    # -----------------------------------------------------
+    # BILL ONLY ITEMS NOT PREVIOUSLY BILLED
+    # -----------------------------------------------------
 
     for sale_item in sale_items:
+
+        if sale_item.id in existing_items:
+            continue
 
         medicine_name = sale_item.medicine.name
 
@@ -286,45 +340,47 @@ def add_pharmacy_charge(pharmacy_sale):
             "strength",
             None
         ):
-
             medicine_name = (
                 f"{medicine_name} "
                 f"{sale_item.medicine.strength}"
             )
 
         item = add_invoice_item(
-
             invoice=invoice,
-
             service_type="PHARMACY",
-
             description=(
-                f"Pharmacy: "
-                f"{medicine_name} "
+                f"Pharmacy: {medicine_name} "
                 f"x {sale_item.quantity}"
             ),
-
             quantity=sale_item.quantity,
-
             unit_price=sale_item.selling_price,
-
             source_type="PHARMACY_SALE_ITEM",
-
             source_id=sale_item.id,
         )
 
         created_items.append(item)
 
-    # =====================================================
+    # -----------------------------------------------------
     # REFRESH INVOICE
-    # =====================================================
+    # -----------------------------------------------------
+
+    invoice.refresh_from_db()
 
     invoice.update_payment_status()
 
     invoice.refresh_from_db()
 
-    return invoice, created_items
+    all_billed_items = [
+        existing_items[sale_item.id]
+        if sale_item.id in existing_items
+        else next(
+            item for item in created_items
+            if item.source_id == sale_item.id
+        )
+        for sale_item in sale_items
+    ]
 
+    return invoice, all_billed_items
 
 # =========================================================
 # CONSULTATION CHARGE

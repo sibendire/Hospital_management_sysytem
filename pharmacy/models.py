@@ -1,3 +1,5 @@
+
+
 from decimal import Decimal
 
 from django.conf import settings
@@ -44,25 +46,10 @@ class Medicine(models.Model):
         ("INACTIVE", "Inactive"),
     )
 
-    # =====================================================
-    # BASIC INFORMATION
-    # =====================================================
-
-    name = models.CharField(
-        max_length=200
-    )
-
-    generic_name = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True
-    )
-
-    brand_name = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True
-    )
+    # Basic information
+    name = models.CharField(max_length=200)
+    generic_name = models.CharField(max_length=200, blank=True, null=True)
+    brand_name = models.CharField(max_length=200, blank=True, null=True)
 
     category = models.CharField(
         max_length=50,
@@ -74,174 +61,104 @@ class Medicine(models.Model):
         choices=DOSAGE_FORM_CHOICES
     )
 
-    strength = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True
+    strength = models.CharField(max_length=100, blank=True, null=True)
+
+    UNIT_CHOICES = (
+        ("TABLET", "Tablet"),
+        ("CAPSULE", "Capsule"),
+        ("BOTTLE", "Bottle"),
+        ("VIAL", "Vial"),
+        ("AMPOULE", "Ampoule"),
+        ("TUBE", "Tube"),
+        ("SACHET", "Sachet"),
+        ("PACK", "Pack"),
+        ("PIECE", "Piece"),
+        ("ML", "Millilitre (mL)"),
+        ("DROP", "Drop"),
+        ("PUFF", "Puff"),
+        ("SUPPOSITORY", "Suppository"),
+        ("OTHER", "Other"),
     )
 
     unit = models.CharField(
         max_length=50,
-        default="unit"
+        choices=UNIT_CHOICES,
+        default="OTHER",
+        help_text="Select the unit used when dispensing this medicine."
     )
 
-    # =====================================================
-    # SUPPLIER
-    # =====================================================
+    # Supplier
+    manufacturer = models.CharField(max_length=200, blank=True, null=True)
+    supplier = models.CharField(max_length=200, blank=True, null=True)
 
-    manufacturer = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True
-    )
+    # Stock
+    batch_number = models.CharField(max_length=100, blank=True, null=True)
+    expiry_date = models.DateField(null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=0)
+    reorder_level = models.PositiveIntegerField(default=10)
 
-    supplier = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True
-    )
-
-    # =====================================================
-    # STOCK
-    # =====================================================
-
-    batch_number = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True
-    )
-
-    expiry_date = models.DateField(
-        null=True,
-        blank=True
-    )
-
-    quantity = models.PositiveIntegerField(
-        default=0
-    )
-
-    reorder_level = models.PositiveIntegerField(
-        default=10
-    )
-
-    # =====================================================
-    # PRICING
-    # =====================================================
-
+    # Pricing
     buying_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=[
-            MinValueValidator(
-                Decimal("0.00")
-            )
-        ]
+        validators=[MinValueValidator(Decimal("0.00"))]
     )
 
     selling_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=[
-            MinValueValidator(
-                Decimal("0.00")
-            )
-        ]
+        validators=[MinValueValidator(Decimal("0.00"))]
     )
 
-    # =====================================================
-    # PRESCRIPTION / CONTROL
-    # =====================================================
+    # Prescription / control
+    prescription_required = models.BooleanField(default=False)
+    controlled_substance = models.BooleanField(default=False)
 
-    prescription_required = models.BooleanField(
-        default=False
-    )
-
-    controlled_substance = models.BooleanField(
-        default=False
-    )
-
-    # =====================================================
-    # STATUS
-    # =====================================================
-
+    # Status
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default="ACTIVE"
     )
 
-    description = models.TextField(
-        blank=True,
-        null=True
-    )
+    description = models.TextField(blank=True, null=True)
 
-    # =====================================================
-    # TIMESTAMPS
-    # =====================================================
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    updated_at = models.DateTimeField(
-        auto_now=True
-    )
-
-    # =====================================================
-    # HELPERS
-    # =====================================================
-
+    # Helpers
     def is_expired(self):
         if not self.expiry_date:
             return False
-
         return self.expiry_date < timezone.now().date()
 
     def is_low_stock(self):
-        return (
-            self.quantity > 0
-            and self.quantity <= self.reorder_level
-        )
+        return 0 < self.quantity <= self.reorder_level
 
     def is_out_of_stock(self):
         return self.quantity <= 0
 
     def stock_value(self):
-        return (
-            self.quantity
-            * self.buying_price
-        )
+        return self.quantity * self.buying_price
 
     def selling_value(self):
-        return (
-            self.quantity
-            * self.selling_price
-        )
+        return self.quantity * self.selling_price
 
     def __str__(self):
         if self.strength:
             return f"{self.name} {self.strength}"
-
         return self.name
 
     class Meta:
         ordering = ["name"]
-
         indexes = [
-            models.Index(
-                fields=["name"]
-            ),
-            models.Index(
-                fields=["category"]
-            ),
-            models.Index(
-                fields=["status"]
-            ),
-            models.Index(
-                fields=["expiry_date"]
-            ),
+            models.Index(fields=["name"]),
+            models.Index(fields=["category"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["expiry_date"]),
         ]
 
 
@@ -253,27 +170,16 @@ class Prescription(models.Model):
 
     STATUS_CHOICES = (
         ("PENDING", "Pending"),
-        (
-            "PARTIALLY_DISPENSED",
-            "Partially Dispensed"
-        ),
+        ("PARTIALLY_DISPENSED", "Partially Dispensed"),
         ("DISPENSED", "Dispensed"),
         ("CANCELLED", "Cancelled"),
     )
-
-    # =====================================================
-    # PATIENT
-    # =====================================================
 
     patient = models.ForeignKey(
         Patient,
         on_delete=models.PROTECT,
         related_name="prescriptions"
     )
-
-    # =====================================================
-    # ENCOUNTER
-    # =====================================================
 
     encounter = models.ForeignKey(
         "consultations.ClinicalEncounter",
@@ -283,10 +189,6 @@ class Prescription(models.Model):
         blank=True
     )
 
-    # =====================================================
-    # DOCTOR
-    # =====================================================
-
     prescribed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -295,19 +197,10 @@ class Prescription(models.Model):
         related_name="prescriptions_created"
     )
 
-    # =====================================================
-    # PRESCRIPTION DETAILS
-    # =====================================================
+    diagnosis = models.TextField(blank=True)
 
-    diagnosis = models.TextField(
-        blank=True
-    )
-
-    # Must remain nullable to match migration 0006
-    notes = models.TextField(
-        blank=True,
-        null=True
-    )
+    # Nullable to preserve the existing migration definition.
+    notes = models.TextField(blank=True, null=True)
 
     status = models.CharField(
         max_length=30,
@@ -315,30 +208,17 @@ class Prescription(models.Model):
         default="PENDING"
     )
 
-    # Historical migration 0006 uses auto_now_add=True
-    prescribed_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    prescribed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return (
-            f"Prescription #{self.id} - "
-            f"{self.patient}"
-        )
+        return f"Prescription #{self.id} - {self.patient}"
 
     class Meta:
         ordering = ["-prescribed_at"]
-
         indexes = [
-            models.Index(
-                fields=["patient", "status"]
-            ),
-            models.Index(
-                fields=["encounter"]
-            ),
-            models.Index(
-                fields=["prescribed_at"]
-            ),
+            models.Index(fields=["patient", "status"]),
+            models.Index(fields=["encounter"]),
+            models.Index(fields=["prescribed_at"]),
         ]
 
 
@@ -348,19 +228,11 @@ class Prescription(models.Model):
 
 class PrescriptionItem(models.Model):
 
-    # =====================================================
-    # PRESCRIPTION
-    # =====================================================
-
     prescription = models.ForeignKey(
         Prescription,
         on_delete=models.CASCADE,
         related_name="items"
     )
-
-    # =====================================================
-    # MEDICINE
-    # =====================================================
 
     medicine = models.ForeignKey(
         Medicine,
@@ -368,69 +240,33 @@ class PrescriptionItem(models.Model):
         related_name="prescription_items"
     )
 
-    # =====================================================
-    # INSTRUCTIONS
-    # =====================================================
-
-    dosage = models.CharField(
-        max_length=100
-    )
-
-    frequency = models.CharField(
-        max_length=100
-    )
-
-    duration = models.CharField(
-        max_length=100
-    )
+    dosage = models.CharField(max_length=100)
+    frequency = models.CharField(max_length=100)
+    duration = models.CharField(max_length=100)
 
     quantity = models.PositiveIntegerField(
-        validators=[
-            MinValueValidator(1)
-        ]
+        validators=[MinValueValidator(1)]
     )
 
-    # =====================================================
-    # DISPENSING TRACKING
-    # =====================================================
+    dispensed_quantity = models.PositiveIntegerField(default=0)
 
-    dispensed_quantity = models.PositiveIntegerField(
-        default=0
-    )
-
-    instructions = models.TextField(
-        blank=True,
-        null=True
-    )
+    instructions = models.TextField(blank=True, null=True)
 
     @property
     def remaining_quantity(self):
-        return max(
-            self.quantity - self.dispensed_quantity,
-            0
-        )
+        return max(self.quantity - self.dispensed_quantity, 0)
 
     @property
     def fully_dispensed(self):
-        return (
-            self.dispensed_quantity
-            >= self.quantity
-        )
+        return self.dispensed_quantity >= self.quantity
 
     def __str__(self):
-        return (
-            f"{self.medicine} - "
-            f"{self.quantity}"
-        )
+        return f"{self.medicine} - {self.quantity}"
 
     class Meta:
         indexes = [
-            models.Index(
-                fields=["prescription"]
-            ),
-            models.Index(
-                fields=["medicine"]
-            ),
+            models.Index(fields=["prescription"]),
+            models.Index(fields=["medicine"]),
         ]
 
 
@@ -456,19 +292,11 @@ class PharmacySale(models.Model):
         ("OTHER", "Other"),
     )
 
-    # =====================================================
-    # SALE NUMBER
-    # =====================================================
-
     sale_number = models.CharField(
         max_length=30,
         unique=True,
         editable=False
     )
-
-    # =====================================================
-    # PATIENT
-    # =====================================================
 
     patient = models.ForeignKey(
         Patient,
@@ -479,21 +307,13 @@ class PharmacySale(models.Model):
     )
 
     # Legacy field retained for compatibility.
-    # Migration 0004 defines this as non-nullable.
-    patient_name = models.CharField(
-        max_length=200
-    )
+    patient_name = models.CharField(max_length=200)
 
-    # Migration 0004 defines this as nullable.
     patient_number = models.CharField(
         max_length=100,
         blank=True,
         null=True
     )
-
-    # =====================================================
-    # ENCOUNTER
-    # =====================================================
 
     encounter = models.ForeignKey(
         "consultations.ClinicalEncounter",
@@ -503,10 +323,6 @@ class PharmacySale(models.Model):
         blank=True
     )
 
-    # =====================================================
-    # PRESCRIPTION
-    # =====================================================
-
     prescription = models.ForeignKey(
         Prescription,
         on_delete=models.PROTECT,
@@ -514,10 +330,6 @@ class PharmacySale(models.Model):
         null=True,
         blank=True
     )
-
-    # =====================================================
-    # STAFF
-    # =====================================================
 
     issued_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -527,13 +339,7 @@ class PharmacySale(models.Model):
         related_name="pharmacy_sales"
     )
 
-    # =====================================================
-    # SALE INFORMATION
-    # =====================================================
-
-    sale_date = models.DateTimeField(
-        default=timezone.now
-    )
+    sale_date = models.DateTimeField(default=timezone.now)
 
     total_amount = models.DecimalField(
         max_digits=12,
@@ -568,112 +374,54 @@ class PharmacySale(models.Model):
         related_name="pharmacy_payments"
     )
 
-    paid_at = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    paid_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True, null=True)
 
-    # Migration 0004 defines this as nullable.
-    notes = models.TextField(
-        blank=True,
-        null=True
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    updated_at = models.DateTimeField(
-        auto_now=True
-    )
-
-    # =====================================================
-    # SALE NUMBER GENERATION
-    # =====================================================
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-
         if not self.sale_number:
-
             year = timezone.now().year
 
             last_sale = (
                 PharmacySale.objects
-                .filter(
-                    sale_number__startswith=(
-                        f"PS-{year}-"
-                    )
-                )
+                .filter(sale_number__startswith=f"PS-{year}-")
                 .order_by("-id")
                 .first()
             )
 
+            next_number = 1
+
             if last_sale:
-
                 try:
-                    last_number = int(
-                        last_sale.sale_number
-                        .split("-")[-1]
-                    )
-
-                    next_number = (
-                        last_number + 1
-                    )
-
-                except (
-                    ValueError,
-                    AttributeError
-                ):
-
+                    last_number = int(last_sale.sale_number.split("-")[-1])
+                    next_number = last_number + 1
+                except (ValueError, AttributeError):
                     next_number = 1
 
-            else:
+            self.sale_number = f"PS-{year}-{next_number:05d}"
 
-                next_number = 1
-
-            self.sale_number = (
-                f"PS-{year}-{next_number:05d}"
-            )
-
-        super().save(
-            *args,
-            **kwargs
-        )
+        super().save(*args, **kwargs)
 
     @property
     def balance(self):
-
         return max(
             self.total_amount - self.amount_paid,
             Decimal("0.00")
         )
 
     def __str__(self):
-
         return self.sale_number
 
     class Meta:
-
-        ordering = [
-            "-sale_date"
-        ]
-
+        ordering = ["-sale_date"]
         indexes = [
-            models.Index(
-                fields=["sale_date"]
-            ),
-            models.Index(
-                fields=["patient"]
-            ),
-            models.Index(
-                fields=["encounter"]
-            ),
-            models.Index(
-                fields=["prescription"]
-            ),
-            models.Index(
-                fields=["payment_status"]
-            ),
+            models.Index(fields=["sale_date"]),
+            models.Index(fields=["patient"]),
+            models.Index(fields=["encounter"]),
+            models.Index(fields=["prescription"]),
+            models.Index(fields=["payment_status"]),
         ]
 
 
@@ -683,19 +431,11 @@ class PharmacySale(models.Model):
 
 class PharmacySaleItem(models.Model):
 
-    # =====================================================
-    # SALE
-    # =====================================================
-
     sale = models.ForeignKey(
         PharmacySale,
         on_delete=models.PROTECT,
         related_name="items"
     )
-
-    # =====================================================
-    # PRESCRIPTION TRACEABILITY
-    # =====================================================
 
     prescription_item = models.ForeignKey(
         PrescriptionItem,
@@ -705,48 +445,26 @@ class PharmacySaleItem(models.Model):
         blank=True
     )
 
-    # =====================================================
-    # MEDICINE
-    # =====================================================
-
     medicine = models.ForeignKey(
         Medicine,
         on_delete=models.PROTECT,
         related_name="sale_items"
     )
 
-    # =====================================================
-    # QUANTITY
-    # =====================================================
-
     quantity = models.PositiveIntegerField(
-        validators=[
-            MinValueValidator(1)
-        ]
+        validators=[MinValueValidator(1)]
     )
-
-    # =====================================================
-    # PRICES
-    # =====================================================
 
     buying_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        validators=[
-            MinValueValidator(
-                Decimal("0.00")
-            )
-        ]
+        validators=[MinValueValidator(Decimal("0.00"))]
     )
 
     selling_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        validators=[
-            MinValueValidator(
-                Decimal("0.00")
-            )
-        ]
+        validators=[MinValueValidator(Decimal("0.00"))]
     )
 
     total_price = models.DecimalField(
@@ -755,53 +473,30 @@ class PharmacySaleItem(models.Model):
         default=Decimal("0.00")
     )
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def save(self, *args, **kwargs):
-
-        self.total_price = (
-            self.selling_price * self.quantity
-        )
-
-        super().save(
-            *args,
-            **kwargs
-        )
+        self.total_price = self.selling_price * self.quantity
+        super().save(*args, **kwargs)
 
     @property
     def total_cost(self):
-
-        return (
-            self.buying_price * self.quantity
-        )
+        return self.buying_price * self.quantity
 
     @property
     def profit(self):
-
-        return (
-            self.total_price
-            - self.total_cost
-        )
+        return self.total_price - self.total_cost
 
     def __str__(self):
-
-        return (
-            f"{self.medicine} x "
-            f"{self.quantity}"
-        )
+        return f"{self.medicine} x {self.quantity}"
 
     class Meta:
-
         ordering = ["id"]
-
         indexes = [
-            models.Index(
-                fields=["sale"]
-            ),
-            models.Index(
-                fields=["medicine"]
-            ),
-            models.Index(
-                fields=["prescription_item"]
-            ),
+            models.Index(fields=["sale"]),
+            models.Index(fields=["medicine"]),
+            models.Index(fields=["prescription_item"]),
         ]
 
 
@@ -812,38 +507,14 @@ class PharmacySaleItem(models.Model):
 class PharmacyAuditLog(models.Model):
 
     ACTION_CHOICES = (
-        (
-            "MEDICINE_CREATED",
-            "Medicine Created"
-        ),
-        (
-            "MEDICINE_UPDATED",
-            "Medicine Updated"
-        ),
-        (
-            "MEDICINE_DELETED",
-            "Medicine Deleted"
-        ),
-        (
-            "MEDICINE_DISPENSED",
-            "Medicine Dispensed"
-        ),
-        (
-            "PAYMENT_RECEIVED",
-            "Payment Received"
-        ),
-        (
-            "PRESCRIPTION_CREATED",
-            "Prescription Created"
-        ),
-        (
-            "STOCK_ADJUSTED",
-            "Stock Adjusted"
-        ),
-        (
-            "SALE_CANCELLED",
-            "Sale Cancelled"
-        ),
+        ("MEDICINE_CREATED", "Medicine Created"),
+        ("MEDICINE_UPDATED", "Medicine Updated"),
+        ("MEDICINE_DELETED", "Medicine Deleted"),
+        ("MEDICINE_DISPENSED", "Medicine Dispensed"),
+        ("PAYMENT_RECEIVED", "Payment Received"),
+        ("PRESCRIPTION_CREATED", "Prescription Created"),
+        ("STOCK_ADJUSTED", "Stock Adjusted"),
+        ("SALE_CANCELLED", "Sale Cancelled"),
     )
 
     user = models.ForeignKey(
@@ -858,29 +529,21 @@ class PharmacyAuditLog(models.Model):
         choices=ACTION_CHOICES
     )
 
-    # Migration 0007 defines reference as nullable.
     reference = models.CharField(
         max_length=100,
         blank=True,
         null=True
     )
 
-    # Migration 0007 defines description as non-nullable.
-    description = models.TextField(
-        blank=True
-    )
+    description = models.TextField(blank=True)
 
     ip_address = models.GenericIPAddressField(
         null=True,
         blank=True
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        ordering = ["-created_at"]
 
-        ordering = [
-            "-created_at"
-        ]

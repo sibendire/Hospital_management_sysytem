@@ -148,7 +148,7 @@ def add_medicine(request):
                 "Medicine added successfully."
             )
 
-            return redirect("medicine_list")
+            return redirect("pharmacy:medicine_list")
 
         print("FORM ERRORS:")
         print(form.errors)
@@ -716,71 +716,34 @@ def dispense_medicine(request):
                 "PENDING"
             )
 
-        prescription.save(
-            update_fields=[
-                "status"
-            ]
+            prescription.save(
+            update_fields=["status"]
         )
 
         # =====================================================
         # ADD PHARMACY CHARGES TO CENTRAL BILL
         # =====================================================
 
-        from billing.services import (
-            add_pharmacy_charge
-        )
+        from billing.services import add_pharmacy_charge
 
-        invoice, invoice_items = (
-            add_pharmacy_charge(
-                sale
-            )
-        )
+        invoice, invoice_items = add_pharmacy_charge(sale)
 
         # =====================================================
-        # AUDIT
-        # =====================================================
-
-        # =====================================================
-        # ADD PHARMACY CHARGES TO CENTRAL BILL
-        # =====================================================
-
-        from billing.services import (
-            add_pharmacy_charge
-        )
-
-        invoice, invoice_items = (
-            add_pharmacy_charge(
-                sale
-            )
-        )
-
-        # =====================================================
-        # AUDIT
+        # AUDIT LOG
         # =====================================================
 
         PharmacyAuditLog.objects.create(
-
             user=request.user,
-
             action="MEDICINE_DISPENSED",
-
             reference=sale.sale_number,
-
             description=(
-                f"Pharmacy sale "
-                f"{sale.sale_number} "
-                f"created from prescription "
-                f"#{prescription.id}. "
+                f"Pharmacy sale {sale.sale_number} "
+                f"created from prescription #{prescription.id}. "
                 f"Patient: {patient}. "
-                f"Invoice: "
-                f"{invoice.invoice_number}. "
-                f"Total: "
-                f"UGX {grand_total:,.2f}"
+                f"Invoice: {invoice.invoice_number}. "
+                f"Total: UGX {grand_total:,.2f}"
             ),
-
-            ip_address=request.META.get(
-                "REMOTE_ADDR"
-            )
+            ip_address=request.META.get("REMOTE_ADDR")
         )
 
         # =====================================================
@@ -793,14 +756,13 @@ def dispense_medicine(request):
                 f"Prescription #{prescription.id} "
                 f"dispensed successfully. "
                 f"UGX {grand_total:,.2f} "
-                f"has been added to "
-                f"invoice "
+                f"has been billed to invoice "
                 f"{invoice.invoice_number}."
             )
         )
 
         return redirect(
-            "pharmacy_receipt",
+            "pharmacy:pharmacy_receipt",
             sale_id=sale.id
         )
 
@@ -824,16 +786,33 @@ def dispense_medicine(request):
                 "PARTIALLY_DISPENSED"
             ]
         )
-        .order_by(
-            "-prescribed_at"
-        )
+        .order_by("-prescribed_at")
     )
+
+    selected_prescription_id = request.GET.get(
+        "prescription_id"
+    )
+
+    selected_prescription = None
+
+    if selected_prescription_id:
+        selected_prescription = prescriptions.filter(
+            id=selected_prescription_id
+        ).first()
+
+        if selected_prescription is None:
+            messages.warning(
+                request,
+                "The selected prescription is unavailable "
+                "or has already been fully dispensed."
+            )
 
     return render(
         request,
         "pharmacy/dispense_medicine.html",
         {
-            "prescriptions": prescriptions
+            "prescriptions": prescriptions,
+            "selected_prescription": selected_prescription,
         }
     )
 

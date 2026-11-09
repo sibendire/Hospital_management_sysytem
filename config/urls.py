@@ -64,6 +64,11 @@ path(
             "consultations.urls"
         )
     ),
+
+      path(
+        "notifications/",
+        include("notifications.urls")
+    ),
 ]
 
 

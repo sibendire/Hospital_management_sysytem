@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'billing',
     'wards',
     'consultations',
+    'channels',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hospital_management',
         'USER': 'root',
-        'PASSWORD': 'Admin123?',
+        'PASSWORD': 'Admin123',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -114,6 +116,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 ]
 
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

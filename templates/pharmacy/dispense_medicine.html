@@ -1,813 +1,467 @@
+
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>Dispense Prescription | MediCare HMS</title>
 
-    <title>Dispense Medicine | MediCare HMS</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
 
     <style>
-
         body {
             background: #f4f7fb;
-            font-family: "Segoe UI", Arial, sans-serif;
-            color: #1f2937;
+            color: #243247;
+            font-family: Arial, sans-serif;
         }
 
-        .container-page {
-            max-width: 1250px;
+        .page-container {
+            max-width: 1200px;
             margin: 35px auto;
+            padding: 0 15px;
         }
 
-        .card-box {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(0,0,0,.07);
-            overflow: hidden;
+        .page-header, .content-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 5px 22px rgba(20, 40, 70, .07);
         }
 
         .page-header {
-            background: #123c69;
+            padding: 25px;
             color: white;
-            padding: 25px 30px;
+            background: linear-gradient(120deg, #0f62fe, #0043ce);
+            margin-bottom: 22px;
         }
 
-        .page-header h2 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .page-header p {
-            margin-top: 5px;
-            margin-bottom: 0;
-            opacity: .85;
-        }
-
-        .form-section {
-            padding: 25px 30px;
+        .content-card {
+            padding: 25px;
+            margin-bottom: 22px;
         }
 
         .section-title {
-            color: #123c69;
-            font-size: 18px;
+            font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 18px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e5e7eb;
         }
 
-        .medicine-row {
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-
-        .medicine-row select,
-        .medicine-row input {
-            height: 45px;
-        }
-
-        .btn-remove {
-            height: 45px;
-        }
-
-        .total-box {
-            background: #e7f6ee;
-            border: 1px solid #b7e4ca;
+        .patient-panel {
+            background: #eef5ff;
+            border: 1px solid #d4e4ff;
             border-radius: 12px;
             padding: 20px;
-            margin-top: 20px;
         }
 
-        .total-label {
-            color: #146c43;
-            font-size: 14px;
+        .info-label {
+            color: #65758b;
+            font-size: .82rem;
+            margin-bottom: 5px;
         }
 
-        .grand-total {
-            color: #123c69;
-            font-size: 28px;
-            font-weight: 700;
+        .info-value {
+            font-weight: 600;
+            overflow-wrap: anywhere;
         }
 
-        .empty-message {
+        .table thead th {
+            background: #f0f4fa;
+            white-space: nowrap;
+        }
+
+        .quantity-input {
+            max-width: 125px;
+        }
+
+        .total-panel {
+            background: #edf8f1;
+            border: 1px solid #ccebd7;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 45px 20px;
             text-align: center;
-            padding: 30px;
-            color: #6b7280;
+            border-radius: 14px;
+            color: #65758b;
         }
 
-        .back-link {
-            text-decoration: none;
-            color: white;
-        }
-
-        .stock-info {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 4px;
-        }
-
-        @media(max-width: 768px) {
-
-            .container-page {
-                margin: 15px;
+        @media (max-width: 767px) {
+            .page-container {
+                margin-top: 15px;
             }
 
-            .form-section {
-                padding: 20px 15px;
+            .content-card {
+                padding: 17px;
             }
 
             .page-header {
                 padding: 20px;
             }
-
         }
-
     </style>
-
 </head>
 
 <body>
+<div class="page-container">
 
-
-<div class="container container-page">
-
-    <div class="card-box">
-
-
-        <!-- =================================================
-             HEADER
-        ================================================== -->
-
-        <div class="page-header">
-
-            <div class="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                    <h2>
-                        💉 Dispense Medicine
-                    </h2>
-
-                    <p>
-                        Issue one or more medicines to a patient.
-                    </p>
-
-                </div>
-
-                <a
-                    href="{% url 'pharmacy:pharmacy_dashboard' %}"
-                    class="btn btn-light"
-                >
-                    ← Dashboard
-                </a>
-
+    <header class="page-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h2 class="mb-2">
+                    <i class="bi bi-capsule"></i> Dispense Prescription
+                </h2>
+                <p class="mb-0">
+                    Select a doctor's prescription and dispense its prescribed medicines.
+                </p>
             </div>
 
+            <a href="{% url 'pharmacy:pharmacy_dashboard' %}"
+               class="btn btn-light">
+                <i class="bi bi-arrow-left"></i> Dashboard
+            </a>
         </div>
+    </header>
 
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert
+                {% if message.tags == 'error' %}alert-danger
+                {% elif message.tags == 'success' %}alert-success
+                {% elif message.tags == 'warning' %}alert-warning
+                {% else %}alert-info{% endif %}
+                alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-        <!-- =================================================
-             MESSAGES
-        ================================================== -->
+    <section class="content-card">
+        <h5 class="section-title">
+            <i class="bi bi-clipboard2-pulse text-primary"></i>
+            Select Prescription
+        </h5>
 
-        {% if messages %}
+        {% if prescriptions %}
+            <form method="get" id="prescriptionSelectForm">
+                <label for="prescription_id" class="form-label fw-semibold">
+                    Available prescriptions
+                </label>
 
-            <div class="px-4 pt-4">
+                <select name="prescription_id"
+                        id="prescription_id"
+                        class="form-select form-select-lg"
+                        onchange="this.form.submit()">
+                    <option value="">-- Select a prescription --</option>
 
-                {% for message in messages %}
+                    {% for prescription in prescriptions %}
+                        <option value="{{ prescription.id }}"
+                            {% if selected_prescription and selected_prescription.id == prescription.id %}
+                                selected
+                            {% endif %}>
+                            Prescription #{{ prescription.id }}
+                            — {{ prescription.patient }}
+                            — {{ prescription.get_status_display|default:prescription.status }}
+                            — {{ prescription.prescribed_at|date:"d M Y, H:i" }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-                    <div
-                        class="alert
-                        {% if message.tags == 'error' %}
-                            alert-danger
-                        {% elif message.tags == 'success' %}
-                            alert-success
-                        {% else %}
-                            alert-info
-                        {% endif %}
-                        alert-dismissible fade show"
-                        role="alert"
-                    >
+                <div class="form-text">
+                    Choose the prescription created by the attending doctor.
+                    Patient information will be loaded automatically.
+                </div>
+            </form>
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-clipboard-check fs-1 text-secondary"></i>
+                <h5 class="mt-3">No pending prescriptions</h5>
+                <p class="mb-0">
+                    There are currently no pending or partially dispensed
+                    prescriptions available.
+                </p>
+            </div>
+        {% endif %}
+    </section>
 
-                        {{ message }}
+    {% if selected_prescription %}
+        <section class="content-card">
+            <h5 class="section-title">
+                <i class="bi bi-person-vcard text-primary"></i>
+                Registered Patient
+            </h5>
 
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="alert"
-                        ></button>
-
+            <div class="patient-panel">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="info-label">Patient name</div>
+                        <div class="info-value">
+                            {{ selected_prescription.patient }}
+                        </div>
                     </div>
 
-                {% endfor %}
+                    <div class="col-md-6">
+                        <div class="info-label">Patient number</div>
+                        <div class="info-value">
+                            {{ selected_prescription.patient.patient_number|default:"Not recorded" }}
+                        </div>
+                    </div>
 
+                    <div class="col-md-6">
+                        <div class="info-label">Prescription number</div>
+                        <div class="info-value">
+                            #{{ selected_prescription.id }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-label">Prescribed by</div>
+                        <div class="info-value">
+                            {% if selected_prescription.prescribed_by %}
+                                {{ selected_prescription.prescribed_by.get_full_name|default:selected_prescription.prescribed_by.username }}
+                            {% else %}
+                                Not recorded
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-label">Prescription date</div>
+                        <div class="info-value">
+                            {{ selected_prescription.prescribed_at|date:"d M Y, H:i" }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-label">Prescription status</div>
+                        <div>
+                            {% if selected_prescription.status == "PARTIALLY_DISPENSED" %}
+                                <span class="badge text-bg-warning">Partially dispensed</span>
+                            {% else %}
+                                <span class="badge text-bg-primary">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
+        </section>
 
-        {% endif %}
-
-
-        <!-- =================================================
-             FORM
-        ================================================== -->
-
-        <form
-            method="POST"
-            id="dispenseForm"
-        >
-
+        <form method="post" id="dispenseForm">
             {% csrf_token %}
 
+            <input type="hidden"
+                   name="prescription_id"
+                   value="{{ selected_prescription.id }}">
 
-            <div class="form-section">
+            <section class="content-card">
+                <h5 class="section-title">
+                    <i class="bi bi-capsule-pill text-primary"></i>
+                    Prescribed Medicines
+                </h5>
 
+                <p class="text-muted">
+                    Enter the quantity to dispense for each prescribed medicine.
+                    Leave a quantity blank to skip that medicine for now.
+                </p>
 
-                <!-- =================================================
-                     PATIENT INFORMATION
-                ================================================== -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Dosage</th>
+                            <th>Frequency</th>
+                            <th>Duration</th>
+                            <th>Prescribed</th>
+                            <th>Already dispensed</th>
+                            <th>Remaining</th>
+                            <th>Stock</th>
+                            <th>Unit price (UGX)</th>
+                            <th>Dispense now</th>
+                        </tr>
+                        </thead>
 
-                <div class="section-title">
+                        <tbody>
+                        {% for item in selected_prescription.items.all %}
+                            {% with remaining=item.quantity|add:"-"|add:item.dispensed_quantity %}
+                            <tr class="medicine-row"
+                                data-price="{{ item.medicine.selling_price }}"
+                                data-remaining="{{ item.quantity|add:"0" }}"
+                                data-dispensed="{{ item.dispensed_quantity }}">
+                                <td>
+                                    <div class="fw-semibold">
+                                        {{ item.medicine.name }}
+                                    </div>
+                                    {% if item.medicine.generic_name %}
+                                        <small class="text-muted">
+                                            {{ item.medicine.generic_name }}
+                                        </small>
+                                    {% endif %}
+                                </td>
 
-                    👤 Patient Information
-
+                                <td>{{ item.dosage|default:"—" }}</td>
+                                <td>{{ item.frequency|default:"—" }}</td>
+                                <td>{{ item.duration|default:"—" }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.dispensed_quantity }}</td>
+                                <td>
+                                    {{ item.quantity|add:"-"|add:item.dispensed_quantity }}
+                                </td>
+                                <td>{{ item.medicine.quantity }}</td>
+                                <td class="text-nowrap">
+                                    {{ item.medicine.selling_price|floatformat:2 }}
+                                </td>
+                                <td>
+                                    {% with remaining_qty=item.quantity|add:"0" %}
+                                        <input type="number"
+                                               name="quantity_{{ item.id }}"
+                                               class="form-control quantity-input"
+                                               min="1"
+                                               max="{{ item.quantity }}"
+                                               placeholder="Skip"
+                                               inputmode="numeric"
+                                               aria-label="Quantity to dispense for {{ item.medicine.name }}">
+                                    {% endwith %}
+                                </td>
+                            </tr>
+                            {% endwith %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center text-muted py-4">
+                                    This prescription has no medicine items.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
 
-
-                <div class="row g-3 mb-4">
-
-                    <div class="col-md-6">
-
-                        <label
-                            class="form-label fw-semibold"
-                        >
-                            Patient Name
-                            <span class="text-danger">*</span>
-                        </label>
-
-                        <input
-                            type="text"
-                            name="patient_name"
-                            class="form-control"
-                            placeholder="Enter patient name"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="col-md-6">
-
-                        <label
-                            class="form-label fw-semibold"
-                        >
-                            Patient Number
-                        </label>
-
-                        <input
-                            type="text"
-                            name="patient_number"
-                            class="form-control"
-                            placeholder="Enter patient number"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
-                     MEDICINES
-                ================================================== -->
-
-                <div class="section-title">
-
-                    💊 Medicines
-
-                </div>
-
-
-                <div id="medicineContainer">
-
-
-                    <div class="medicine-row">
-
-                        <div class="row g-3 align-items-end">
-
-
-                            <!-- MEDICINE -->
-
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
-                                    Medicine
-                                </label>
-
-                                <select
-                                    name="medicine_id[]"
-                                    class="form-select medicine-select"
-                                    required
-                                >
-
-                                    <option value="">
-                                        -- Select Medicine --
-                                    </option>
-
-                                    {% for medicine in medicines %}
-
-                                        <option
-                                            value="{{ medicine.id }}"
-                                            data-price="{{ medicine.selling_price }}"
-                                            data-stock="{{ medicine.quantity }}"
-                                        >
-
-                                            {{ medicine.name }}
-
-                                            {% if medicine.strength %}
-                                                - {{ medicine.strength }}
-                                            {% endif %}
-
-                                            | Stock:
-                                            {{ medicine.quantity }}
-
-                                            | UGX
-                                            {{ medicine.selling_price|floatformat:2 }}
-
-                                        </option>
-
-                                    {% empty %}
-
-                                        <option value="">
-                                            No medicines available
-                                        </option>
-
-                                    {% endfor %}
-
-                                </select>
-
-                                <div class="stock-info medicine-stock">
-                                    Select a medicine to view stock.
-                                </div>
-
-                            </div>
-
-
-                            <!-- QUANTITY -->
-
-                            <div class="col-md-3">
-
-                                <label class="form-label fw-semibold">
-                                    Quantity
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="quantity[]"
-                                    class="form-control quantity-input"
-                                    min="1"
-                                    value="1"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <!-- REMOVE -->
-
-                            <div class="col-md-3">
-
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-danger w-100 btn-remove"
-                                    onclick="removeMedicine(this)"
-                                >
-                                    🗑 Remove
-                                </button>
-
-                            </div>
-
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
-                     ADD MEDICINE
-                ================================================== -->
-
-                <button
-                    type="button"
-                    class="btn btn-outline-primary mt-2"
-                    onclick="addMedicine()"
-                >
-                    + Add Another Medicine
-                </button>
-
-
-                <!-- =================================================
-                     TOTAL
-                ================================================== -->
-
-                <div class="total-box">
-
-                    <div class="d-flex justify-content-between align-items-center">
-
+                <div class="total-panel mt-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div>
-
-                            <div class="total-label">
-                                Grand Total
-                            </div>
-
-                            <div class="grand-total">
+                            <div class="text-muted">Estimated total for this dispensing</div>
+                            <div class="fs-3 fw-bold text-success">
                                 UGX <span id="grandTotal">0.00</span>
                             </div>
-
                         </div>
-
-                        <div>
-                            💰
-                        </div>
-
+                        <small class="text-muted">
+                            Final amount is calculated and validated by the server.
+                        </small>
                     </div>
-
                 </div>
 
-
-                <!-- =================================================
-                     SUBMIT
-                ================================================== -->
-
-                <div class="d-flex justify-content-end gap-2 mt-4">
-
-                    <a
-                        href="{% url 'pharmacy:medicine_sales' %}"
-                        class="btn btn-secondary"
-                    >
+                <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
+                    <a href="{% url 'pharmacy:medicine_sales' %}"
+                       class="btn btn-outline-secondary">
                         Cancel
                     </a>
 
-                    <button
-                        type="submit"
-                        class="btn btn-success px-4"
-                    >
-                        💉 Dispense Medicine
+                    <button type="submit"
+                            class="btn btn-success px-4"
+                            {% if not selected_prescription.items.all %}disabled{% endif %}>
+                        <i class="bi bi-check-circle"></i>
+                        Dispense Selected Quantities
                     </button>
-
                 </div>
-
-
-            </div>
-
+            </section>
         </form>
-
-    </div>
+    {% endif %}
 
 </div>
 
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
-
-/* =========================================================
-   ADD MEDICINE ROW
-========================================================= */
-
-function addMedicine() {
-
-    const container =
-        document.getElementById("medicineContainer");
-
-    const firstRow =
-        document.querySelector(".medicine-row");
-
-    const newRow =
-        firstRow.cloneNode(true);
-
-
-    /* Reset select */
-
-    const select =
-        newRow.querySelector(".medicine-select");
-
-    select.value = "";
-
-
-    /* Reset quantity */
-
-    const quantity =
-        newRow.querySelector(".quantity-input");
-
-    quantity.value = 1;
-
-
-    /* Reset stock text */
-
-    const stockInfo =
-        newRow.querySelector(".medicine-stock");
-
-    stockInfo.textContent =
-        "Select a medicine to view stock.";
-
-
-    container.appendChild(newRow);
-
-    updateTotal();
-
-}
-
-
-/* =========================================================
-   REMOVE MEDICINE
-========================================================= */
-
-function removeMedicine(button) {
-
-    const rows =
-        document.querySelectorAll(".medicine-row");
-
-
-    if (rows.length <= 1) {
-
-        alert(
-            "At least one medicine is required."
-        );
-
-        return;
-    }
-
-
-    button.closest(".medicine-row").remove();
-
-    updateTotal();
-
-}
-
-
-/* =========================================================
-   UPDATE MEDICINE INFORMATION
-========================================================= */
-
-function updateMedicineInfo(row) {
-
-    const select =
-        row.querySelector(".medicine-select");
-
-    const selectedOption =
-        select.options[select.selectedIndex];
-
-
-    const price =
-        selectedOption.dataset.price || 0;
-
-    const stock =
-        selectedOption.dataset.stock || 0;
-
-
-    const stockInfo =
-        row.querySelector(".medicine-stock");
-
-
-    if (select.value) {
-
-        stockInfo.textContent =
-            "Available stock: "
-            + stock
-            + " | Unit price: UGX "
-            + parseFloat(price).toLocaleString(
-                undefined,
-                {
-                    minimumFractionDigits: 2
-                }
-            );
-
-    } else {
-
-        stockInfo.textContent =
-            "Select a medicine to view stock.";
-
-    }
-
-
-    updateTotal();
-
-}
-
-
-/* =========================================================
-   CALCULATE TOTAL
-========================================================= */
-
-function updateTotal() {
-
-    let total = 0;
-
-
-    document
-        .querySelectorAll(".medicine-row")
-        .forEach(function(row) {
-
-
-            const select =
-                row.querySelector(".medicine-select");
-
-            const quantity =
-                row.querySelector(".quantity-input");
-
-
-            if (!select || !quantity) {
-                return;
+(function () {
+    const form = document.getElementById("dispenseForm");
+    if (!form) return;
+
+    const rows = Array.from(form.querySelectorAll(".medicine-row"));
+    const totalElement = document.getElementById("grandTotal");
+
+    function updateTotal() {
+        let total = 0;
+
+        rows.forEach(function (row) {
+            const input = row.querySelector(".quantity-input");
+            const quantity = Number.parseInt(input.value, 10) || 0;
+            const price = Number.parseFloat(row.dataset.price) || 0;
+
+            if (quantity > 0) {
+                total += quantity * price;
             }
-
-
-            const option =
-                select.options[select.selectedIndex];
-
-
-            const price =
-                parseFloat(
-                    option?.dataset.price || 0
-                );
-
-
-            const qty =
-                parseInt(
-                    quantity.value || 0
-                );
-
-
-            total += price * qty;
-
         });
 
-
-    document.getElementById(
-        "grandTotal"
-    ).textContent = total.toLocaleString(
-        undefined,
-        {
+        totalElement.textContent = total.toLocaleString("en-UG", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
-        }
-    );
-
-}
-
-
-/* =========================================================
-   EVENTS
-========================================================= */
-
-document.addEventListener(
-    "change",
-    function(event) {
-
-        if (
-            event.target.classList.contains(
-                "medicine-select"
-            )
-        ) {
-
-            const row =
-                event.target.closest(
-                    ".medicine-row"
-                );
-
-            updateMedicineInfo(row);
-
-        }
-
+        });
     }
-);
 
+    form.querySelectorAll(".quantity-input").forEach(function (input) {
+        input.addEventListener("input", updateTotal);
+    });
 
-document.addEventListener(
-    "input",
-    function(event) {
-
-        if (
-            event.target.classList.contains(
-                "quantity-input"
-            )
-        ) {
-
-            updateTotal();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   FORM VALIDATION
-========================================================= */
-
-document.getElementById(
-    "dispenseForm"
-).addEventListener(
-    "submit",
-    function(event) {
-
-
-        const rows =
-            document.querySelectorAll(
-                ".medicine-row"
-            );
-
-
-        let valid = true;
-
-
-        rows.forEach(function(row) {
-
-            const select =
-                row.querySelector(
-                    ".medicine-select"
-                );
-
-            const quantity =
-                row.querySelector(
-                    ".quantity-input"
-                );
-
-
-            if (!select.value) {
-
-                valid = false;
-
-                return;
-
-            }
-
-
-            const option =
-                select.options[
-                    select.selectedIndex
-                ];
-
-
-            const stock =
-                parseInt(
-                    option.dataset.stock || 0
-                );
-
-
-            const qty =
-                parseInt(
-                    quantity.value || 0
-                );
-
-
-            if (qty <= 0 || qty > stock) {
-
-                valid = false;
-
-                alert(
-                    "Requested quantity cannot exceed available stock."
-                );
-
-            }
-
+    form.addEventListener("submit", function (event) {
+        const entered = rows.filter(function (row) {
+            return row.querySelector(".quantity-input").value.trim() !== "";
         });
 
-
-        if (!valid) {
-
+        if (entered.length === 0) {
             event.preventDefault();
-
+            alert("Enter a quantity for at least one prescribed medicine.");
+            return;
         }
 
-    }
-);
+        for (const row of entered) {
+            const input = row.querySelector(".quantity-input");
+            const quantity = Number.parseInt(input.value, 10);
+            const remaining = Number.parseInt(row.dataset.remaining, 10)
+                - Number.parseInt(row.dataset.dispensed, 10);
+            const stock = Number.parseInt(row.cells[7].textContent.trim(), 10);
+            const medicineName = row.cells[0].innerText.trim();
 
+            if (!Number.isInteger(quantity) || quantity <= 0) {
+                event.preventDefault();
+                alert("Enter a valid positive quantity for " + medicineName + ".");
+                input.focus();
+                return;
+            }
 
-/* Initial calculation */
+            if (quantity > remaining) {
+                event.preventDefault();
+                alert("The quantity for " + medicineName +
+                    " exceeds the remaining prescribed quantity of " + remaining + ".");
+                input.focus();
+                return;
+            }
 
-updateTotal();
+            if (quantity > stock) {
+                event.preventDefault();
+                alert("Insufficient stock for " + medicineName +
+                    ". Available stock: " + stock + ".");
+                input.focus();
+                return;
+            }
+        }
 
+        if (!window.confirm(
+            "Confirm dispensing these quantities? The medicines will be deducted from stock and charged to the patient's invoice."
+        )) {
+            event.preventDefault();
+        }
+    });
 
+    updateTotal();
+})();
 </script>
-
 </body>
-
 </html>

@@ -542,7 +542,7 @@
     </div>
 
 
-    <a href="{% url 'pharmacy_dashboard' %}">
+    <a href="{% url 'pharmacy:pharmacy_dashboard' %}">
 
         <span class="icon">
             💊
@@ -554,7 +554,7 @@
 
 
     <a
-        href="{% url 'medicine_list' %}"
+        href="{% url 'pharmacy:medicine_list' %}"
         class="active"
     >
 
@@ -567,7 +567,7 @@
     </a>
 
 
-    <a href="{% url 'add_medicine' %}">
+    <a href="{% url 'pharmacy:add_medicine' %}">
 
         <span class="icon">
             ➕
@@ -578,7 +578,7 @@
     </a>
 
 
-    <a href="{% url 'dispense_medicine' %}">
+    <a href="{% url 'pharmacy:dispense_medicine' %}">
 
         <span class="icon">
             🧾
@@ -589,7 +589,7 @@
     </a>
 
 
-    <a href="{% url 'prescription_list' %}">
+    <a href="{% url 'pharmacy:prescription_list' %}">
 
         <span class="icon">
             📋
@@ -617,7 +617,7 @@
     </div>
 
 
-    <a href="{% url 'laboratory_dashboard' %}">
+    <a href="{% url 'laboratory:laboratory_dashboard' %}">
 
         <span class="icon">
             🧪
@@ -691,7 +691,7 @@
             <div>
 
                 <a
-                    href="{% url 'add_medicine' %}"
+                    href="{% url 'pharmacy:add_medicine' %}"
                     class="btn btn-primary"
                 >
 
@@ -1081,7 +1081,7 @@
 
 
                         <a
-                            href="{% url 'add_medicine' %}"
+                            href="{% url 'pharmacy:add_medicine' %}"
                             class="btn btn-primary"
                         >
 
