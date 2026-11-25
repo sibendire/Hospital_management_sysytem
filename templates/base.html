@@ -117,27 +117,70 @@
         </div>
 
 
-        <!-- HEADER RIGHT -->
+       <!-- HEADER RIGHT -->
+<div class="header-right">
 
-        <div class="header-right">
+    <!-- NOTIFICATION DROPDOWN -->
+    <div class="dropdown notification-container">
 
+        <button
+            id="notification-toggle"
+            class="header-icon position-relative"
+            type="button"
+            aria-expanded="false"
+            aria-label="Notifications">
 
-            <button
-                type="button"
-                class="header-button"
-                aria-label="Notifications"
-            >
-                <i class="bi bi-bell"></i>
-            </button>
+            <i class="bi bi-bell"></i>
 
+            <span
+                id="notification-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                aria-live="polite"
+                aria-label="0 unread notifications">
+                0
+            </span>
 
-            <button
-                type="button"
-                class="header-button"
-                aria-label="Help"
-            >
-                <i class="bi bi-question-circle"></i>
-            </button>
+        </button>
+
+        <!-- NOTIFICATION MENU -->
+        <div
+            id="notification-dropdown"
+            class="dropdown-menu dropdown-menu-end p-3 shadow notification-dropdown"
+            style="width: 350px; max-height: 450px; overflow-y: auto;">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <h6 class="mb-0">Notifications</h6>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link"
+                    id="mark-all-read">
+                    Mark all as read
+                </button>
+
+            </div>
+
+            <!-- NOTIFICATION LIST -->
+            <div id="notification-list">
+                <p class="text-muted text-center mb-0">
+                    Loading notifications...
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- HELP BUTTON -->
+    <button
+        class="header-icon"
+        type="button"
+        aria-label="Help">
+        <i class="bi bi-question-circle"></i>
+    </button>
+
+<!-- </div> -->
 
 
             <div class="user-menu">
@@ -413,7 +456,14 @@
 
 </div>
 
+<!-- =====================================================
+     LIVE NOTIFICATIONS
+===================================================== -->
 
+<script
+    src="{% static 'js/notifications.js' %}"
+    defer>
+</script>
 
 <!-- =========================================================
      SIDEBAR JAVASCRIPT

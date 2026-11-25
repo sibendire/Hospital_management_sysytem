@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -39,6 +42,7 @@ from datetime import timedelta
 
 from django.urls import reverse
 from notifications.services import send_notification
+
 
 
 # =========================================================
@@ -1282,12 +1286,16 @@ def prescription_list(request):
 # CREATE PRESCRIPTION
 # =========================================================
 
+# =========================================================
+# CREATE PRESCRIPTION
+# =========================================================
+
 @login_required
 @transaction.atomic
 def create_prescription(request):
 
     # =====================================================
-    # GET ENCOUNTER
+    # GET ENCOUNTER ID
     # =====================================================
 
     encounter_id = (
@@ -1296,22 +1304,11 @@ def create_prescription(request):
     )
 
     if not encounter_id:
-
         messages.error(
             request,
-            (
-                "A clinical encounter is required before "
-                "creating a prescription."
-            )
+            "A clinical encounter is required before creating a prescription."
         )
-
-        return redirect(
-            "consultations:consultation_dashboard"
-        )
-
-    # =====================================================
-    # GET ENCOUNTER
-    # =====================================================
+        return redirect("consultations:consultation_dashboard")
 
     from consultations.models import ClinicalEncounter
 
@@ -1333,49 +1330,31 @@ def create_prescription(request):
         not request.user.is_staff
         and encounter.doctor_id != request.user.id
     ):
-
         messages.error(
             request,
-            (
-                "You are not authorized to prescribe "
-                "medication for this encounter."
-            )
+            "You are not authorized to prescribe medication for this encounter."
         )
-
-        return redirect(
-            "consultations:consultation_dashboard"
-        )
+        return redirect("consultations:consultation_dashboard")
 
     # =====================================================
     # ENCOUNTER STATUS
     # =====================================================
 
     if encounter.status == "COMPLETED":
-
         messages.error(
             request,
-            (
-                "This clinical encounter has already been "
-                "completed. A new prescription cannot be "
-                "created from this encounter."
-            )
+            "This clinical encounter has already been completed."
         )
-
         return redirect(
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
 
     if encounter.status == "CANCELLED":
-
         messages.error(
             request,
-            (
-                "A prescription cannot be created from "
-                "a cancelled encounter."
-            )
+            "A prescription cannot be created from a cancelled encounter."
         )
-
         return redirect(
             "consultations:encounter_detail",
             encounter_id=encounter.id,
@@ -1384,412 +1363,327 @@ def create_prescription(request):
     # =====================================================
     # LABORATORY REVIEW REQUIREMENT
     # =====================================================
-    #
-    # Prescription is allowed only after laboratory
-    # results have been completed AND reviewed by the
-    # attending doctor.
-    #
-    # If there are multiple completed laboratory requests,
-    # ALL of them must have reviewed results.
-    #
-    # =====================================================
 
-    completed_lab_requests = (
-        LabRequest.objects
-        .filter(
-            encounter=encounter,
-            status="Completed",
-        )
+    completed_lab_requests = LabRequest.objects.filter(
+        encounter=encounter,
+        status="Completed",
     )
-
-    # -----------------------------------------------------
-    # NO COMPLETED LABORATORY RESULT
-    # -----------------------------------------------------
 
     if not completed_lab_requests.exists():
-
         messages.error(
             request,
             (
-                "Prescription is not yet available. "
-                "A completed laboratory result must be "
-                "reviewed by the doctor before medication "
-                "can be prescribed."
+                "Prescription is not yet available. A completed "
+                "laboratory result must be reviewed by the doctor "
+                "before medication can be prescribed."
             )
         )
-
         return redirect(
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
 
-    # -----------------------------------------------------
-    # CHECK FOR LAB RESULTS WITHOUT A RESULT RECORD
-    # -----------------------------------------------------
-
-    missing_results = (
-        completed_lab_requests
-        .filter(
-            result_record__isnull=True
-        )
-        .exists()
-    )
+    missing_results = completed_lab_requests.filter(
+        result_record__isnull=True
+    ).exists()
 
     if missing_results:
-
         messages.error(
             request,
             (
-                "One or more completed laboratory tests "
-                "do not yet have a laboratory result. "
-                "Prescription is blocked until the results "
-                "are available and reviewed."
+                "One or more completed laboratory tests do not yet "
+                "have a result. Prescription is blocked until all "
+                "results are available and reviewed."
             )
         )
-
         return redirect(
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
 
-    # -----------------------------------------------------
-    # CHECK FOR RESULTS NOT YET REVIEWED
-    # -----------------------------------------------------
-
-    pending_review = (
-        completed_lab_requests
-        .filter(
-            result_record__reviewed_at__isnull=True
-        )
-        .exists()
-    )
+    pending_review = completed_lab_requests.filter(
+        result_record__reviewed_at__isnull=True
+    ).exists()
 
     if pending_review:
-
         messages.error(
             request,
             (
-                "Prescription is not yet available. "
-                "All completed laboratory results must be "
-                "reviewed by the attending doctor before "
-                "medication can be prescribed."
+                "All completed laboratory results must be reviewed "
+                "by the attending doctor before medication can be prescribed."
             )
         )
-
         return redirect(
             "consultations:encounter_detail",
             encounter_id=encounter.id,
         )
 
     # =====================================================
-    # ALL LAB RESULTS HAVE BEEN REVIEWED
-    # =====================================================
-
-    # At this point:
-    #
-    # completed laboratory request exists
-    #        ↓
-    # result exists
-    #        ↓
-    # doctor reviewed result
-    #        ↓
-    # prescription can be created
-    #
-    # =====================================================
-
-    # =====================================================
-    # POST - CREATE PRESCRIPTION
+    # PRESCRIPTION FORM
     # =====================================================
 
     if request.method == "POST":
 
-        prescription_form = PrescriptionForm(
-            request.POST
-        )
+        prescription_form = PrescriptionForm(request.POST)
 
-        if prescription_form.is_valid():
-
-            prescription = prescription_form.save(
-                commit=False
-            )
-
-            # -------------------------------------------------
-            # NEVER TRUST PATIENT FROM FORM/URL
-            # -------------------------------------------------
-
-            prescription.patient = patient
-
-            # -------------------------------------------------
-            # LINK PRESCRIPTION TO CLINICAL ENCOUNTER
-            # -------------------------------------------------
-
-            prescription.encounter = encounter
-
-            # -------------------------------------------------
-            # DOCTOR WHO PRESCRIBED
-            # -------------------------------------------------
-
-            prescription.prescribed_by = request.user
-
-            prescription.save()
-
-            # =================================================
-            # PRESCRIPTION ITEMS
-            # =================================================
-
-            medicine_ids = request.POST.getlist(
-                "medicine[]"
-            )
-
-            dosages = request.POST.getlist(
-                "dosage[]"
-            )
-
-            frequencies = request.POST.getlist(
-                "frequency[]"
-            )
-
-            durations = request.POST.getlist(
-                "duration[]"
-            )
-
-            quantities = request.POST.getlist(
-                "quantity[]"
-            )
-
-            instructions = request.POST.getlist(
-                "instructions[]"
-            )
-
-            # -------------------------------------------------
-            # VALIDATE MEDICINE ITEMS
-            # -------------------------------------------------
-
-            if not medicine_ids:
-
-                messages.error(
-                    request,
-                    (
-                        "Please add at least one medicine "
-                        "to the prescription."
-                    )
-                )
-
-                # The transaction will roll back because
-                # we are inside @transaction.atomic.
-                return redirect(
-                    "pharmacy:create_prescription"
-                )
-
-            # -------------------------------------------------
-            # CREATE PRESCRIPTION ITEMS
-            # -------------------------------------------------
-
-            created_items = 0
-
-            for i in range(
-                len(medicine_ids)
-            ):
-
-                medicine_id = medicine_ids[i]
-
-                if not medicine_id:
-                    continue
-
-                # ---------------------------------------------
-                # MEDICINE
-                # ---------------------------------------------
-
-                medicine = get_object_or_404(
-                    Medicine,
-                    id=medicine_id,
-                    status="ACTIVE",
-                )
-
-                # ---------------------------------------------
-                # REQUIRED FIELDS
-                # ---------------------------------------------
-
-                dosage = (
-                    dosages[i]
-                    if i < len(dosages)
-                    else ""
-                )
-
-                frequency = (
-                    frequencies[i]
-                    if i < len(frequencies)
-                    else ""
-                )
-
-                duration = (
-                    durations[i]
-                    if i < len(durations)
-                    else ""
-                )
-
-                instructions_value = (
-                    instructions[i]
-                    if i < len(instructions)
-                    else ""
-                )
-
-                quantity_value = (
-                    quantities[i]
-                    if i < len(quantities)
-                    else ""
-                )
-
-                # ---------------------------------------------
-                # QUANTITY VALIDATION
-                # ---------------------------------------------
-
-                try:
-
-                    quantity = int(
-                        quantity_value
-                    )
-
-                except (
-                    TypeError,
-                    ValueError,
-                ):
-
-                    messages.error(
-                        request,
-                        (
-                            f"Invalid quantity for "
-                            f"{medicine.name}."
-                        )
-                    )
-
-                    return redirect(
-                        "pharmacy:create_prescription"
-                    )
-
-                if quantity <= 0:
-
-                    messages.error(
-                        request,
-                        (
-                            f"Quantity for "
-                            f"{medicine.name} "
-                            f"must be greater than zero."
-                        )
-                    )
-
-                    return redirect(
-                        "pharmacy:create_prescription"
-                    )
-
-                # ---------------------------------------------
-                # STOCK CHECK
-                # ---------------------------------------------
-
-                if medicine.quantity <= 0:
-
-                    messages.error(
-                        request,
-                        (
-                            f"{medicine.name} is currently "
-                            f"out of stock."
-                        )
-                    )
-
-                    return redirect(
-                        "pharmacy:create_prescription"
-                    )
-
-                if quantity > medicine.quantity:
-
-                    messages.error(
-                        request,
-                        (
-                            f"The requested quantity for "
-                            f"{medicine.name} exceeds the "
-                            f"available stock of "
-                            f"{medicine.quantity}."
-                        )
-                    )
-
-                    return redirect(
-                        "pharmacy:create_prescription"
-                    )
-
-                # ---------------------------------------------
-                # CREATE PRESCRIPTION ITEM
-                # ---------------------------------------------
-
-                PrescriptionItem.objects.create(
-
-                    prescription=prescription,
-
-                    medicine=medicine,
-
-                    dosage=dosage,
-
-                    frequency=frequency,
-
-                    duration=duration,
-
-                    quantity=quantity,
-
-                    instructions=(
-                        instructions_value
-                    ),
-                )
-
-                created_items += 1
-
-            # =================================================
-            # ENSURE AT LEAST ONE ITEM WAS CREATED
-            # =================================================
-
-            if created_items == 0:
-
-                messages.error(
-                    request,
-                    (
-                        "Please add at least one valid "
-                        "medicine to the prescription."
-                    )
-                )
-
-                return redirect(
-                    "pharmacy:create_prescription"
-                )
-
-            # =================================================
-            # SUCCESS
-            # =================================================
-
-            messages.success(
+        if not prescription_form.is_valid():
+            messages.error(
                 request,
-                (
-                    f"Prescription #{prescription.id} "
-                    f"created successfully for "
-                    f"{patient}."
-                )
+                "Please correct the prescription form errors."
             )
 
-            return redirect(
-                "pharmacy:prescription_details",
-                pk=prescription.id,
-            )
+        else:
+
+            # =================================================
+            # READ PRESCRIPTION ITEMS
+            # =================================================
+
+            medicine_ids = request.POST.getlist("medicine[]")
+            dosages = request.POST.getlist("dosage[]")
+            frequencies = request.POST.getlist("frequency[]")
+            durations = request.POST.getlist("duration[]")
+            quantities = request.POST.getlist("quantity[]")
+            instructions = request.POST.getlist("instructions[]")
+
+            valid_medicine_ids = [
+                medicine_id
+                for medicine_id in medicine_ids
+                if medicine_id
+            ]
+
+            if not valid_medicine_ids:
+                messages.error(
+                    request,
+                    "Please add at least one medicine to the prescription."
+                )
+
+            else:
+
+                # =============================================
+                # LOCK AND LOAD ACTIVE MEDICINES
+                # =============================================
+
+                medicines = {
+                    str(medicine.id): medicine
+                    for medicine in Medicine.objects.select_for_update().filter(
+                        id__in=valid_medicine_ids,
+                        status="ACTIVE",
+                    )
+                }
+
+                validated_items = []
+                requested_stock = {}
+
+                validation_error = None
+
+                # =============================================
+                # VALIDATE EVERY PRESCRIPTION ITEM
+                # =============================================
+
+                for index, medicine_id in enumerate(medicine_ids):
+
+                    if not medicine_id:
+                        continue
+
+                    medicine = medicines.get(str(medicine_id))
+
+                    if medicine is None:
+                        validation_error = (
+                            "One of the selected medicines is unavailable "
+                            "or inactive."
+                        )
+                        break
+
+                    dosage = (
+                        dosages[index].strip()
+                        if index < len(dosages)
+                        else ""
+                    )
+
+                    frequency = (
+                        frequencies[index].strip()
+                        if index < len(frequencies)
+                        else ""
+                    )
+
+                    duration = (
+                        durations[index].strip()
+                        if index < len(durations)
+                        else ""
+                    )
+
+                    instructions_value = (
+                        instructions[index].strip()
+                        if index < len(instructions)
+                        else ""
+                    )
+
+                    quantity_value = (
+                        quantities[index].strip()
+                        if index < len(quantities)
+                        else ""
+                    )
+
+                    try:
+                        quantity = int(quantity_value)
+                    except (TypeError, ValueError):
+                        validation_error = (
+                            f"Invalid quantity for {medicine.name}."
+                        )
+                        break
+
+                    if quantity <= 0:
+                        validation_error = (
+                            f"Quantity for {medicine.name} "
+                            "must be greater than zero."
+                        )
+                        break
+
+                    if medicine.quantity <= 0:
+                        validation_error = (
+                            f"{medicine.name} is currently out of stock."
+                        )
+                        break
+
+                    requested_stock[medicine.id] = (
+                        requested_stock.get(medicine.id, 0) + quantity
+                    )
+
+                    validated_items.append({
+                        "medicine": medicine,
+                        "dosage": dosage,
+                        "frequency": frequency,
+                        "duration": duration,
+                        "quantity": quantity,
+                        "instructions": instructions_value,
+                    })
+
+                # =============================================
+                # CHECK TOTAL QUANTITY PER MEDICINE
+                # =============================================
+
+                if not validation_error:
+
+                    for medicine_id, requested_quantity in requested_stock.items():
+
+                        medicine = medicines[str(medicine_id)]
+
+                        if requested_quantity > medicine.quantity:
+                            validation_error = (
+                                f"The requested total quantity for "
+                                f"{medicine.name} exceeds available stock. "
+                                f"Available stock: {medicine.quantity}."
+                            )
+                            break
+
+                # =============================================
+                # HANDLE VALIDATION FAILURE
+                # =============================================
+
+                if validation_error:
+
+                    messages.error(request, validation_error)
+
+                else:
+
+                    # =========================================
+                    # CREATE PRESCRIPTION
+                    # =========================================
+
+                    prescription = prescription_form.save(commit=False)
+
+                    prescription.patient = patient
+                    prescription.encounter = encounter
+                    prescription.prescribed_by = request.user
+
+                    prescription.save()
+
+                    # =========================================
+                    # CREATE PRESCRIPTION ITEMS
+                    # =========================================
+
+                    for item in validated_items:
+
+                        PrescriptionItem.objects.create(
+                            prescription=prescription,
+                            medicine=item["medicine"],
+                            dosage=item["dosage"],
+                            frequency=item["frequency"],
+                            duration=item["duration"],
+                            quantity=item["quantity"],
+                            instructions=item["instructions"],
+                        )
+
+                    # =========================================
+                    # NOTIFY PHARMACY
+                    # =========================================
+                    #
+                    # Notify only after the prescription and
+                    # all its items have been successfully saved.
+                    #
+                    # The notification service broadcasts after
+                    # the surrounding database transaction commits.
+                    #
+                    # =========================================
+
+                    try:
+
+                        send_notification(
+                            title="New Prescription Received",
+
+                            message=(
+                                f"A new prescription has been created "
+                                f"for patient {patient.patient_number}. "
+                                f"Prescription reference: "
+                                f"#{prescription.id}. "
+                              f"Prescribed by: {request.user.get_full_name()}"
+                               f"or Prescribed by: {request.user.get_full_name()}"
+                            ),
+
+                            notification_type="PRESCRIPTION",
+
+                            department="PHARMACY",
+
+                            source_module="pharmacy",
+
+                            reference_id=prescription.id,
+
+                            url=reverse(
+                                "pharmacy:prescription_details",
+                                kwargs={"pk": prescription.id},
+                            ),
+
+                            sender=request.user,
+                        )
+
+                    except Exception:
+                        logger.exception(
+                            "Failed to notify Pharmacy about prescription %s",
+                            prescription.id,
+                        )
+
+                    # =========================================
+                    # SUCCESS
+                    # =========================================
+
+                    messages.success(
+                        request,
+                        (
+                            f"Prescription #{prescription.id} "
+                            f"created successfully for {patient}."
+                        )
+                    )
+
+                    return redirect(
+                        "pharmacy:prescription_details",
+                        pk=prescription.id,
+                    )
 
     else:
-
         prescription_form = PrescriptionForm()
 
     # =====================================================
-    # LABORATORY RESULTS
-    # =====================================================
-    #
-    # IMPORTANT:
-    # Results are now loaded for THIS ENCOUNTER only.
-    # We no longer show unrelated laboratory results from
-    # the same patient.
-    #
+    # LABORATORY RESULTS FOR THIS ENCOUNTER
     # =====================================================
 
     lab_results = (
@@ -1803,13 +1697,11 @@ def create_prescription(request):
             lab_request__encounter=encounter,
             lab_request__status="Completed",
         )
-        .order_by(
-            "-result_date"
-        )
+        .order_by("-result_date")
     )
 
     # =====================================================
-    # MEDICINES
+    # AVAILABLE MEDICINES
     # =====================================================
 
     medicines = (
@@ -1827,17 +1719,11 @@ def create_prescription(request):
 
     context = {
         "prescription_form": prescription_form,
-
         "medicines": medicines,
-
         "lab_results": lab_results,
-
         "selected_patient": patient.id,
-
         "patient": patient,
-
         "encounter": encounter,
-
         "lab_results_reviewed": True,
     }
 
@@ -1846,6 +1732,7 @@ def create_prescription(request):
         "pharmacy/create_prescription.html",
         context,
     )
+
 # =========================================================
 # PHARMACY REPORTS
 # =========================================================

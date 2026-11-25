@@ -542,6 +542,70 @@
             padding: 30px 0 10px;
         }
 
+        /* =====================================================
+   HEADER NOTIFICATIONS
+===================================================== */
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notification-container {
+    position: relative;
+}
+
+.header-icon {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #123c69;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    cursor: pointer;
+    position: relative;
+    transition: background .2s ease;
+}
+
+.header-icon:hover {
+    background: #e2e8f0;
+}
+
+#notification-count {
+    display: none;
+    font-size: 10px;
+    min-width: 19px;
+    min-height: 19px;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-dropdown {
+    width: 350px;
+    max-height: 450px;
+    overflow-y: auto;
+    z-index: 1100;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .notification-dropdown {
+        position: fixed !important;
+        top: 75px !important;
+        right: 10px !important;
+        left: auto !important;
+        width: min(350px, calc(100vw - 20px));
+    }
+}
+
 
         /* =====================================================
            RESPONSIVE
@@ -604,7 +668,17 @@
 
 </head>
 
+<!-- Bootstrap CSS -->
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
 
+<!-- Bootstrap Icons -->
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+>
 <body>
 
 
@@ -777,6 +851,71 @@
             </p>
 
         </div>
+    
+<!-- HEADER RIGHT -->
+<div class="header-right">
+
+    <!-- NOTIFICATION DROPDOWN -->
+    <div class="dropdown notification-container">
+
+        <button
+            id="notification-toggle"
+            class="header-icon position-relative"
+            type="button"
+            aria-expanded="false"
+            aria-label="Notifications">
+
+            <i class="bi bi-bell"></i>
+
+            <span
+                id="notification-count"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                aria-live="polite"
+                aria-label="0 unread notifications">
+                0
+            </span>
+
+        </button>
+
+        <!-- NOTIFICATION MENU -->
+        <div
+            id="notification-dropdown"
+            class="dropdown-menu dropdown-menu-end p-3 shadow notification-dropdown"
+            style="width: 350px; max-height: 450px; overflow-y: auto;">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <h6 class="mb-0">Notifications</h6>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link"
+                    id="mark-all-read">
+                    Mark all as read
+                </button>
+
+            </div>
+
+            <!-- NOTIFICATION LIST -->
+            <div id="notification-list">
+                <p class="text-muted text-center mb-0">
+                    Loading notifications...
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- HELP BUTTON -->
+    <button
+        class="header-icon"
+        type="button"
+        aria-label="Help">
+        <i class="bi bi-question-circle"></i>
+    </button>
+
+</div>
 
 
         <div class="user-area">
@@ -1525,6 +1664,14 @@
 
 
 </main>
+<!-- =====================================================
+     LIVE NOTIFICATIONS
+===================================================== -->
+
+<script
+    src="{% static 'js/notifications.js' %}"
+    defer>
+</script>
 
 </body>
 
