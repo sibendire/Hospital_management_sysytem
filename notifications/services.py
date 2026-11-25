@@ -19,29 +19,37 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-def broadcast_notification(notification_id, recipient_ids):
+# =====================================================
+# BROADCAST NOTIFICATION TO EACH RECIPIENT
+# =====================================================
 
+def broadcast_notification(notification_id, recipient_ids):
     channel_layer = get_channel_layer()
 
     if channel_layer is None:
+        logger.error("Notification channel layer is unavailable.")
         return
 
-    notification = Notification.objects.get(
-        id=notification_id
+    recipient_records = (
+        NotificationRecipient.objects
+        .filter(
+            notification_id=notification_id,
+            recipient_id__in=recipient_ids
+        )
+        .select_related("notification")
     )
 
-    for recipient_id in recipient_ids:
+    for record in recipient_records:
+        notification = record.notification
 
         try:
-
             async_to_sync(channel_layer.group_send)(
-                f"notifications_user_{recipient_id}",
-
+                f"notifications_user_{record.recipient_id}",
                 {
                     "type": "notification.message",
-
                     "notification": {
-                        "id": notification_id,
+                        # Must be NotificationRecipient.id
+                        "id": record.id,
                         "title": notification.title,
                         "message": notification.message,
                         "type": notification.notification_type,
@@ -54,12 +62,15 @@ def broadcast_notification(notification_id, recipient_ids):
             )
 
         except Exception:
-
             logger.exception(
                 "Notification broadcast failed for user %s",
-                recipient_id
+                record.recipient_id
             )
 
+
+# =====================================================
+# CENTRAL NOTIFICATION FUNCTION
+# =====================================================
 
 def send_notification(
     title,
@@ -82,15 +93,16 @@ def send_notification(
         - Multiple user notifications
         - Database storage
         - Real-time WebSocket broadcasting
+
+    Department notifications use Django Groups.
+    The department argument must match a Django Group name.
     """
 
     users = {}
 
-    department_name = ""
-
-    # ==========================================
+    # =================================================
     # 1. FIND DEPARTMENT USERS
-    # ==========================================
+    # =================================================
 
     if department:
 
@@ -113,17 +125,23 @@ def send_notification(
             for user in department_users:
                 users[user.id] = user
 
-    # ==========================================
+        else:
+
+            logger.warning(
+                "Department group '%s' does not exist.",
+                department_name
+            )
+
+    # =================================================
     # 2. ADD INDIVIDUAL USER
-    # ==========================================
+    # =================================================
 
     if recipient and recipient.is_active:
-
         users[recipient.id] = recipient
 
-    # ==========================================
+    # =================================================
     # 3. ADD MULTIPLE USERS
-    # ==========================================
+    # =================================================
 
     if recipients:
 
@@ -132,20 +150,22 @@ def send_notification(
             if user and user.is_active:
                 users[user.id] = user
 
-    # ==========================================
-    # 4. STOP IF THERE ARE NO RECIPIENTS
-    # ==========================================
+    # =================================================
+    # 4. CHECK RECIPIENTS
+    # =================================================
 
     if not users:
+
         logger.warning(
             "No recipients found for notification: %s",
             title
         )
+
         return None
 
-    # ==========================================
-    # 5. SAVE NOTIFICATION AND RECIPIENTS
-    # ==========================================
+    # =================================================
+    # 5. SAVE NOTIFICATION AND RECIPIENT RECORDS
+    # =================================================
 
     with transaction.atomic():
 
@@ -182,9 +202,9 @@ def send_notification(
 
         recipient_ids = list(users.keys())
 
-        # ======================================
-        # 6. BROADCAST AFTER DATABASE COMMIT
-        # ======================================
+        # =============================================
+        # 6. BROADCAST ONLY AFTER DATABASE COMMIT
+        # =============================================
 
         transaction.on_commit(
 

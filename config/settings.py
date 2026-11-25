@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Daphne must come before the other applications
+    'daphne',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-     'accounts',
+    'accounts',
     'patients',
     'pharmacy',
     'inventory',
@@ -139,13 +142,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
+# =====================================================
+# STATIC FILES
+# =====================================================
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / 'static',
 ]
 
+# =====================================================
+# MEDIA FILES
+# =====================================================
+
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

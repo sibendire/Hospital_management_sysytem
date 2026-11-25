@@ -36,6 +36,9 @@ from .models import (
     Diagnosis,
 )
 
+from django.urls import reverse
+from notifications.services import send_notification
+
 
 # =========================================================
 # DOCTOR WORKSPACE / CONSULTATION DASHBOARD
@@ -764,11 +767,13 @@ def request_lab_test(request, encounter_id):
     # CREATE BILLING CHARGE
     # -----------------------------------------------------
 
+    # -----------------------------------------------------
+    # CREATE BILLING CHARGE
+    # -----------------------------------------------------
+
     try:
 
-        add_lab_charge(
-            lab_request
-        )
+        add_lab_charge(lab_request)
 
     except ValidationError as exc:
 
@@ -801,6 +806,37 @@ def request_lab_test(request, encounter_id):
             encounter_id=encounter.id,
         )
 
+    # -----------------------------------------------------
+    # NOTIFY LABORATORY AFTER SUCCESSFUL BILLING
+    # -----------------------------------------------------
+
+    try:
+
+        send_notification(
+            title="New Laboratory Test Request",
+            message=(
+                f"A new laboratory test has been requested. "
+                f"Patient: {encounter.patient.patient_number}. "
+                f"Test: {test.name}. "
+                f"Sample number: {lab_request.sample_number}."
+            ),
+            notification_type="LAB_REQUEST",
+            department="LABORATORY",
+            source_module="consultations",
+            reference_id=lab_request.id,
+            url=reverse("laboratory:lab_requests"),
+            sender=request.user,
+        )
+
+    except Exception:
+        # A notification failure should not cancel
+        # an otherwise successful clinical request.
+        import logging
+        logging.getLogger(__name__).exception(
+            "Failed to notify laboratory for request %s",
+            lab_request.id,
+        )
+
     messages.success(
         request,
         (
@@ -813,6 +849,7 @@ def request_lab_test(request, encounter_id):
         "consultations:encounter_detail",
         encounter_id=encounter.id,
     )
+
 
 
 # =========================================================
